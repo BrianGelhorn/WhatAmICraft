@@ -113,6 +113,7 @@ def main() -> None:
 
     range_status, range_headers, range_body = get(
         f"{media}/{fixture}",
+        expected={206},
         headers={"Range": "bytes=0-4"},
     )
     if range_status != 206 or range_body != expected_body[:5] or "bytes 0-4/" not in range_headers.get("content-range", ""):
