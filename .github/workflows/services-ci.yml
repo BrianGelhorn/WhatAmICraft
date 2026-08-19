@@ -118,6 +118,7 @@ jobs:
           set -euo pipefail
           python -m py_compile scripts/clues_api.py scripts/clues_client.py
           PYTHONPATH=scripts python scripts/test_clues_api.py
+          PYTHONPATH=scripts python scripts/test_clues_api_catalog.py
 
   media:
     name: Media service
@@ -181,6 +182,7 @@ jobs:
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
               && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8790/health >/dev/null \
               && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
               break
             fi

@@ -40,6 +40,7 @@ jobs:
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
               && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8790/health >/dev/null \
               && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
               break
             fi
