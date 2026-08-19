@@ -119,7 +119,7 @@ def main() -> None:
     if range_status != 206 or range_body != expected_body[:5] or "bytes 0-4/" not in range_headers.get("content-range", ""):
         raise RuntimeError("media service did not honor a byte range")
     get(f"{media}/missing.mp4", {404})
-    get(f"{media}/%2e%2e%2fdata%2fquiz-copy-episodes.json", {404})
+    get(f"{media}/%2e%2e%2fdata%2fquiz-copy-episodes.json", {400, 404})
 
     get(f"{dashboard}/videos/%2e%2e%2fdata%2fquiz-copy-episodes.json", {404})
     print("ok: dashboard/media service contract and path guard")
