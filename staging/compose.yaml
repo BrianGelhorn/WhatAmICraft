@@ -10,6 +10,7 @@ services:
       DASHBOARD_PORT: 8787
       CLUES_API_URL: http://clues-api:8790
       ANALYTICS_API_URL: http://analytics-api:8791
+      MONITOR_API_URL: http://monitor:8792
       PUBLIC_VIDEO_BASE_URL: http://127.0.0.1:8081
       YOUTUBE_PRIVACY_STATUS: private
       YOUTUBE_CATEGORY_ID: 20
@@ -35,6 +36,7 @@ services:
     depends_on:
       - clues-api
       - analytics-api
+      - monitor
 
   clues-api:
     image: minecraft-quiz-guesser:dev
@@ -64,6 +66,24 @@ services:
       - ../data:/app/data
       - ../out:/app/out
       - ../backups:/app/backups
+
+  monitor:
+    image: minecraft-quiz-guesser:dev
+    build: ..
+    entrypoint: ["python3", "scripts/monitor_service.py"]
+    restart: unless-stopped
+    environment:
+      MONITOR_PORT: 8792
+      MONITOR_DASHBOARD_URL: http://dashboard:8787
+      MONITOR_CLUES_URL: http://clues-api:8790
+      MONITOR_ANALYTICS_URL: http://analytics-api:8791
+      MONITOR_MEDIA_URL: http://media
+      MONITOR_EVENTS_PATH: /app/out/monitor/events.jsonl
+      MONITOR_INTERVAL_SECONDS: 60
+    ports:
+      - "127.0.0.1:8792:8792"
+    volumes:
+      - ../out:/app/out
 
   media:
     image: nginx:alpine

@@ -35,6 +35,7 @@ from review.storage import (  # noqa: E402
 from analytics import build_snapshot, sync_all, write_exports  # noqa: E402
 from analytics_client import AnalyticsApiError, request_json as analytics_request, request_text as analytics_text  # noqa: E402
 from clues_client import CluesApiError, request_json as clues_request  # noqa: E402
+from monitor_client import MonitorApiError, request_json as monitor_request  # noqa: E402
 from publishing import PUBLISHERS  # noqa: E402
 from publishing.common import json_request, sha256  # noqa: E402
 from publishing.settings import (  # noqa: E402
@@ -93,6 +94,7 @@ CONTEXT_SNAPSHOT_PATH = ROOT / "out/context-snapshot.md"
 JOB_LOCK = threading.Lock()
 ANALYTICS_LOCK = threading.Lock()
 ANALYTICS_API_URL = os.getenv("ANALYTICS_API_URL", "").rstrip("/")
+MONITOR_API_URL = os.getenv("MONITOR_API_URL", "").rstrip("/")
 JOB = {"status": "idle", "label": "", "lines": [], "returnCode": None}
 ACTIVE_PROCESSES = {}
 CANCEL_REQUESTED = {}
@@ -337,6 +339,7 @@ def diagnostics_state() -> dict:
         "services": [
             {"name": "dashboard", "state": "running", "status": "responding"},
             {"name": "analytics-api", "state": "external" if ANALYTICS_API_URL else "embedded", "status": "configured" if ANALYTICS_API_URL else "local fallback"},
+            {"name": "monitor", "state": "external" if MONITOR_API_URL else "disabled", "status": "configured" if MONITOR_API_URL else "not configured"},
             {"name": "bot", "state": "external", "status": "check via SSH"},
             {"name": "publisher-worker", "state": "external", "status": "check via SSH"},
             {"name": "media", "state": "external", "status": "check via SSH"},
@@ -803,6 +806,16 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_json({"ok": False, "error": "La API de pistas no responde"}, HTTPStatus.BAD_GATEWAY)
         elif path == "/api/diagnostics":
             self.send_json(diagnostics_state())
+        elif path.startswith("/api/monitor/"):
+            if not MONITOR_API_URL:
+                self.send_json({"ok": False, "error": "El servicio de monitoreo no está configurado"}, HTTPStatus.SERVICE_UNAVAILABLE)
+            else:
+                try:
+                    target = path + (f"?{urlparse(self.path).query}" if urlparse(self.path).query else "")
+                    status, result = monitor_request(target)
+                    self.send_json(result, status)
+                except MonitorApiError:
+                    self.send_json({"ok": False, "error": "El servicio de monitoreo no responde"}, HTTPStatus.BAD_GATEWAY)
         elif path == "/api/analytics/export.json":
             if ANALYTICS_API_URL:
                 status, result = analytics_request("/api/analytics/export.json")
@@ -907,6 +920,12 @@ class Handler(BaseHTTPRequestHandler):
                 disconnect_tiktok()
             elif path == "/api/analytics/sync":
                 start_analytics_sync()
+            elif path in {"/api/monitor/check", "/api/monitor/events"}:
+                if not MONITOR_API_URL:
+                    raise RuntimeError("El servicio de monitoreo no está configurado")
+                status, result = monitor_request(path, method="POST", payload=payload)
+                self.send_json(result, status)
+                return
             elif path == "/api/publish-now":
                 start_publish_job()
             elif path == "/api/publish-platform":
@@ -951,6 +970,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_error(HTTPStatus.NOT_FOUND)
                 return
             self.send_json({"ok": True})
+        except MonitorApiError as error:
+            self.send_json({"ok": False, "error": str(error)}, HTTPStatus.BAD_GATEWAY)
         except (KeyError, ValueError, RuntimeError) as error:
             self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
         except Exception as error:

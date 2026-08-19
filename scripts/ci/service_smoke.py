@@ -55,12 +55,14 @@ def main() -> None:
     parser.add_argument("--dashboard", required=True)
     parser.add_argument("--media", required=True)
     parser.add_argument("--analytics", required=True)
+    parser.add_argument("--monitor", required=True)
     parser.add_argument("--fixture", required=True)
     args = parser.parse_args()
 
     dashboard = args.dashboard.rstrip("/")
     media = args.media.rstrip("/")
     analytics = args.analytics.rstrip("/")
+    monitor = args.monitor.rstrip("/")
     fixture = args.fixture.lstrip("/")
 
     status, headers, _ = get(f"{dashboard}/")
@@ -88,6 +90,26 @@ def main() -> None:
         raise RuntimeError("analytics service returned an invalid snapshot")
     if state.get("analytics", {}).get("schemaVersion") != analytics_snapshot.get("schemaVersion"):
         raise RuntimeError("dashboard is not receiving analytics from the service")
+
+    _, monitor_headers, monitor_health_body = get(f"{monitor}/health")
+    if not monitor_headers.get("content-type", "").startswith("application/json"):
+        raise RuntimeError("monitor service health is not JSON")
+    monitor_health = json.loads(monitor_health_body)
+    if monitor_health.get("service") != "monitor":
+        raise RuntimeError("monitor service health returned the wrong service")
+    _, _, monitor_status_body = request(f"{monitor}/api/monitor/check", method="POST")
+    monitor_status = json.loads(monitor_status_body)
+    monitored = {item.get("service"): item.get("status") for item in monitor_status.get("services", [])}
+    if not {"dashboard", "clues-api", "analytics-api", "media"}.issubset(monitored):
+        raise RuntimeError("monitor service did not check every staging dependency")
+    if any(monitored[name] != "up" for name in ("dashboard", "clues-api", "analytics-api", "media")):
+        raise RuntimeError(f"monitor service found a staging dependency down: {monitored}")
+    _, _, proxied_monitor_body = get(f"{dashboard}/api/monitor/status")
+    if not isinstance(json.loads(proxied_monitor_body).get("services"), list):
+        raise RuntimeError("dashboard monitor proxy returned an invalid status")
+    _, _, monitor_events_body = get(f"{monitor}/api/monitor/events?limit=10")
+    if not isinstance(json.loads(monitor_events_body).get("items"), list):
+        raise RuntimeError("monitor service returned an invalid event list")
 
     _, clues_headers, clues_body = get(f"{dashboard}/api/clues?status=unused")
     if not clues_headers.get("content-type", "").startswith("application/json"):
@@ -139,7 +161,7 @@ def main() -> None:
     get(f"{media}/%2e%2e%2fdata%2fquiz-copy-episodes.json", {400, 404})
 
     get(f"{dashboard}/videos/%2e%2e%2fdata%2fquiz-copy-episodes.json", {404})
-    print("ok: dashboard/media/analytics service contract and path guard")
+    print("ok: dashboard/media/analytics/monitor service contract and path guard")
 
 
 if __name__ == "__main__":
