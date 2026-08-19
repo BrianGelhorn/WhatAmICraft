@@ -46,3 +46,15 @@ def upload_clue(value: dict) -> dict:
     if status != 201:
         raise CluesApiError(result.get("error", "La API rechazó la pista"))
     return result
+
+
+def update_usage(target_id: str, status: str, episode_id: str | None = None, video_file: str | None = None) -> dict:
+    payload = {"status": status}
+    if episode_id is not None:
+        payload["episodeId"] = episode_id
+    if video_file is not None:
+        payload["videoFile"] = video_file
+    response_status, result = request_json(f"/api/clues/{target_id}", method="PATCH", payload=payload)
+    if response_status != 200:
+        raise CluesApiError(result.get("error", "La API rechazó el cambio de uso"))
+    return result

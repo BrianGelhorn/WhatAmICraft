@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from clues_api import ClueCatalog, make_server  # noqa: E402
-from clues_client import get_clue, list_clues, upload_clue  # noqa: E402
+from clues_client import get_clue, list_clues, update_usage, upload_clue  # noqa: E402
 sys.path.insert(0, str(ROOT / "dashboard"))
 import app as dashboard_app  # noqa: E402
 
@@ -86,11 +86,23 @@ def main() -> None:
         uploaded = upload_clue(value)
         assert uploaded["id"] == "ci_clue" and uploaded["status"] == "unused"
         assert list_clues("unused")["counts"] == {"all": 2, "used": 1, "unused": 1}
+        marked = update_usage("ci_clue", "used", "mc-ci", "mc-ci-ci_clue.mp4")
+        assert marked["status"] == "used" and marked["usage"]["sources"] == ["clues_api"]
+        assert marked["usage"]["episode_ids"] == ["mc-ci"]
+        assert marked["usage"]["video_files"] == ["mc-ci-ci_clue.mp4"]
+        assert list_clues("used")["counts"] == {"all": 2, "used": 2, "unused": 0}
+        released = update_usage("ci_clue", "unused")
+        assert released["status"] == "unused"
+        assert list_clues("unused")["counts"] == {"all": 2, "used": 1, "unused": 1}
         duplicate_status, _ = call(base, "/api/clues", "POST", value)
         assert duplicate_status == 409
 
-        used_path.write_text(json.dumps({"target_ids": ["amethyst_block", "ci_clue"], "targets": [{"id": "amethyst_block"}, {"id": "ci_clue", "episode_ids": ["mc-ci"]}]}), encoding="utf-8")
+        used_path.write_text(json.dumps({"target_ids": ["amethyst_block", "ci_clue"], "targets": [{"id": "amethyst_block", "sources": ["clue_bank"]}, {"id": "ci_clue", "sources": ["rendered_video"], "episode_ids": ["mc-ci"]}]}), encoding="utf-8")
         assert get_clue("ci_clue")["status"] == "used"
+        protected_status, _ = call(base, "/api/clues/amethyst_block", "PATCH", {"status": "unused"})
+        assert protected_status == 409
+        invalid_usage_status, _ = call(base, "/api/clues/ci_clue", "PATCH", {"status": "pending"})
+        assert invalid_usage_status == 400
         reused = upload_fixture()
         reused["episode"]["target"]["id"] = "amethyst_block"
         reused["episode"]["candidates"][0] = "amethyst_block"

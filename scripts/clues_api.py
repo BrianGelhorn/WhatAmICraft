@@ -21,6 +21,10 @@ class CatalogError(ValueError):
     pass
 
 
+class UsageConflict(CatalogError):
+    pass
+
+
 def read_json(path: Path, default):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -208,6 +212,66 @@ class ClueCatalog:
             temporary.replace(destination)
         return self.get(target_id)
 
+    def update_usage(
+        self,
+        target_id: str,
+        status: str,
+        episode_id: str | None = None,
+        video_file: str | None = None,
+    ) -> dict:
+        if not TARGET_ID.fullmatch(target_id):
+            raise CatalogError("ID de objetivo inválido")
+        if status not in {"used", "unused"}:
+            raise CatalogError("status debe ser used o unused")
+        for name, value, maximum in (("episodeId", episode_id, 120), ("videoFile", video_file, 255)):
+            if value is not None and (not isinstance(value, str) or not value.strip() or len(value) > maximum or any(char in value for char in "\\/")):
+                raise CatalogError(f"{name} inválido")
+        current = self.get(target_id)
+        with self._write_lock:
+            document = read_json(self.used_targets_path, {"target_ids": [], "targets": []})
+            if not isinstance(document, dict):
+                raise CatalogError("used-targets.json inválido")
+            target_ids = list(dict.fromkeys(item for item in document.get("target_ids", []) if isinstance(item, str)))
+            targets = [item for item in document.get("targets", []) if isinstance(item, dict) and isinstance(item.get("id"), str)]
+            existing = next((item for item in targets if item["id"] == target_id), None)
+            is_used = target_id in target_ids or existing is not None
+
+            if status == "unused":
+                sources = existing.get("sources", []) if existing else []
+                if is_used and sources != ["clues_api"]:
+                    raise UsageConflict("No se puede quitar un uso registrado fuera de esta API")
+                target_ids = [item for item in target_ids if item != target_id]
+                targets = [item for item in targets if item["id"] != target_id]
+            elif not is_used:
+                target = current["target"]
+                record = {
+                    "id": target_id,
+                    "display_name": target.get("display_name"),
+                    "kind": target.get("kind"),
+                    "sources": ["clues_api"],
+                    "episode_ids": [],
+                    "video_files": [],
+                }
+                targets.append(record)
+                target_ids.append(target_id)
+                existing = record
+            elif existing and existing.get("sources") == ["clues_api"]:
+                existing.setdefault("episode_ids", [])
+                existing.setdefault("video_files", [])
+
+            if status == "used" and existing and existing.get("sources") == ["clues_api"]:
+                if episode_id and episode_id not in existing["episode_ids"]:
+                    existing["episode_ids"].append(episode_id)
+                if video_file and video_file not in existing["video_files"]:
+                    existing["video_files"].append(video_file)
+            document["target_ids"] = sorted(target_ids)
+            document["targets"] = sorted(targets, key=lambda item: item["id"])
+            self.used_targets_path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = self.used_targets_path.with_suffix(".json.tmp")
+            temporary.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            temporary.replace(self.used_targets_path)
+        return self.get(target_id)
+
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_args: object) -> None:
@@ -265,6 +329,34 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"ok": False, "error": str(error)}, HTTPStatus.BAD_REQUEST)
         except Exception:
             self.send_json({"ok": False, "error": "No se pudo cargar la pista"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+
+    def do_PATCH(self) -> None:
+        parsed = urlparse(self.path)
+        if not parsed.path.startswith("/api/clues/"):
+            self.send_error(HTTPStatus.NOT_FOUND)
+            return
+        try:
+            size = int(self.headers.get("Content-Length", "0"))
+            if size <= 0 or size > 16 * 1024:
+                raise CatalogError("Carga vacía o demasiado grande")
+            value = json.loads(self.rfile.read(size))
+            if not isinstance(value, dict):
+                raise CatalogError("El cuerpo debe ser un objeto JSON")
+            result = self.catalog.update_usage(
+                unquote(parsed.path.removeprefix("/api/clues/")),
+                value.get("status"),
+                value.get("episodeId"),
+                value.get("videoFile"),
+            )
+            self.send_json(result)
+        except FileNotFoundError:
+            self.send_json({"ok": False, "error": "Pista no encontrada"}, HTTPStatus.NOT_FOUND)
+        except UsageConflict as error:
+            self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
+        except (CatalogError, json.JSONDecodeError) as error:
+            self.send_json({"ok": False, "error": str(error)}, HTTPStatus.BAD_REQUEST)
+        except Exception:
+            self.send_json({"ok": False, "error": "No se pudo actualizar el uso de la pista"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 def make_server(host: str, port: int, catalog: ClueCatalog) -> ThreadingHTTPServer:
