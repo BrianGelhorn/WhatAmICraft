@@ -1,0 +1,76 @@
+name: minecraftquizguesser-dev
+
+services:
+  dashboard:
+    image: minecraft-quiz-guesser:dev
+    build: .
+    entrypoint: ["python3", "dashboard/app.py"]
+    restart: unless-stopped
+    environment:
+      DASHBOARD_PORT: 8787
+      PUBLIC_VIDEO_BASE_URL: http://127.0.0.1:8081
+      YOUTUBE_PRIVACY_STATUS: private
+      YOUTUBE_CATEGORY_ID: 20
+      ELEVENLABS_VOICE_ID: ""
+      ELEVENLABS_MODEL: eleven_v3
+      REMOTION_CONCURRENCY: "1"
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_REVIEW_CHAT_ID: ""
+      YOUTUBE_CLIENT_ID: ""
+      YOUTUBE_CLIENT_SECRET: ""
+      YOUTUBE_REFRESH_TOKEN: ""
+      INSTAGRAM_ACCESS_TOKEN: ""
+      INSTAGRAM_USER_ID: ""
+      META_ACCESS_TOKEN: ""
+      FACEBOOK_PAGE_ID: ""
+    ports:
+      - "127.0.0.1:8788:8787"
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ./backups:/app/backups
+      - ./public/audio:/app/public/audio
+
+  media:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - ./out/episodes:/usr/share/nginx/html:ro
+
+  bot:
+    profiles: ["integrations"]
+    image: minecraft-quiz-guesser:dev
+    build: .
+    entrypoint: ["python3", "scripts/review/bot.py"]
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_REVIEW_CHAT_ID: ""
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ./public/audio:/app/public/audio
+
+  publisher-worker:
+    profiles: ["integrations"]
+    image: minecraft-quiz-guesser:dev
+    build: .
+    entrypoint: ["python3", "scripts/publish_worker.py"]
+    restart: unless-stopped
+    environment:
+      YOUTUBE_PRIVACY_STATUS: private
+      YOUTUBE_CATEGORY_ID: 20
+      YOUTUBE_CLIENT_ID: ""
+      YOUTUBE_CLIENT_SECRET: ""
+      YOUTUBE_REFRESH_TOKEN: ""
+      INSTAGRAM_ACCESS_TOKEN: ""
+      INSTAGRAM_USER_ID: ""
+      META_ACCESS_TOKEN: ""
+      FACEBOOK_PAGE_ID: ""
+      PUBLISH_QUEUE_INTERVAL: 30
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ./public/audio:/app/public/audio

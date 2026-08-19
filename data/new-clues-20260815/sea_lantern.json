@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "sea_lantern",
+      "display_name": "Sea Lantern",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "block",
+      "family": "aquatic light block",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "sea_lantern",
+      "prismarine",
+      "conduit"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the aquatic light block family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "sea_lantern-family",
+        "matches_candidates": [
+          "sea_lantern",
+          "prismarine",
+          "conduit"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I can be found in an ocean monument.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Sea_Lantern",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "sea_lantern-obtaining",
+        "matches_candidates": [
+          "sea_lantern",
+          "prismarine"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "I remain functional when placed underwater.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Sea_Lantern",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "sea_lantern-use",
+        "matches_candidates": [
+          "sea_lantern",
+          "conduit"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the aquatic light block family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "sea_lantern",
+          "prismarine",
+          "conduit"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I can be found in an ocean monument.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "sea_lantern",
+          "prismarine"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "I remain functional when placed underwater.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "sea_lantern",
+          "conduit"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "conduit",
+        "prismarine",
+        "sea_lantern"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "conduit",
+          "prismarine",
+          "sea_lantern"
+        ],
+        "f_obtain": [
+          "prismarine",
+          "sea_lantern"
+        ],
+        "f_use": [
+          "conduit",
+          "sea_lantern"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "sea_lantern",
+          "prismarine",
+          "conduit"
+        ],
+        [
+          "prismarine",
+          "sea_lantern"
+        ],
+        [
+          "conduit",
+          "sea_lantern"
+        ]
+      ],
+      "semantic_keys": [
+        "sea_lantern-family",
+        "sea_lantern-obtaining",
+        "sea_lantern-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Sea Lantern – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Sea_Lantern"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}

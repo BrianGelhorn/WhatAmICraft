@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "kelp",
+      "display_name": "Kelp",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "plant",
+      "family": "aquatic plant",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "kelp",
+      "seagrass",
+      "sugar_cane"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the aquatic plant family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "kelp-family",
+        "matches_candidates": [
+          "kelp",
+          "seagrass",
+          "sugar_cane"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I grow underwater.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Kelp",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "kelp-obtaining",
+        "matches_candidates": [
+          "kelp",
+          "seagrass"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "Removing a lower section can bring down the growth above it.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Kelp",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "kelp-use",
+        "matches_candidates": [
+          "kelp",
+          "sugar_cane"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the aquatic plant family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "kelp",
+          "seagrass",
+          "sugar_cane"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I grow underwater.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "kelp",
+          "seagrass"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "Removing a lower section can bring down the growth above it.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "kelp",
+          "sugar_cane"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "kelp",
+        "seagrass",
+        "sugar_cane"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "kelp",
+          "seagrass",
+          "sugar_cane"
+        ],
+        "f_obtain": [
+          "kelp",
+          "seagrass"
+        ],
+        "f_use": [
+          "kelp",
+          "sugar_cane"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "kelp",
+          "seagrass",
+          "sugar_cane"
+        ],
+        [
+          "kelp",
+          "seagrass"
+        ],
+        [
+          "kelp",
+          "sugar_cane"
+        ]
+      ],
+      "semantic_keys": [
+        "kelp-family",
+        "kelp-obtaining",
+        "kelp-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Kelp – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Kelp"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}

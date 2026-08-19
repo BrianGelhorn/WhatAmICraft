@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-15",
+  "edition": "java",
+  "version": "1.21.5",
+  "minecraft_data": "3.112.0",
+  "count": 30,
+  "validated": true,
+  "validation": {
+    "clue_count": 3,
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "unique_answer": true,
+    "needs_review": false
+  },
+  "episodes": [
+    "./bamboo.json",
+    "./cactus.json",
+    "./sugar_cane.json",
+    "./kelp.json",
+    "./chorus_flower.json",
+    "./nether_wart.json",
+    "./glow_berries.json",
+    "./amethyst_block.json",
+    "./sponge.json",
+    "./crying_obsidian.json",
+    "./lodestone.json",
+    "./calcite.json",
+    "./amethyst_shard.json",
+    "./sea_lantern.json",
+    "./prismarine.json",
+    "./soul_lantern.json",
+    "./anvil.json",
+    "./grindstone.json",
+    "./loom.json",
+    "./fletching_table.json",
+    "./barrel.json",
+    "./shulker_box.json",
+    "./ender_chest.json",
+    "./dragon_egg.json",
+    "./heavy_core.json",
+    "./sculk.json",
+    "./sculk_catalyst.json",
+    "./sculk_shrieker.json",
+    "./end_portal_frame.json",
+    "./tuff_bricks.json"
+  ]
+}

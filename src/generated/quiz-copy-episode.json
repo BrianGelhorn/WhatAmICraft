@@ -1,0 +1,251 @@
+{
+  "id": "mc-22",
+  "uniqueAnswer": true,
+  "needsReview": false,
+  "answer": {
+    "id": "trident",
+    "displayName": "Trident",
+    "guessType": "Weapon",
+    "edition": "java",
+    "version": "1.21.5"
+  },
+  "background": "images/template-layers/background.png",
+  "hook": {
+    "eyebrow": "MINECRAFT MYSTERY",
+    "title": "CAN YOU GUESS IT?",
+    "handoff": "3 HINTS · ONE CHANCE",
+    "categoryPrefix": "CATEGORY",
+    "selectedIcon": "mc-assets/item-assets/TRIDENT.png",
+    "rouletteIcons": [
+      "mc-assets/item-assets/DIAMOND.png",
+      "mc-assets/item-assets/ENDER_PEARL.png",
+      "mc-assets/item-assets/GOLDEN_APPLE.png",
+      "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+      "mc-assets/item-assets/NETHERITE_SWORD.png",
+      "mc-assets/item-assets/EMERALD.png",
+      "mc-assets/item-assets/TNT.png"
+    ]
+  },
+  "hintUi": {
+    "label": "HINT {current} / {total}",
+    "cta": "LOCK IN YOUR GUESS"
+  },
+  "thumbnail": {
+    "eyebrow": "MINECRAFT QUIZ",
+    "headlineTop": "GUESS",
+    "headlineBottom": "THIS ITEM",
+    "difficulty": "HARD",
+    "subline": "3 HINTS · 1 CHANCE",
+    "mysteryLabel": "WHAT AM I?",
+    "hintLabel": "HINT {number}",
+    "background": "images/template-layers/background.png",
+    "icon": "mc-assets/item-assets/TRIDENT.png",
+    "accent": "#FFD34F",
+    "secondaryAccent": "#7EC850",
+    "iconScale": 1,
+    "iconOffsetY": 0,
+    "platforms": {
+      "vertical": "silhouette",
+      "square": "roulette",
+      "youtube": "silhouette"
+    },
+    "outputDir": "out/thumbnails"
+  },
+  "clues": [
+    {
+      "text": "I am a non-stackable weapon that loses durability through normal use.",
+      "voice": {
+        "generate": false,
+        "text": "I am a non-stackable weapon that loses durability through normal use.",
+        "publicSrc": "audio/quiz-copy/mc-22/clue-1.mp3",
+        "seedSrc": "audio/episodes/mc-22/clue-1.mp3",
+        "durationMs": 3250,
+        "volume": 1,
+        "speed": 1.02,
+        "fromOffsetFrames": 0
+      }
+    },
+    {
+      "text": "I can deal damage through a direct melee attack or from a distance.",
+      "voice": {
+        "generate": false,
+        "text": "I can deal damage through a direct melee attack or from a distance.",
+        "publicSrc": "audio/quiz-copy/mc-22/clue-2.mp3",
+        "seedSrc": "audio/episodes/mc-22/clue-2.mp3",
+        "durationMs": 3390,
+        "volume": 1,
+        "speed": 1.02,
+        "fromOffsetFrames": 0
+      }
+    },
+    {
+      "text": "An aquatic hostile mob can provide me as equipment or loot.",
+      "voice": {
+        "generate": false,
+        "text": "An aquatic hostile mob can provide me as equipment or loot.",
+        "publicSrc": "audio/quiz-copy/mc-22/clue-3.mp3",
+        "seedSrc": "audio/episodes/mc-22/clue-3.mp3",
+        "durationMs": 2786,
+        "volume": 1,
+        "speed": 1.02,
+        "fromOffsetFrames": 0
+      }
+    }
+  ],
+  "reveal": {
+    "prompt": "FINAL ANSWER?",
+    "answerLabel": "THE ANSWER IS",
+    "answerText": "TRIDENT!",
+    "cta": "HOW MANY HINTS DID YOU NEED?",
+    "icon": "mc-assets/item-assets/TRIDENT.png",
+    "countdownFrom": 3,
+    "voice": {
+      "generate": false,
+      "text": "Did you guess it? It is... the Trident!",
+      "publicSrc": "audio/quiz-copy/mc-22/reveal.mp3",
+      "seedSrc": "audio/episodes/mc-22/reveal.mp3",
+      "durationMs": 2182,
+      "volume": 1,
+      "speed": 1.02,
+      "fromOffsetFrames": 0,
+      "answerStartMs": 1544,
+      "syncOffsetFrames": 5
+    }
+  },
+  "timeline": {
+    "contentStartFrame": 180,
+    "reelStopFrame": 34,
+    "hookTitleFromFrame": 42,
+    "handoffFromFrame": 80,
+    "categoryFromFrame": 34,
+    "hintDurationInFrames": 155,
+    "revealDurationInFrames": 210,
+    "answerStartFrame": 72,
+    "countdownStepInFrames": 24
+  },
+  "voiceGeneration": {
+    "voiceId": "pNInz6obpgDQGcFmaJgB",
+    "model": "eleven_v3"
+  },
+  "audio": {
+    "normalization": {
+      "voiceTargetLufs": -16,
+      "voiceTruePeakDb": -1.5,
+      "voiceLoudnessRange": 11
+    },
+    "music": {
+      "publicSrc": "audio/quiz-copy/music-cache/89915add3558bb75b643.m4a",
+      "sourceName": "Cat.ogg @ 0s",
+      "fragmentStartSeconds": 0,
+      "from": 0,
+      "volume": 0.16,
+      "duckedVolume": 0.07,
+      "fadeInFrames": 24,
+      "fadeOutFrames": 36,
+      "duckFadeFrames": 6,
+      "trackCount": 7,
+      "durationInFrames": 855
+    },
+    "roulette": {
+      "publicSrc": "audio/quiz-copy/normalized/a0f6111eb410e9bdad54.m4a",
+      "from": 0,
+      "durationInFrames": 36,
+      "volume": 1,
+      "targetPeakDb": -8
+    },
+    "effects": [
+      {
+        "id": "roulette-select-bell",
+        "publicSrc": "audio/quiz-copy/normalized/835fa4819df0abb21707.m4a",
+        "durationInFrames": 16,
+        "volume": 0.85,
+        "targetPeakDb": -4.5,
+        "from": 34
+      },
+      {
+        "id": "countdown-3",
+        "publicSrc": "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+        "durationInFrames": 5,
+        "volume": 1,
+        "targetPeakDb": -8,
+        "from": 645
+      },
+      {
+        "id": "countdown-2",
+        "publicSrc": "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+        "durationInFrames": 5,
+        "volume": 1,
+        "targetPeakDb": -8,
+        "from": 669
+      },
+      {
+        "id": "countdown-1",
+        "publicSrc": "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+        "durationInFrames": 5,
+        "volume": 1,
+        "targetPeakDb": -8,
+        "from": 693
+      },
+      {
+        "id": "reveal-bell",
+        "publicSrc": "audio/quiz-copy/normalized/835fa4819df0abb21707.m4a",
+        "durationInFrames": 16,
+        "volume": 0.85,
+        "targetPeakDb": -4.5,
+        "from": 717
+      }
+    ],
+    "voices": [
+      {
+        "id": "hook",
+        "generate": false,
+        "text": "Can you guess it?",
+        "publicSrc": "audio/quiz-copy/normalized/05aadec5f4025c8c1792.m4a",
+        "from": 48,
+        "durationInFrames": 28,
+        "volume": 1
+      },
+      {
+        "id": "handoff",
+        "generate": false,
+        "text": "Three hints. One chance.",
+        "publicSrc": "audio/quiz-copy/normalized/97387dbb94043c6f836b.m4a",
+        "from": 80,
+        "durationInFrames": 54,
+        "volume": 1,
+        "playbackRate": 1.12,
+        "fadeOutFrames": 11
+      },
+      {
+        "id": "clue-1",
+        "publicSrc": "audio/quiz-copy/normalized/643312963ea1ba69c1f5.m4a",
+        "from": 180,
+        "durationInFrames": 98,
+        "volume": 1
+      },
+      {
+        "id": "clue-2",
+        "publicSrc": "audio/quiz-copy/normalized/e1fd39e405d1072bc59c.m4a",
+        "from": 335,
+        "durationInFrames": 102,
+        "volume": 1
+      },
+      {
+        "id": "clue-3",
+        "publicSrc": "audio/quiz-copy/normalized/ce3eb307864a504b4a06.m4a",
+        "from": 490,
+        "durationInFrames": 84,
+        "volume": 1
+      },
+      {
+        "id": "reveal",
+        "publicSrc": "audio/quiz-copy/normalized/a620bfe4af78b93378f8.m4a",
+        "from": 675,
+        "durationInFrames": 66,
+        "volume": 1
+      }
+    ]
+  },
+  "fps": 30,
+  "durationInFrames": 855
+}

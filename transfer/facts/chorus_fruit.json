@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "target": {
+    "id": "chorus_fruit",
+    "display_name": "Chorus Fruit",
+    "edition": "java",
+    "version": "1.21.5",
+    "kind": "item",
+    "family": "fruit"
+  },
+  "facts": [
+    {
+      "id": "structured_kind",
+      "type": "kind",
+      "value": "item",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_stack",
+      "type": "stack_size",
+      "value": 64,
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    }
+  ],
+  "sibling_candidates": [
+    {
+      "id": "popped_chorus_fruit",
+      "display_name": "Popped Chorus Fruit"
+    }
+  ],
+  "notes": [
+    "This file contains structured facts only. Add version-specific contextual facts from Minecraft Wiki before writing clues.",
+    "Facts with verified=false require a second source before use."
+  ]
+}

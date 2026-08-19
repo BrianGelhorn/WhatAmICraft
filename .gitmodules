@@ -1,0 +1,3 @@
+[submodule "public/mc-assets"]
+	path = public/mc-assets
+	url = https://github.com/Owen1212055/mc-assets.git

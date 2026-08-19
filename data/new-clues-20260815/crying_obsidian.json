@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "crying_obsidian",
+      "display_name": "Crying Obsidian",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "block",
+      "family": "building block",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "crying_obsidian",
+      "obsidian",
+      "respawn_anchor"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the building block family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "crying_obsidian-family",
+        "matches_candidates": [
+          "crying_obsidian",
+          "obsidian",
+          "respawn_anchor"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I have very high blast resistance.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Crying_Obsidian",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "crying_obsidian-obtaining",
+        "matches_candidates": [
+          "crying_obsidian",
+          "obsidian"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "I can be used in the recipe for a return-point device.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Crying_Obsidian",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "crying_obsidian-use",
+        "matches_candidates": [
+          "crying_obsidian",
+          "respawn_anchor"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the building block family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "crying_obsidian",
+          "obsidian",
+          "respawn_anchor"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I have very high blast resistance.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "crying_obsidian",
+          "obsidian"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "I can be used in the recipe for a return-point device.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "crying_obsidian",
+          "respawn_anchor"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "crying_obsidian",
+        "obsidian",
+        "respawn_anchor"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "crying_obsidian",
+          "obsidian",
+          "respawn_anchor"
+        ],
+        "f_obtain": [
+          "crying_obsidian",
+          "obsidian"
+        ],
+        "f_use": [
+          "crying_obsidian",
+          "respawn_anchor"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "crying_obsidian",
+          "obsidian",
+          "respawn_anchor"
+        ],
+        [
+          "crying_obsidian",
+          "respawn_anchor"
+        ],
+        [
+          "crying_obsidian",
+          "obsidian"
+        ]
+      ],
+      "semantic_keys": [
+        "crying_obsidian-family",
+        "crying_obsidian-obtaining",
+        "crying_obsidian-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Crying Obsidian – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Crying_Obsidian"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}

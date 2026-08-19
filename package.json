@@ -1,0 +1,44 @@
+{
+  "name": "quiz-capas",
+  "version": "1.0.0",
+  "description": "Quiz vertical animado por capas",
+  "repository": {},
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.60.0",
+    "@remotion/captions": "4.0.505",
+    "@remotion/cli": "4.0.505",
+    "@remotion/media": "4.0.505",
+    "dotenv": "^17.4.2",
+    "minecraft-data": "^3.112.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.505"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.505",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio --no-open",
+    "build": "remotion bundle --out-dir=out/bundle",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc",
+    "render": "remotion render QuizCapasCopy out/quiz-copy/quiz-copy.mp4",
+    "episode": "python scripts/produce_quiz_copy.py --render",
+    "episodes": "python scripts/produce_quiz_copy.py --all --render",
+    "quiz-copy:prepare": "python scripts/produce_quiz_copy.py",
+    "quiz-copy:audio": "python scripts/produce_quiz_copy.py --generate-audio",
+    "quiz-copy:render": "python scripts/produce_quiz_copy.py --render",
+    "quiz-copy:thumbnails": "python scripts/produce_quiz_copy.py --thumbnails",
+    "audio:static": "node scripts/generate-static-voices.mjs"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}

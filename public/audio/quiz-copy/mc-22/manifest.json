@@ -1,0 +1,18 @@
+{
+  "signature": "3a3072942ca7347935a20b7b7741d4a9841872154a5c67c2227487320278389e",
+  "voices": {
+    "clue-1": {
+      "durationMs": 3250
+    },
+    "clue-2": {
+      "durationMs": 3390
+    },
+    "clue-3": {
+      "durationMs": 2786
+    },
+    "reveal": {
+      "durationMs": 2182,
+      "answerStartMs": 1544
+    }
+  }
+}

@@ -1,0 +1,141 @@
+x-publishing-environment: &publishing-environment
+  YOUTUBE_CLIENT_ID: ${YOUTUBE_CLIENT_ID:-}
+  YOUTUBE_CLIENT_SECRET: ${YOUTUBE_CLIENT_SECRET:-}
+  YOUTUBE_REFRESH_TOKEN: ${YOUTUBE_REFRESH_TOKEN:-}
+  YOUTUBE_PRIVACY_STATUS: ${YOUTUBE_PRIVACY_STATUS:-private}
+  YOUTUBE_CATEGORY_ID: ${YOUTUBE_CATEGORY_ID:-20}
+  TIKTOK_ACCESS_TOKEN: ${TIKTOK_ACCESS_TOKEN:-}
+  TIKTOK_CLIENT_KEY: ${TIKTOK_CLIENT_KEY:-}
+  TIKTOK_CLIENT_SECRET: ${TIKTOK_CLIENT_SECRET:-}
+  TIKTOK_REDIRECT_URI: ${TIKTOK_REDIRECT_URI:-https://what-am-i-craft.tail6cc348.ts.net:8443/api/tiktok/callback/}
+  TIKTOK_PRIVACY_LEVEL: ${TIKTOK_PRIVACY_LEVEL:-SELF_ONLY}
+  TIKTOK_IS_AIGC: ${TIKTOK_IS_AIGC:-true}
+  TIKTOK_DISABLE_DUET: ${TIKTOK_DISABLE_DUET:-false}
+  TIKTOK_DISABLE_COMMENT: ${TIKTOK_DISABLE_COMMENT:-false}
+  TIKTOK_DISABLE_STITCH: ${TIKTOK_DISABLE_STITCH:-false}
+  INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN:-}
+  INSTAGRAM_GRAPH_VERSION: ${INSTAGRAM_GRAPH_VERSION:-v26.0}
+  META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+  META_GRAPH_VERSION: ${META_GRAPH_VERSION:-v26.0}
+  META_PROCESS_TIMEOUT: ${META_PROCESS_TIMEOUT:-600}
+  INSTAGRAM_USER_ID: ${INSTAGRAM_USER_ID:-}
+  INSTAGRAM_SHARE_TO_FEED: ${INSTAGRAM_SHARE_TO_FEED:-true}
+  FACEBOOK_PAGE_ID: ${FACEBOOK_PAGE_ID:-}
+  FACEBOOK_VIDEO_STATE: ${FACEBOOK_VIDEO_STATE:-PUBLISHED}
+  PUBLIC_VIDEO_BASE_URL: ${PUBLIC_VIDEO_BASE_URL:-}
+
+services:
+  producer:
+    image: minecraft-quiz-guesser:local
+    build: .
+    environment:
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
+      ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
+      REMOTION_CONCURRENCY: ${REMOTION_CONCURRENCY:-1}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_REVIEW_CHAT_ID: ${TELEGRAM_REVIEW_CHAT_ID:-}
+    secrets:
+      - elevenlabs_api_key
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ${VIDEO_STORAGE_PATH:-./out/episodes}:/app/out/episodes
+      - ./public/audio:/app/public/audio
+
+  bot:
+    image: minecraft-quiz-guesser:local
+    build: .
+    entrypoint: ["python3", "scripts/review/bot.py"]
+    restart: unless-stopped
+    environment:
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
+      ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
+      REMOTION_CONCURRENCY: ${REMOTION_CONCURRENCY:-1}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_REVIEW_CHAT_ID: ${TELEGRAM_REVIEW_CHAT_ID:-}
+    secrets:
+      - elevenlabs_api_key
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ${VIDEO_STORAGE_PATH:-./out/episodes}:/app/out/episodes
+      - ./public/audio:/app/public/audio
+
+  dashboard:
+    image: minecraft-quiz-guesser:local
+    build: .
+    entrypoint: ["python3", "dashboard/app.py"]
+    restart: unless-stopped
+    environment:
+      <<: *publishing-environment
+      DASHBOARD_PORT: 8787
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
+      ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
+      REMOTION_CONCURRENCY: ${REMOTION_CONCURRENCY:-1}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_REVIEW_CHAT_ID: ${TELEGRAM_REVIEW_CHAT_ID:-}
+    secrets:
+      - elevenlabs_api_key
+    ports:
+      # El dashboard se publica externamente solo por Tailscale en el mini PC.
+      # El bind local evita exponerlo a la red LAN y mantiene el destino de tailscale serve.
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ./backups:/app/backups
+      - ${VIDEO_STORAGE_PATH:-./out/episodes}:/app/out/episodes
+      - ./public/audio:/app/public/audio
+
+  publisher:
+    image: minecraft-quiz-guesser:local
+    build: .
+    profiles: ["manual"]
+    entrypoint: ["python3", "scripts/publish.py"]
+    command: ["--queue"]
+    environment: *publishing-environment
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ${VIDEO_STORAGE_PATH:-./out/episodes}:/app/out/episodes
+
+  publisher-worker:
+    image: minecraft-quiz-guesser:local
+    build: .
+    entrypoint: ["python3", "scripts/publish_worker.py"]
+    restart: unless-stopped
+    environment:
+      <<: *publishing-environment
+      PUBLISH_QUEUE_INTERVAL: ${PUBLISH_QUEUE_INTERVAL:-30}
+      ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
+      ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
+      REMOTION_CONCURRENCY: ${REMOTION_CONCURRENCY:-1}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_REVIEW_CHAT_ID: ${TELEGRAM_REVIEW_CHAT_ID:-}
+    secrets:
+      - elevenlabs_api_key
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ${VIDEO_STORAGE_PATH:-./out/episodes}:/app/out/episodes
+      - ./public/audio:/app/public/audio
+
+  media:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ${VIDEO_STORAGE_PATH:-./out/episodes}:/usr/share/nginx/html:ro
+
+  tunnel:
+    # ponytail: quick tunnel URL changes on recreation; use a named tunnel for a stable production domain.
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    depends_on:
+      - media
+    command: tunnel --no-autoupdate --url http://media:80
+
+secrets:
+  elevenlabs_api_key:
+    file: ./.secrets/elevenlabs_api_key

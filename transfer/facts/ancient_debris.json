@@ -1,0 +1,491 @@
+{
+  "schema_version": 1,
+  "target": {
+    "id": "ancient_debris",
+    "display_name": "Ancient Debris",
+    "edition": "java",
+    "version": "1.21.5",
+    "kind": "block",
+    "family": "debris"
+  },
+  "facts": [
+    {
+      "id": "structured_kind",
+      "type": "kind",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_stack",
+      "type": "stack_size",
+      "value": 64,
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_material",
+      "type": "material",
+      "value": "incorrect_for_wooden_tool",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_hardness",
+      "type": "hardness",
+      "value": 30,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_resistance",
+      "type": "resistance",
+      "value": 1200,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_diggable",
+      "type": "diggable",
+      "value": true,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_transparent",
+      "type": "transparent",
+      "value": false,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_light",
+      "type": "emitted_light",
+      "value": 0,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_bounding_box",
+      "type": "bounding_box",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_drops",
+      "type": "drops",
+      "value": [
+        "ancient_debris"
+      ],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_tools",
+      "type": "harvest_tools",
+      "value": [
+        "diamond_pickaxe",
+        "netherite_pickaxe"
+      ],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    }
+  ],
+  "sibling_candidates": [
+    {
+      "id": "gold_ore",
+      "display_name": "Gold Ore"
+    },
+    {
+      "id": "deepslate_gold_ore",
+      "display_name": "Deepslate Gold Ore"
+    },
+    {
+      "id": "iron_ore",
+      "display_name": "Iron Ore"
+    },
+    {
+      "id": "deepslate_iron_ore",
+      "display_name": "Deepslate Iron Ore"
+    },
+    {
+      "id": "lapis_ore",
+      "display_name": "Lapis Lazuli Ore"
+    },
+    {
+      "id": "deepslate_lapis_ore",
+      "display_name": "Deepslate Lapis Lazuli Ore"
+    },
+    {
+      "id": "lapis_block",
+      "display_name": "Block of Lapis Lazuli"
+    },
+    {
+      "id": "gold_block",
+      "display_name": "Block of Gold"
+    },
+    {
+      "id": "iron_block",
+      "display_name": "Block of Iron"
+    },
+    {
+      "id": "obsidian",
+      "display_name": "Obsidian"
+    },
+    {
+      "id": "diamond_ore",
+      "display_name": "Diamond Ore"
+    },
+    {
+      "id": "deepslate_diamond_ore",
+      "display_name": "Deepslate Diamond Ore"
+    },
+    {
+      "id": "diamond_block",
+      "display_name": "Block of Diamond"
+    },
+    {
+      "id": "redstone_ore",
+      "display_name": "Redstone Ore"
+    },
+    {
+      "id": "deepslate_redstone_ore",
+      "display_name": "Deepslate Redstone Ore"
+    },
+    {
+      "id": "emerald_ore",
+      "display_name": "Emerald Ore"
+    },
+    {
+      "id": "deepslate_emerald_ore",
+      "display_name": "Deepslate Emerald Ore"
+    },
+    {
+      "id": "emerald_block",
+      "display_name": "Block of Emerald"
+    },
+    {
+      "id": "netherite_block",
+      "display_name": "Block of Netherite"
+    },
+    {
+      "id": "crying_obsidian",
+      "display_name": "Crying Obsidian"
+    },
+    {
+      "id": "respawn_anchor",
+      "display_name": "Respawn Anchor"
+    },
+    {
+      "id": "copper_block",
+      "display_name": "Block of Copper"
+    },
+    {
+      "id": "exposed_copper",
+      "display_name": "Exposed Copper"
+    },
+    {
+      "id": "weathered_copper",
+      "display_name": "Weathered Copper"
+    },
+    {
+      "id": "oxidized_copper",
+      "display_name": "Oxidized Copper"
+    },
+    {
+      "id": "copper_ore",
+      "display_name": "Copper Ore"
+    },
+    {
+      "id": "deepslate_copper_ore",
+      "display_name": "Deepslate Copper Ore"
+    },
+    {
+      "id": "oxidized_cut_copper",
+      "display_name": "Oxidized Cut Copper"
+    },
+    {
+      "id": "weathered_cut_copper",
+      "display_name": "Weathered Cut Copper"
+    },
+    {
+      "id": "exposed_cut_copper",
+      "display_name": "Exposed Cut Copper"
+    },
+    {
+      "id": "cut_copper",
+      "display_name": "Cut Copper"
+    },
+    {
+      "id": "oxidized_chiseled_copper",
+      "display_name": "Oxidized Chiseled Copper"
+    },
+    {
+      "id": "weathered_chiseled_copper",
+      "display_name": "Weathered Chiseled Copper"
+    },
+    {
+      "id": "exposed_chiseled_copper",
+      "display_name": "Exposed Chiseled Copper"
+    },
+    {
+      "id": "chiseled_copper",
+      "display_name": "Chiseled Copper"
+    },
+    {
+      "id": "waxed_oxidized_chiseled_copper",
+      "display_name": "Waxed Oxidized Chiseled Copper"
+    },
+    {
+      "id": "waxed_weathered_chiseled_copper",
+      "display_name": "Waxed Weathered Chiseled Copper"
+    },
+    {
+      "id": "waxed_exposed_chiseled_copper",
+      "display_name": "Waxed Exposed Chiseled Copper"
+    },
+    {
+      "id": "waxed_chiseled_copper",
+      "display_name": "Waxed Chiseled Copper"
+    },
+    {
+      "id": "oxidized_cut_copper_stairs",
+      "display_name": "Oxidized Cut Copper Stairs"
+    },
+    {
+      "id": "weathered_cut_copper_stairs",
+      "display_name": "Weathered Cut Copper Stairs"
+    },
+    {
+      "id": "exposed_cut_copper_stairs",
+      "display_name": "Exposed Cut Copper Stairs"
+    },
+    {
+      "id": "cut_copper_stairs",
+      "display_name": "Cut Copper Stairs"
+    },
+    {
+      "id": "oxidized_cut_copper_slab",
+      "display_name": "Oxidized Cut Copper Slab"
+    },
+    {
+      "id": "weathered_cut_copper_slab",
+      "display_name": "Weathered Cut Copper Slab"
+    },
+    {
+      "id": "exposed_cut_copper_slab",
+      "display_name": "Exposed Cut Copper Slab"
+    },
+    {
+      "id": "cut_copper_slab",
+      "display_name": "Cut Copper Slab"
+    },
+    {
+      "id": "waxed_copper_block",
+      "display_name": "Waxed Block of Copper"
+    },
+    {
+      "id": "waxed_weathered_copper",
+      "display_name": "Waxed Weathered Copper"
+    },
+    {
+      "id": "waxed_exposed_copper",
+      "display_name": "Waxed Exposed Copper"
+    },
+    {
+      "id": "waxed_oxidized_copper",
+      "display_name": "Waxed Oxidized Copper"
+    },
+    {
+      "id": "waxed_oxidized_cut_copper",
+      "display_name": "Waxed Oxidized Cut Copper"
+    },
+    {
+      "id": "waxed_weathered_cut_copper",
+      "display_name": "Waxed Weathered Cut Copper"
+    },
+    {
+      "id": "waxed_exposed_cut_copper",
+      "display_name": "Waxed Exposed Cut Copper"
+    },
+    {
+      "id": "waxed_cut_copper",
+      "display_name": "Waxed Cut Copper"
+    },
+    {
+      "id": "waxed_oxidized_cut_copper_stairs",
+      "display_name": "Waxed Oxidized Cut Copper Stairs"
+    },
+    {
+      "id": "waxed_weathered_cut_copper_stairs",
+      "display_name": "Waxed Weathered Cut Copper Stairs"
+    },
+    {
+      "id": "waxed_exposed_cut_copper_stairs",
+      "display_name": "Waxed Exposed Cut Copper Stairs"
+    },
+    {
+      "id": "waxed_cut_copper_stairs",
+      "display_name": "Waxed Cut Copper Stairs"
+    },
+    {
+      "id": "waxed_oxidized_cut_copper_slab",
+      "display_name": "Waxed Oxidized Cut Copper Slab"
+    },
+    {
+      "id": "waxed_weathered_cut_copper_slab",
+      "display_name": "Waxed Weathered Cut Copper Slab"
+    },
+    {
+      "id": "waxed_exposed_cut_copper_slab",
+      "display_name": "Waxed Exposed Cut Copper Slab"
+    },
+    {
+      "id": "waxed_cut_copper_slab",
+      "display_name": "Waxed Cut Copper Slab"
+    },
+    {
+      "id": "copper_trapdoor",
+      "display_name": "Copper Trapdoor"
+    },
+    {
+      "id": "exposed_copper_trapdoor",
+      "display_name": "Exposed Copper Trapdoor"
+    },
+    {
+      "id": "oxidized_copper_trapdoor",
+      "display_name": "Oxidized Copper Trapdoor"
+    },
+    {
+      "id": "weathered_copper_trapdoor",
+      "display_name": "Weathered Copper Trapdoor"
+    },
+    {
+      "id": "waxed_copper_trapdoor",
+      "display_name": "Waxed Copper Trapdoor"
+    },
+    {
+      "id": "waxed_exposed_copper_trapdoor",
+      "display_name": "Waxed Exposed Copper Trapdoor"
+    },
+    {
+      "id": "waxed_oxidized_copper_trapdoor",
+      "display_name": "Waxed Oxidized Copper Trapdoor"
+    },
+    {
+      "id": "waxed_weathered_copper_trapdoor",
+      "display_name": "Waxed Weathered Copper Trapdoor"
+    },
+    {
+      "id": "copper_grate",
+      "display_name": "Copper Grate"
+    },
+    {
+      "id": "exposed_copper_grate",
+      "display_name": "Exposed Copper Grate"
+    },
+    {
+      "id": "weathered_copper_grate",
+      "display_name": "Weathered Copper Grate"
+    },
+    {
+      "id": "oxidized_copper_grate",
+      "display_name": "Oxidized Copper Grate"
+    },
+    {
+      "id": "waxed_copper_grate",
+      "display_name": "Waxed Copper Grate"
+    },
+    {
+      "id": "waxed_exposed_copper_grate",
+      "display_name": "Waxed Exposed Copper Grate"
+    },
+    {
+      "id": "waxed_weathered_copper_grate",
+      "display_name": "Waxed Weathered Copper Grate"
+    },
+    {
+      "id": "waxed_oxidized_copper_grate",
+      "display_name": "Waxed Oxidized Copper Grate"
+    },
+    {
+      "id": "copper_bulb",
+      "display_name": "Copper Bulb"
+    },
+    {
+      "id": "exposed_copper_bulb",
+      "display_name": "Exposed Copper Bulb"
+    },
+    {
+      "id": "weathered_copper_bulb",
+      "display_name": "Weathered Copper Bulb"
+    },
+    {
+      "id": "oxidized_copper_bulb",
+      "display_name": "Oxidized Copper Bulb"
+    },
+    {
+      "id": "waxed_copper_bulb",
+      "display_name": "Waxed Copper Bulb"
+    },
+    {
+      "id": "waxed_exposed_copper_bulb",
+      "display_name": "Waxed Exposed Copper Bulb"
+    },
+    {
+      "id": "waxed_weathered_copper_bulb",
+      "display_name": "Waxed Weathered Copper Bulb"
+    },
+    {
+      "id": "waxed_oxidized_copper_bulb",
+      "display_name": "Waxed Oxidized Copper Bulb"
+    },
+    {
+      "id": "lightning_rod",
+      "display_name": "Lightning Rod"
+    },
+    {
+      "id": "raw_iron_block",
+      "display_name": "Block of Raw Iron"
+    },
+    {
+      "id": "raw_copper_block",
+      "display_name": "Block of Raw Copper"
+    },
+    {
+      "id": "raw_gold_block",
+      "display_name": "Block of Raw Gold"
+    },
+    {
+      "id": "crafter",
+      "display_name": "Crafter"
+    }
+  ],
+  "notes": [
+    "This file contains structured facts only. Add version-specific contextual facts from Minecraft Wiki before writing clues.",
+    "Facts with verified=false require a second source before use."
+  ]
+}

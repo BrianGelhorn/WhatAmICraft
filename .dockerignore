@@ -1,0 +1,8 @@
+node_modules
+out
+.git
+.env
+.env.local
+data/publishing-secrets.json
+backups
+references

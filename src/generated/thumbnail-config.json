@@ -1,0 +1,35 @@
+{
+  "thumbnail": {
+    "eyebrow": "MINECRAFT QUIZ",
+    "headlineTop": "GUESS",
+    "headlineBottom": "THIS ITEM",
+    "difficulty": "HARD",
+    "subline": "3 HINTS · 1 CHANCE",
+    "mysteryLabel": "WHAT AM I?",
+    "hintLabel": "HINT {number}",
+    "background": "images/template-layers/background.png",
+    "icon": "mc-assets/item-assets/CAULDRON.png",
+    "accent": "#FFD34F",
+    "secondaryAccent": "#7EC850",
+    "iconScale": 1,
+    "iconOffsetY": 0,
+    "platforms": {
+      "vertical": "silhouette",
+      "square": "roulette",
+      "youtube": "silhouette"
+    },
+    "outputDir": "out/thumbnails"
+  },
+  "answerType": "Item",
+  "categoryIcon": "images/guess-types/hidden/Item.png",
+  "rouletteIcons": [
+    "mc-assets/item-assets/DIAMOND.png",
+    "mc-assets/item-assets/ENDER_PEARL.png",
+    "mc-assets/item-assets/GOLDEN_APPLE.png",
+    "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+    "mc-assets/item-assets/NETHERITE_SWORD.png",
+    "mc-assets/item-assets/EMERALD.png",
+    "mc-assets/item-assets/TNT.png"
+  ],
+  "hintCount": 3
+}

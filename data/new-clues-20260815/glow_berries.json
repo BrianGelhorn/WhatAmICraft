@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "glow_berries",
+      "display_name": "Glow Berries",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "food",
+      "family": "cave plant",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "glow_berries",
+      "sweet_berry_bush",
+      "cave_vines"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the cave plant family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "glow_berries-family",
+        "matches_candidates": [
+          "glow_berries",
+          "sweet_berry_bush",
+          "cave_vines"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I can be eaten directly from a growing plant.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Glow_Berries",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "glow_berries-obtaining",
+        "matches_candidates": [
+          "glow_berries",
+          "sweet_berry_bush"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "I grow from a hanging vine in a cave environment.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Glow_Berries",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "glow_berries-use",
+        "matches_candidates": [
+          "glow_berries",
+          "cave_vines"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the cave plant family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "glow_berries",
+          "sweet_berry_bush",
+          "cave_vines"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I can be eaten directly from a growing plant.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "glow_berries",
+          "sweet_berry_bush"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "I grow from a hanging vine in a cave environment.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "glow_berries",
+          "cave_vines"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "cave_vines",
+        "glow_berries",
+        "sweet_berry_bush"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "glow_berries",
+          "sweet_berry_bush",
+          "cave_vines"
+        ],
+        "f_obtain": [
+          "glow_berries",
+          "sweet_berry_bush"
+        ],
+        "f_use": [
+          "glow_berries",
+          "cave_vines"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "glow_berries",
+          "sweet_berry_bush",
+          "cave_vines"
+        ],
+        [
+          "glow_berries",
+          "sweet_berry_bush"
+        ],
+        [
+          "glow_berries",
+          "cave_vines"
+        ]
+      ],
+      "semantic_keys": [
+        "glow_berries-family",
+        "glow_berries-obtaining",
+        "glow_berries-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Glow Berries – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Glow_Berries"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}

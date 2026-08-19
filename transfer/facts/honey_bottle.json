@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "target": {
+    "id": "honey_bottle",
+    "display_name": "Honey Bottle",
+    "edition": "java",
+    "version": "1.21.5",
+    "kind": "item",
+    "family": "bottle"
+  },
+  "facts": [
+    {
+      "id": "structured_kind",
+      "type": "kind",
+      "value": "item",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_stack",
+      "type": "stack_size",
+      "value": 16,
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_recipes",
+      "type": "recipes",
+      "value": [
+        {
+          "ingredients": [
+            {
+              "raw": 695,
+              "resolved_name": "honey_block"
+            },
+            {
+              "raw": 1058,
+              "resolved_name": "glass_bottle"
+            },
+            {
+              "raw": 1058,
+              "resolved_name": "glass_bottle"
+            },
+            {
+              "raw": 1058,
+              "resolved_name": "glass_bottle"
+            },
+            {
+              "raw": 1058,
+              "resolved_name": "glass_bottle"
+            }
+          ],
+          "result_count": 4
+        }
+      ],
+      "scope": "variant",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": false,
+      "note": "Recipe entries can encode tags or alternatives; confirm the applicable ingredients in Minecraft Wiki before turning this into a clue."
+    }
+  ],
+  "sibling_candidates": [
+    {
+      "id": "glass_bottle",
+      "display_name": "Glass Bottle"
+    },
+    {
+      "id": "experience_bottle",
+      "display_name": "Bottle o' Enchanting"
+    },
+    {
+      "id": "ominous_bottle",
+      "display_name": "Ominous Bottle"
+    }
+  ],
+  "notes": [
+    "This file contains structured facts only. Add version-specific contextual facts from Minecraft Wiki before writing clues.",
+    "Facts with verified=false require a second source before use."
+  ]
+}

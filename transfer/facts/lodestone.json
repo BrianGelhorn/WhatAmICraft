@@ -1,0 +1,691 @@
+{
+  "schema_version": 1,
+  "target": {
+    "id": "lodestone",
+    "display_name": "Lodestone",
+    "edition": "java",
+    "version": "1.21.5",
+    "kind": "block",
+    "family": "lodestone"
+  },
+  "facts": [
+    {
+      "id": "structured_kind",
+      "type": "kind",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_stack",
+      "type": "stack_size",
+      "value": 64,
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_material",
+      "type": "material",
+      "value": "mineable/pickaxe",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_hardness",
+      "type": "hardness",
+      "value": 3.5,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_resistance",
+      "type": "resistance",
+      "value": 3.5,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_diggable",
+      "type": "diggable",
+      "value": true,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_transparent",
+      "type": "transparent",
+      "value": false,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_light",
+      "type": "emitted_light",
+      "value": 0,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_bounding_box",
+      "type": "bounding_box",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_drops",
+      "type": "drops",
+      "value": [
+        "lodestone"
+      ],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_tools",
+      "type": "harvest_tools",
+      "value": [
+        "wooden_pickaxe",
+        "stone_pickaxe",
+        "golden_pickaxe",
+        "iron_pickaxe",
+        "diamond_pickaxe",
+        "netherite_pickaxe"
+      ],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_recipes",
+      "type": "recipes",
+      "value": [
+        {
+          "ingredients": [
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 851,
+              "resolved_name": "iron_ingot"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            },
+            {
+              "raw": 365,
+              "resolved_name": "chiseled_stone_bricks"
+            }
+          ],
+          "result_count": 1
+        }
+      ],
+      "scope": "variant",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": false,
+      "note": "Recipe entries can encode tags or alternatives; confirm the applicable ingredients in Minecraft Wiki before turning this into a clue."
+    }
+  ],
+  "sibling_candidates": [
+    {
+      "id": "stone",
+      "display_name": "Stone"
+    },
+    {
+      "id": "granite",
+      "display_name": "Granite"
+    },
+    {
+      "id": "polished_granite",
+      "display_name": "Polished Granite"
+    },
+    {
+      "id": "diorite",
+      "display_name": "Diorite"
+    },
+    {
+      "id": "polished_diorite",
+      "display_name": "Polished Diorite"
+    },
+    {
+      "id": "andesite",
+      "display_name": "Andesite"
+    },
+    {
+      "id": "polished_andesite",
+      "display_name": "Polished Andesite"
+    },
+    {
+      "id": "cobblestone",
+      "display_name": "Cobblestone"
+    },
+    {
+      "id": "coal_ore",
+      "display_name": "Coal Ore"
+    },
+    {
+      "id": "deepslate_coal_ore",
+      "display_name": "Deepslate Coal Ore"
+    },
+    {
+      "id": "nether_gold_ore",
+      "display_name": "Nether Gold Ore"
+    },
+    {
+      "id": "dispenser",
+      "display_name": "Dispenser"
+    },
+    {
+      "id": "sandstone",
+      "display_name": "Sandstone"
+    },
+    {
+      "id": "chiseled_sandstone",
+      "display_name": "Chiseled Sandstone"
+    },
+    {
+      "id": "cut_sandstone",
+      "display_name": "Cut Sandstone"
+    },
+    {
+      "id": "powered_rail",
+      "display_name": "Powered Rail"
+    },
+    {
+      "id": "detector_rail",
+      "display_name": "Detector Rail"
+    },
+    {
+      "id": "sticky_piston",
+      "display_name": "Sticky Piston"
+    },
+    {
+      "id": "piston",
+      "display_name": "Piston"
+    },
+    {
+      "id": "piston_head",
+      "display_name": "Piston Head"
+    },
+    {
+      "id": "bricks",
+      "display_name": "Bricks"
+    },
+    {
+      "id": "mossy_cobblestone",
+      "display_name": "Mossy Cobblestone"
+    },
+    {
+      "id": "spawner",
+      "display_name": "Monster Spawner"
+    },
+    {
+      "id": "furnace",
+      "display_name": "Furnace"
+    },
+    {
+      "id": "rail",
+      "display_name": "Rail"
+    },
+    {
+      "id": "cobblestone_stairs",
+      "display_name": "Cobblestone Stairs"
+    },
+    {
+      "id": "stone_pressure_plate",
+      "display_name": "Stone Pressure Plate"
+    },
+    {
+      "id": "iron_door",
+      "display_name": "Iron Door"
+    },
+    {
+      "id": "stone_button",
+      "display_name": "Stone Button"
+    },
+    {
+      "id": "ice",
+      "display_name": "Ice"
+    },
+    {
+      "id": "netherrack",
+      "display_name": "Netherrack"
+    },
+    {
+      "id": "basalt",
+      "display_name": "Basalt"
+    },
+    {
+      "id": "polished_basalt",
+      "display_name": "Polished Basalt"
+    },
+    {
+      "id": "stone_bricks",
+      "display_name": "Stone Bricks"
+    },
+    {
+      "id": "mossy_stone_bricks",
+      "display_name": "Mossy Stone Bricks"
+    },
+    {
+      "id": "cracked_stone_bricks",
+      "display_name": "Cracked Stone Bricks"
+    },
+    {
+      "id": "chiseled_stone_bricks",
+      "display_name": "Chiseled Stone Bricks"
+    },
+    {
+      "id": "packed_mud",
+      "display_name": "Packed Mud"
+    },
+    {
+      "id": "mud_bricks",
+      "display_name": "Mud Bricks"
+    },
+    {
+      "id": "infested_stone",
+      "display_name": "Infested Stone"
+    },
+    {
+      "id": "infested_cobblestone",
+      "display_name": "Infested Cobblestone"
+    },
+    {
+      "id": "infested_stone_bricks",
+      "display_name": "Infested Stone Bricks"
+    },
+    {
+      "id": "infested_mossy_stone_bricks",
+      "display_name": "Infested Mossy Stone Bricks"
+    },
+    {
+      "id": "infested_cracked_stone_bricks",
+      "display_name": "Infested Cracked Stone Bricks"
+    },
+    {
+      "id": "infested_chiseled_stone_bricks",
+      "display_name": "Infested Chiseled Stone Bricks"
+    },
+    {
+      "id": "iron_bars",
+      "display_name": "Iron Bars"
+    },
+    {
+      "id": "chain",
+      "display_name": "Chain"
+    },
+    {
+      "id": "brick_stairs",
+      "display_name": "Brick Stairs"
+    },
+    {
+      "id": "stone_brick_stairs",
+      "display_name": "Stone Brick Stairs"
+    },
+    {
+      "id": "mud_brick_stairs",
+      "display_name": "Mud Brick Stairs"
+    },
+    {
+      "id": "resin_bricks",
+      "display_name": "Resin Bricks"
+    },
+    {
+      "id": "resin_brick_stairs",
+      "display_name": "Resin Brick Stairs"
+    },
+    {
+      "id": "resin_brick_slab",
+      "display_name": "Resin Brick Slab"
+    },
+    {
+      "id": "resin_brick_wall",
+      "display_name": "Resin Brick Wall"
+    },
+    {
+      "id": "chiseled_resin_bricks",
+      "display_name": "Chiseled Resin Bricks"
+    },
+    {
+      "id": "nether_bricks",
+      "display_name": "Nether Bricks"
+    },
+    {
+      "id": "nether_brick_fence",
+      "display_name": "Nether Brick Fence"
+    },
+    {
+      "id": "nether_brick_stairs",
+      "display_name": "Nether Brick Stairs"
+    },
+    {
+      "id": "enchanting_table",
+      "display_name": "Enchanting Table"
+    },
+    {
+      "id": "brewing_stand",
+      "display_name": "Brewing Stand"
+    },
+    {
+      "id": "cauldron",
+      "display_name": "Cauldron"
+    },
+    {
+      "id": "water_cauldron",
+      "display_name": "Water Cauldron"
+    },
+    {
+      "id": "lava_cauldron",
+      "display_name": "Lava Cauldron"
+    },
+    {
+      "id": "powder_snow_cauldron",
+      "display_name": "Powder Snow Cauldron"
+    },
+    {
+      "id": "end_stone",
+      "display_name": "End Stone"
+    },
+    {
+      "id": "sandstone_stairs",
+      "display_name": "Sandstone Stairs"
+    },
+    {
+      "id": "ender_chest",
+      "display_name": "Ender Chest"
+    },
+    {
+      "id": "cobblestone_wall",
+      "display_name": "Cobblestone Wall"
+    },
+    {
+      "id": "mossy_cobblestone_wall",
+      "display_name": "Mossy Cobblestone Wall"
+    },
+    {
+      "id": "anvil",
+      "display_name": "Anvil"
+    },
+    {
+      "id": "chipped_anvil",
+      "display_name": "Chipped Anvil"
+    },
+    {
+      "id": "damaged_anvil",
+      "display_name": "Damaged Anvil"
+    },
+    {
+      "id": "light_weighted_pressure_plate",
+      "display_name": "Light Weighted Pressure Plate"
+    },
+    {
+      "id": "heavy_weighted_pressure_plate",
+      "display_name": "Heavy Weighted Pressure Plate"
+    },
+    {
+      "id": "redstone_block",
+      "display_name": "Block of Redstone"
+    },
+    {
+      "id": "nether_quartz_ore",
+      "display_name": "Nether Quartz Ore"
+    },
+    {
+      "id": "hopper",
+      "display_name": "Hopper"
+    },
+    {
+      "id": "quartz_block",
+      "display_name": "Block of Quartz"
+    },
+    {
+      "id": "chiseled_quartz_block",
+      "display_name": "Chiseled Quartz Block"
+    },
+    {
+      "id": "quartz_pillar",
+      "display_name": "Quartz Pillar"
+    },
+    {
+      "id": "quartz_stairs",
+      "display_name": "Quartz Stairs"
+    },
+    {
+      "id": "activator_rail",
+      "display_name": "Activator Rail"
+    },
+    {
+      "id": "dropper",
+      "display_name": "Dropper"
+    },
+    {
+      "id": "white_terracotta",
+      "display_name": "White Terracotta"
+    },
+    {
+      "id": "orange_terracotta",
+      "display_name": "Orange Terracotta"
+    },
+    {
+      "id": "magenta_terracotta",
+      "display_name": "Magenta Terracotta"
+    },
+    {
+      "id": "light_blue_terracotta",
+      "display_name": "Light Blue Terracotta"
+    },
+    {
+      "id": "yellow_terracotta",
+      "display_name": "Yellow Terracotta"
+    },
+    {
+      "id": "lime_terracotta",
+      "display_name": "Lime Terracotta"
+    },
+    {
+      "id": "pink_terracotta",
+      "display_name": "Pink Terracotta"
+    },
+    {
+      "id": "gray_terracotta",
+      "display_name": "Gray Terracotta"
+    },
+    {
+      "id": "light_gray_terracotta",
+      "display_name": "Light Gray Terracotta"
+    },
+    {
+      "id": "cyan_terracotta",
+      "display_name": "Cyan Terracotta"
+    },
+    {
+      "id": "purple_terracotta",
+      "display_name": "Purple Terracotta"
+    },
+    {
+      "id": "blue_terracotta",
+      "display_name": "Blue Terracotta"
+    },
+    {
+      "id": "brown_terracotta",
+      "display_name": "Brown Terracotta"
+    },
+    {
+      "id": "green_terracotta",
+      "display_name": "Green Terracotta"
+    },
+    {
+      "id": "red_terracotta",
+      "display_name": "Red Terracotta"
+    },
+    {
+      "id": "black_terracotta",
+      "display_name": "Black Terracotta"
+    },
+    {
+      "id": "iron_trapdoor",
+      "display_name": "Iron Trapdoor"
+    },
+    {
+      "id": "prismarine",
+      "display_name": "Prismarine"
+    },
+    {
+      "id": "prismarine_bricks",
+      "display_name": "Prismarine Bricks"
+    },
+    {
+      "id": "dark_prismarine",
+      "display_name": "Dark Prismarine"
+    },
+    {
+      "id": "prismarine_stairs",
+      "display_name": "Prismarine Stairs"
+    },
+    {
+      "id": "prismarine_brick_stairs",
+      "display_name": "Prismarine Brick Stairs"
+    },
+    {
+      "id": "dark_prismarine_stairs",
+      "display_name": "Dark Prismarine Stairs"
+    },
+    {
+      "id": "prismarine_slab",
+      "display_name": "Prismarine Slab"
+    },
+    {
+      "id": "prismarine_brick_slab",
+      "display_name": "Prismarine Brick Slab"
+    },
+    {
+      "id": "dark_prismarine_slab",
+      "display_name": "Dark Prismarine Slab"
+    },
+    {
+      "id": "terracotta",
+      "display_name": "Terracotta"
+    },
+    {
+      "id": "coal_block",
+      "display_name": "Block of Coal"
+    },
+    {
+      "id": "packed_ice",
+      "display_name": "Packed Ice"
+    },
+    {
+      "id": "red_sandstone",
+      "display_name": "Red Sandstone"
+    },
+    {
+      "id": "chiseled_red_sandstone",
+      "display_name": "Chiseled Red Sandstone"
+    },
+    {
+      "id": "cut_red_sandstone",
+      "display_name": "Cut Red Sandstone"
+    },
+    {
+      "id": "red_sandstone_stairs",
+      "display_name": "Red Sandstone Stairs"
+    },
+    {
+      "id": "stone_slab",
+      "display_name": "Stone Slab"
+    },
+    {
+      "id": "smooth_stone_slab",
+      "display_name": "Smooth Stone Slab"
+    },
+    {
+      "id": "sandstone_slab",
+      "display_name": "Sandstone Slab"
+    },
+    {
+      "id": "cut_sandstone_slab",
+      "display_name": "Cut Sandstone Slab"
+    },
+    {
+      "id": "petrified_oak_slab",
+      "display_name": "Petrified Oak Slab"
+    },
+    {
+      "id": "cobblestone_slab",
+      "display_name": "Cobblestone Slab"
+    },
+    {
+      "id": "brick_slab",
+      "display_name": "Brick Slab"
+    },
+    {
+      "id": "stone_brick_slab",
+      "display_name": "Stone Brick Slab"
+    },
+    {
+      "id": "mud_brick_slab",
+      "display_name": "Mud Brick Slab"
+    },
+    {
+      "id": "nether_brick_slab",
+      "display_name": "Nether Brick Slab"
+    },
+    {
+      "id": "quartz_slab",
+      "display_name": "Quartz Slab"
+    },
+    {
+      "id": "red_sandstone_slab",
+      "display_name": "Red Sandstone Slab"
+    }
+  ],
+  "notes": [
+    "This file contains structured facts only. Add version-specific contextual facts from Minecraft Wiki before writing clues.",
+    "Facts with verified=false require a second source before use."
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "shulker_box",
+      "display_name": "Shulker Box",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "block",
+      "family": "portable block",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "shulker_box",
+      "bed",
+      "ender_chest"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the portable block family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "shulker_box-family",
+        "matches_candidates": [
+          "shulker_box",
+          "bed",
+          "ender_chest"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I can be dyed into several colors.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Shulker_Box",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "shulker_box-obtaining",
+        "matches_candidates": [
+          "shulker_box",
+          "bed"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "My inventory remains available after I break the block.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Shulker_Box",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "shulker_box-use",
+        "matches_candidates": [
+          "shulker_box",
+          "ender_chest"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the portable block family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "shulker_box",
+          "bed",
+          "ender_chest"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I can be dyed into several colors.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "shulker_box",
+          "bed"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "My inventory remains available after I break the block.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "shulker_box",
+          "ender_chest"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "chest",
+        "ender_chest",
+        "shulker_box"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "chest",
+          "ender_chest",
+          "shulker_box"
+        ],
+        "f_obtain": [
+          "chest",
+          "shulker_box"
+        ],
+        "f_use": [
+          "ender_chest",
+          "shulker_box"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "shulker_box",
+          "chest",
+          "ender_chest"
+        ],
+        [
+          "chest",
+          "shulker_box"
+        ],
+        [
+          "ender_chest",
+          "shulker_box"
+        ]
+      ],
+      "semantic_keys": [
+        "shulker_box-family",
+        "shulker_box-obtaining",
+        "shulker_box-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Shulker Box – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Shulker_Box"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}

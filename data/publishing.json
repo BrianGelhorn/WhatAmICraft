@@ -1,0 +1,55 @@
+{
+  "title": "Can You Guess the Minecraft {kind} in 3 Hints? 👀",
+  "caption": "Think you know Minecraft? Put your knowledge to the test with this Minecraft quiz!\n\nYou get 3 clues and only 1 chance to guess the mystery {kind} before the reveal. Watch until the end, lock in your answer, and comment how many hints you needed.\n\nChallenge a friend: who can guess it first?",
+  "hashtags": [
+    "minecraft",
+    "minecraftquiz",
+    "minecrafttrivia",
+    "MinecraftChallenge",
+    "GamingQuiz",
+    "gaming",
+    "shorts",
+    "MinecraftReels"
+  ],
+  "platforms": {
+    "youtube": {
+      "enabled": false,
+      "privacyStatus": "public",
+      "categoryId": "20"
+    },
+    "tiktok": {
+      "enabled": false,
+      "privacyLevel": "SELF_ONLY",
+      "isAigc": false,
+      "disableDuet": false,
+      "disableComment": false,
+      "disableStitch": false
+    },
+    "instagram": {
+      "enabled": true,
+      "shareToFeed": true,
+      "publicVideoBaseUrl": "https://what-am-i-craft.tail6cc348.ts.net"
+    },
+    "facebook": {
+      "enabled": false,
+      "videoState": "PUBLISHED"
+    }
+  },
+  "schedule": {
+    "enabled": true,
+    "intervalMinutes": 720
+  },
+  "generation": {
+    "enabled": true,
+    "intervalMinutes": 180,
+    "targetStock": 8,
+    "lowStockThreshold": 5,
+    "publishGuardMinutes": 90,
+    "formats": {
+      "clues": {
+        "enabled": true,
+        "priority": 1
+      }
+    }
+  }
+}

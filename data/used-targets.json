@@ -1,0 +1,816 @@
+{
+  "schema_version": 1,
+  "edition": "java",
+  "version": "1.21.5",
+  "generated_at": "2026-08-11T17:09:09.538635+00:00",
+  "target_ids": [
+    "allay",
+    "ancient_debris",
+    "beacon",
+    "bell",
+    "blast_furnace",
+    "blaze",
+    "breeze",
+    "brewing_stand",
+    "brush",
+    "calibrated_sculk_sensor",
+    "campfire",
+    "cartography_table",
+    "cauldron",
+    "chorus_fruit",
+    "clock",
+    "comparator",
+    "composter",
+    "conduit",
+    "crafter",
+    "creeper",
+    "crossbow",
+    "daylight_detector",
+    "decorated_pot",
+    "dispenser",
+    "dropper",
+    "enchanting_table",
+    "end_crystal",
+    "fishing_rod",
+    "goat_horn",
+    "golden_apple",
+    "golden_carrot",
+    "guardian",
+    "hopper",
+    "jukebox",
+    "lectern",
+    "lightning_rod",
+    "mace",
+    "name_tag",
+    "netherite_ingot",
+    "note_block",
+    "observer",
+    "pillager",
+    "piston",
+    "recovery_compass",
+    "redstone_lamp",
+    "respawn_anchor",
+    "slime_block",
+    "smithing_table",
+    "sniffer",
+    "spyglass",
+    "sticky_piston",
+    "stonecutter",
+    "strider",
+    "target",
+    "test",
+    "trident",
+    "tripwire_hook",
+    "warden",
+    "wind_charge",
+    "wither_skeleton"
+  ],
+  "targets": [
+    {
+      "id": "allay",
+      "display_name": "Allay",
+      "kind": "mob",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-19"
+      ],
+      "video_files": [
+        "mc-19-allay.mp4"
+      ]
+    },
+    {
+      "id": "ancient_debris",
+      "display_name": "Ancient Debris",
+      "kind": "mineral",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-27"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "beacon",
+      "display_name": "Beacon",
+      "kind": "item",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-38"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "bell",
+      "display_name": "Bell",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-43"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "blast_furnace",
+      "display_name": "Blast Furnace",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-14"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "blaze",
+      "display_name": "Blaze",
+      "kind": "mob",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-16"
+      ],
+      "video_files": [
+        "mc-09-blaze.mp4",
+        "mc-16-blaze.mp4"
+      ]
+    },
+    {
+      "id": "breeze",
+      "display_name": "Breeze",
+      "kind": "mob",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-20"
+      ],
+      "video_files": [
+        "mc-20-breeze.mp4"
+      ]
+    },
+    {
+      "id": "brewing_stand",
+      "display_name": "Brewing Stand",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-45"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "brush",
+      "display_name": "Brush",
+      "kind": "tool",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-24"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "calibrated_sculk_sensor",
+      "display_name": "Calibrated Sculk Sensor",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-02-calibrated_sculk_sensor.mp4"
+      ]
+    },
+    {
+      "id": "campfire",
+      "display_name": "Campfire",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-44"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "cartography_table",
+      "display_name": "Cartography Table",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-42"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "cauldron",
+      "display_name": "Cauldron",
+      "kind": "item",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-46"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "chorus_fruit",
+      "display_name": "Chorus Fruit",
+      "kind": "food",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-26"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "clock",
+      "display_name": "Clock",
+      "kind": "item",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-07"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "comparator",
+      "display_name": "Comparator",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-16-comparator.mp4"
+      ]
+    },
+    {
+      "id": "composter",
+      "display_name": "Composter",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-12"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "conduit",
+      "display_name": "Conduit",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-39"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "crafter",
+      "display_name": "Crafter",
+      "kind": "block",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-13"
+      ],
+      "video_files": [
+        "mc-13-crafter.mp4"
+      ]
+    },
+    {
+      "id": "creeper",
+      "display_name": "Creeper",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-04-creeper.mp4"
+      ]
+    },
+    {
+      "id": "crossbow",
+      "display_name": "Crossbow",
+      "kind": "weapon",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-01"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "daylight_detector",
+      "display_name": "Daylight Detector",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-48"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "decorated_pot",
+      "display_name": "Decorated Pot",
+      "kind": "block",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-28"
+      ],
+      "video_files": [
+        "mc-20-decorated_pot.mp4"
+      ]
+    },
+    {
+      "id": "dispenser",
+      "display_name": "Dispenser",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-34"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "dropper",
+      "display_name": "Dropper",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-35"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "enchanting_table",
+      "display_name": "Enchanting Table",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-40"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "end_crystal",
+      "display_name": "End Crystal",
+      "kind": "item",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-04"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "fishing_rod",
+      "display_name": "Fishing Rod",
+      "kind": "tool",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-23"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "goat_horn",
+      "display_name": "Goat Horn",
+      "kind": "item",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-02"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "golden_apple",
+      "display_name": "Golden Apple",
+      "kind": "food",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-25"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "golden_carrot",
+      "display_name": "Golden Carrot",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-05-golden_carrot.mp4"
+      ]
+    },
+    {
+      "id": "guardian",
+      "display_name": "Guardian",
+      "kind": "mob",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-15"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "hopper",
+      "display_name": "Hopper",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-33"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "jukebox",
+      "display_name": "Jukebox",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-37"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "lectern",
+      "display_name": "Lectern",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-09"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "lightning_rod",
+      "display_name": "Lightning Rod",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-08"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "mace",
+      "display_name": "Mace",
+      "kind": "weapon",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-21"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "name_tag",
+      "display_name": "Name Tag",
+      "kind": "item",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-05"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "netherite_ingot",
+      "display_name": "Netherite Ingot",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-11-netherite_ingot.mp4"
+      ]
+    },
+    {
+      "id": "note_block",
+      "display_name": "Note Block",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-36"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "observer",
+      "display_name": "Observer",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-32"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "pillager",
+      "display_name": "Pillager",
+      "kind": "mob",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-17"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "piston",
+      "display_name": "Piston",
+      "kind": "block",
+      "sources": [
+        "intruder_bank"
+      ],
+      "episode_ids": [
+        "intruder-01"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "recovery_compass",
+      "display_name": "Recovery Compass",
+      "kind": "item",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-06"
+      ],
+      "video_files": [
+        "mc-03-recovery_compass.mp4",
+        "mc-06-recovery_compass.mp4"
+      ]
+    },
+    {
+      "id": "redstone_lamp",
+      "display_name": "Redstone Lamp",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-47"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "respawn_anchor",
+      "display_name": "Respawn Anchor",
+      "kind": "block",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-10"
+      ],
+      "video_files": [
+        "mc-10-respawn_anchor.mp4"
+      ]
+    },
+    {
+      "id": "slime_block",
+      "display_name": "Slime Block",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-11"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "smithing_table",
+      "display_name": "Smithing Table",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-41"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "sniffer",
+      "display_name": "Sniffer",
+      "kind": "mob",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-18"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "spyglass",
+      "display_name": "Spyglass",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-12-spyglass.mp4"
+      ]
+    },
+    {
+      "id": "sticky_piston",
+      "display_name": "Sticky Piston",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-15-sticky_piston.mp4"
+      ]
+    },
+    {
+      "id": "stonecutter",
+      "display_name": "Stonecutter",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-50"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "strider",
+      "display_name": "Strider",
+      "kind": "mob",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-30"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "target",
+      "display_name": "Target",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-31"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "test",
+      "display_name": "Test",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-01-test.mp4"
+      ]
+    },
+    {
+      "id": "trident",
+      "display_name": "Trident",
+      "kind": "weapon",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-22"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "tripwire_hook",
+      "display_name": "Tripwire Hook",
+      "kind": "block",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-49"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "warden",
+      "display_name": "Warden",
+      "kind": "mob",
+      "sources": [
+        "clue_bank"
+      ],
+      "episode_ids": [
+        "mc-29"
+      ],
+      "video_files": []
+    },
+    {
+      "id": "wind_charge",
+      "display_name": "Wind Charge",
+      "kind": "item",
+      "sources": [
+        "clue_bank",
+        "rendered_video"
+      ],
+      "episode_ids": [
+        "mc-03"
+      ],
+      "video_files": [
+        "mc-03-wind_charge.mp4"
+      ]
+    },
+    {
+      "id": "wither_skeleton",
+      "display_name": "Wither Skeleton",
+      "kind": "unknown",
+      "sources": [
+        "rendered_video"
+      ],
+      "episode_ids": [],
+      "video_files": [
+        "mc-13-wither_skeleton.mp4"
+      ]
+    }
+  ]
+}

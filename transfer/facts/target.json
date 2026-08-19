@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "target": {
+    "id": "target",
+    "display_name": "Target",
+    "edition": "java",
+    "version": "1.21.5",
+    "kind": "block",
+    "family": "target"
+  },
+  "facts": [
+    {
+      "id": "structured_kind",
+      "type": "kind",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_stack",
+      "type": "stack_size",
+      "value": 64,
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_material",
+      "type": "material",
+      "value": "mineable/hoe",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_hardness",
+      "type": "hardness",
+      "value": 0.5,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_resistance",
+      "type": "resistance",
+      "value": 0.5,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_diggable",
+      "type": "diggable",
+      "value": true,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_transparent",
+      "type": "transparent",
+      "value": false,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_light",
+      "type": "emitted_light",
+      "value": 0,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_bounding_box",
+      "type": "bounding_box",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_drops",
+      "type": "drops",
+      "value": [
+        "target"
+      ],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_tools",
+      "type": "harvest_tools",
+      "value": [],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_recipes",
+      "type": "recipes",
+      "value": [
+        {
+          "ingredients": [
+            {
+              "raw": 687,
+              "resolved_name": "redstone"
+            },
+            {
+              "raw": 687,
+              "resolved_name": "redstone"
+            },
+            {
+              "raw": 475,
+              "resolved_name": "hay_block"
+            },
+            {
+              "raw": 687,
+              "resolved_name": "redstone"
+            },
+            {
+              "raw": 687,
+              "resolved_name": "redstone"
+            }
+          ],
+          "result_count": 1
+        }
+      ],
+      "scope": "variant",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": false,
+      "note": "Recipe entries can encode tags or alternatives; confirm the applicable ingredients in Minecraft Wiki before turning this into a clue."
+    }
+  ],
+  "sibling_candidates": [
+    {
+      "id": "sponge",
+      "display_name": "Sponge"
+    },
+    {
+      "id": "wet_sponge",
+      "display_name": "Wet Sponge"
+    },
+    {
+      "id": "hay_block",
+      "display_name": "Hay Bale"
+    },
+    {
+      "id": "nether_wart_block",
+      "display_name": "Nether Wart Block"
+    },
+    {
+      "id": "dried_kelp_block",
+      "display_name": "Dried Kelp Block"
+    },
+    {
+      "id": "warped_wart_block",
+      "display_name": "Warped Wart Block"
+    },
+    {
+      "id": "shroomlight",
+      "display_name": "Shroomlight"
+    },
+    {
+      "id": "sculk_sensor",
+      "display_name": "Sculk Sensor"
+    },
+    {
+      "id": "calibrated_sculk_sensor",
+      "display_name": "Calibrated Sculk Sensor"
+    },
+    {
+      "id": "sculk",
+      "display_name": "Sculk"
+    },
+    {
+      "id": "sculk_vein",
+      "display_name": "Sculk Vein"
+    },
+    {
+      "id": "sculk_catalyst",
+      "display_name": "Sculk Catalyst"
+    },
+    {
+      "id": "sculk_shrieker",
+      "display_name": "Sculk Shrieker"
+    },
+    {
+      "id": "moss_carpet",
+      "display_name": "Moss Carpet"
+    },
+    {
+      "id": "moss_block",
+      "display_name": "Moss Block"
+    },
+    {
+      "id": "pale_moss_block",
+      "display_name": "Pale Moss Block"
+    },
+    {
+      "id": "pale_moss_carpet",
+      "display_name": "Pale Moss Carpet"
+    }
+  ],
+  "notes": [
+    "This file contains structured facts only. Add version-specific contextual facts from Minecraft Wiki before writing clues.",
+    "Facts with verified=false require a second source before use."
+  ]
+}

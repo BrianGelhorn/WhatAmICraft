@@ -1,0 +1,664 @@
+{
+  "schema_version": 1,
+  "target": {
+    "id": "decorated_pot",
+    "display_name": "Decorated Pot",
+    "edition": "java",
+    "version": "1.21.5",
+    "kind": "block",
+    "family": "pot"
+  },
+  "facts": [
+    {
+      "id": "structured_kind",
+      "type": "kind",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_stack",
+      "type": "stack_size",
+      "value": 64,
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_material",
+      "type": "material",
+      "value": "default",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_hardness",
+      "type": "hardness",
+      "value": 0,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_resistance",
+      "type": "resistance",
+      "value": 0,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_diggable",
+      "type": "diggable",
+      "value": true,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_transparent",
+      "type": "transparent",
+      "value": true,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_light",
+      "type": "emitted_light",
+      "value": 0,
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_bounding_box",
+      "type": "bounding_box",
+      "value": "block",
+      "scope": "family",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_drops",
+      "type": "drops",
+      "value": [
+        "decorated_pot"
+      ],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_tools",
+      "type": "harvest_tools",
+      "value": [],
+      "scope": "target",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": true
+    },
+    {
+      "id": "structured_recipes",
+      "type": "recipes",
+      "value": [
+        {
+          "ingredients": [
+            {
+              "raw": 963,
+              "resolved_name": "brick"
+            },
+            {
+              "raw": 963,
+              "resolved_name": "brick"
+            },
+            {
+              "raw": 963,
+              "resolved_name": "brick"
+            },
+            {
+              "raw": 963,
+              "resolved_name": "brick"
+            }
+          ],
+          "result_count": 1
+        }
+      ],
+      "scope": "variant",
+      "source_type": "minecraft-data",
+      "source": "minecraft-data 1.21.5",
+      "verified": false,
+      "note": "Recipe entries can encode tags or alternatives; confirm the applicable ingredients in Minecraft Wiki before turning this into a clue."
+    }
+  ],
+  "sibling_candidates": [
+    {
+      "id": "air",
+      "display_name": "Air"
+    },
+    {
+      "id": "oak_sapling",
+      "display_name": "Oak Sapling"
+    },
+    {
+      "id": "spruce_sapling",
+      "display_name": "Spruce Sapling"
+    },
+    {
+      "id": "birch_sapling",
+      "display_name": "Birch Sapling"
+    },
+    {
+      "id": "jungle_sapling",
+      "display_name": "Jungle Sapling"
+    },
+    {
+      "id": "acacia_sapling",
+      "display_name": "Acacia Sapling"
+    },
+    {
+      "id": "cherry_sapling",
+      "display_name": "Cherry Sapling"
+    },
+    {
+      "id": "dark_oak_sapling",
+      "display_name": "Dark Oak Sapling"
+    },
+    {
+      "id": "pale_oak_sapling",
+      "display_name": "Pale Oak Sapling"
+    },
+    {
+      "id": "mangrove_propagule",
+      "display_name": "Mangrove Propagule"
+    },
+    {
+      "id": "bedrock",
+      "display_name": "Bedrock"
+    },
+    {
+      "id": "water",
+      "display_name": "Water"
+    },
+    {
+      "id": "lava",
+      "display_name": "Lava"
+    },
+    {
+      "id": "glass",
+      "display_name": "Glass"
+    },
+    {
+      "id": "white_bed",
+      "display_name": "White Bed"
+    },
+    {
+      "id": "orange_bed",
+      "display_name": "Orange Bed"
+    },
+    {
+      "id": "magenta_bed",
+      "display_name": "Magenta Bed"
+    },
+    {
+      "id": "light_blue_bed",
+      "display_name": "Light Blue Bed"
+    },
+    {
+      "id": "yellow_bed",
+      "display_name": "Yellow Bed"
+    },
+    {
+      "id": "lime_bed",
+      "display_name": "Lime Bed"
+    },
+    {
+      "id": "pink_bed",
+      "display_name": "Pink Bed"
+    },
+    {
+      "id": "gray_bed",
+      "display_name": "Gray Bed"
+    },
+    {
+      "id": "light_gray_bed",
+      "display_name": "Light Gray Bed"
+    },
+    {
+      "id": "cyan_bed",
+      "display_name": "Cyan Bed"
+    },
+    {
+      "id": "purple_bed",
+      "display_name": "Purple Bed"
+    },
+    {
+      "id": "blue_bed",
+      "display_name": "Blue Bed"
+    },
+    {
+      "id": "brown_bed",
+      "display_name": "Brown Bed"
+    },
+    {
+      "id": "green_bed",
+      "display_name": "Green Bed"
+    },
+    {
+      "id": "red_bed",
+      "display_name": "Red Bed"
+    },
+    {
+      "id": "black_bed",
+      "display_name": "Black Bed"
+    },
+    {
+      "id": "short_grass",
+      "display_name": "Short Grass"
+    },
+    {
+      "id": "fern",
+      "display_name": "Fern"
+    },
+    {
+      "id": "dead_bush",
+      "display_name": "Dead Bush"
+    },
+    {
+      "id": "bush",
+      "display_name": "Bush"
+    },
+    {
+      "id": "short_dry_grass",
+      "display_name": "Short Dry Grass"
+    },
+    {
+      "id": "tall_dry_grass",
+      "display_name": "Tall Dry Grass"
+    },
+    {
+      "id": "seagrass",
+      "display_name": "Seagrass"
+    },
+    {
+      "id": "tall_seagrass",
+      "display_name": "Tall Seagrass"
+    },
+    {
+      "id": "moving_piston",
+      "display_name": "Moving Piston"
+    },
+    {
+      "id": "dandelion",
+      "display_name": "Dandelion"
+    },
+    {
+      "id": "torchflower",
+      "display_name": "Torchflower"
+    },
+    {
+      "id": "poppy",
+      "display_name": "Poppy"
+    },
+    {
+      "id": "blue_orchid",
+      "display_name": "Blue Orchid"
+    },
+    {
+      "id": "allium",
+      "display_name": "Allium"
+    },
+    {
+      "id": "azure_bluet",
+      "display_name": "Azure Bluet"
+    },
+    {
+      "id": "red_tulip",
+      "display_name": "Red Tulip"
+    },
+    {
+      "id": "orange_tulip",
+      "display_name": "Orange Tulip"
+    },
+    {
+      "id": "white_tulip",
+      "display_name": "White Tulip"
+    },
+    {
+      "id": "pink_tulip",
+      "display_name": "Pink Tulip"
+    },
+    {
+      "id": "oxeye_daisy",
+      "display_name": "Oxeye Daisy"
+    },
+    {
+      "id": "cornflower",
+      "display_name": "Cornflower"
+    },
+    {
+      "id": "wither_rose",
+      "display_name": "Wither Rose"
+    },
+    {
+      "id": "lily_of_the_valley",
+      "display_name": "Lily of the Valley"
+    },
+    {
+      "id": "brown_mushroom",
+      "display_name": "Brown Mushroom"
+    },
+    {
+      "id": "red_mushroom",
+      "display_name": "Red Mushroom"
+    },
+    {
+      "id": "tnt",
+      "display_name": "TNT"
+    },
+    {
+      "id": "torch",
+      "display_name": "Torch"
+    },
+    {
+      "id": "wall_torch",
+      "display_name": "Torch"
+    },
+    {
+      "id": "fire",
+      "display_name": "Fire"
+    },
+    {
+      "id": "soul_fire",
+      "display_name": "Soul Fire"
+    },
+    {
+      "id": "redstone_wire",
+      "display_name": "Redstone Wire"
+    },
+    {
+      "id": "wheat",
+      "display_name": "Wheat Crops"
+    },
+    {
+      "id": "lever",
+      "display_name": "Lever"
+    },
+    {
+      "id": "redstone_torch",
+      "display_name": "Redstone Torch"
+    },
+    {
+      "id": "redstone_wall_torch",
+      "display_name": "Redstone Torch"
+    },
+    {
+      "id": "cactus",
+      "display_name": "Cactus"
+    },
+    {
+      "id": "cactus_flower",
+      "display_name": "Cactus Flower"
+    },
+    {
+      "id": "sugar_cane",
+      "display_name": "Sugar Cane"
+    },
+    {
+      "id": "soul_torch",
+      "display_name": "Soul Torch"
+    },
+    {
+      "id": "soul_wall_torch",
+      "display_name": "Soul Torch"
+    },
+    {
+      "id": "glowstone",
+      "display_name": "Glowstone"
+    },
+    {
+      "id": "nether_portal",
+      "display_name": "Nether Portal"
+    },
+    {
+      "id": "cake",
+      "display_name": "Cake"
+    },
+    {
+      "id": "repeater",
+      "display_name": "Redstone Repeater"
+    },
+    {
+      "id": "white_stained_glass",
+      "display_name": "White Stained Glass"
+    },
+    {
+      "id": "orange_stained_glass",
+      "display_name": "Orange Stained Glass"
+    },
+    {
+      "id": "magenta_stained_glass",
+      "display_name": "Magenta Stained Glass"
+    },
+    {
+      "id": "light_blue_stained_glass",
+      "display_name": "Light Blue Stained Glass"
+    },
+    {
+      "id": "yellow_stained_glass",
+      "display_name": "Yellow Stained Glass"
+    },
+    {
+      "id": "lime_stained_glass",
+      "display_name": "Lime Stained Glass"
+    },
+    {
+      "id": "pink_stained_glass",
+      "display_name": "Pink Stained Glass"
+    },
+    {
+      "id": "gray_stained_glass",
+      "display_name": "Gray Stained Glass"
+    },
+    {
+      "id": "light_gray_stained_glass",
+      "display_name": "Light Gray Stained Glass"
+    },
+    {
+      "id": "cyan_stained_glass",
+      "display_name": "Cyan Stained Glass"
+    },
+    {
+      "id": "purple_stained_glass",
+      "display_name": "Purple Stained Glass"
+    },
+    {
+      "id": "blue_stained_glass",
+      "display_name": "Blue Stained Glass"
+    },
+    {
+      "id": "brown_stained_glass",
+      "display_name": "Brown Stained Glass"
+    },
+    {
+      "id": "green_stained_glass",
+      "display_name": "Green Stained Glass"
+    },
+    {
+      "id": "red_stained_glass",
+      "display_name": "Red Stained Glass"
+    },
+    {
+      "id": "black_stained_glass",
+      "display_name": "Black Stained Glass"
+    },
+    {
+      "id": "glass_pane",
+      "display_name": "Glass Pane"
+    },
+    {
+      "id": "attached_pumpkin_stem",
+      "display_name": "Attached Pumpkin Stem"
+    },
+    {
+      "id": "attached_melon_stem",
+      "display_name": "Attached Melon Stem"
+    },
+    {
+      "id": "pumpkin_stem",
+      "display_name": "Pumpkin Stem"
+    },
+    {
+      "id": "melon_stem",
+      "display_name": "Melon Stem"
+    },
+    {
+      "id": "resin_clump",
+      "display_name": "Resin Clump"
+    },
+    {
+      "id": "lily_pad",
+      "display_name": "Lily Pad"
+    },
+    {
+      "id": "resin_block",
+      "display_name": "Block of Resin"
+    },
+    {
+      "id": "nether_wart",
+      "display_name": "Nether Wart"
+    },
+    {
+      "id": "end_portal",
+      "display_name": "End Portal"
+    },
+    {
+      "id": "end_portal_frame",
+      "display_name": "End Portal Frame"
+    },
+    {
+      "id": "dragon_egg",
+      "display_name": "Dragon Egg"
+    },
+    {
+      "id": "redstone_lamp",
+      "display_name": "Redstone Lamp"
+    },
+    {
+      "id": "tripwire_hook",
+      "display_name": "Tripwire Hook"
+    },
+    {
+      "id": "tripwire",
+      "display_name": "Tripwire"
+    },
+    {
+      "id": "command_block",
+      "display_name": "Command Block"
+    },
+    {
+      "id": "beacon",
+      "display_name": "Beacon"
+    },
+    {
+      "id": "flower_pot",
+      "display_name": "Flower Pot"
+    },
+    {
+      "id": "potted_torchflower",
+      "display_name": "Potted Torchflower"
+    },
+    {
+      "id": "potted_oak_sapling",
+      "display_name": "Potted Oak Sapling"
+    },
+    {
+      "id": "potted_spruce_sapling",
+      "display_name": "Potted Spruce Sapling"
+    },
+    {
+      "id": "potted_birch_sapling",
+      "display_name": "Potted Birch Sapling"
+    },
+    {
+      "id": "potted_jungle_sapling",
+      "display_name": "Potted Jungle Sapling"
+    },
+    {
+      "id": "potted_acacia_sapling",
+      "display_name": "Potted Acacia Sapling"
+    },
+    {
+      "id": "potted_cherry_sapling",
+      "display_name": "Potted Cherry Sapling"
+    },
+    {
+      "id": "potted_dark_oak_sapling",
+      "display_name": "Potted Dark Oak Sapling"
+    },
+    {
+      "id": "potted_pale_oak_sapling",
+      "display_name": "Potted Pale Oak Sapling"
+    },
+    {
+      "id": "potted_mangrove_propagule",
+      "display_name": "Potted Mangrove Propagule"
+    },
+    {
+      "id": "potted_fern",
+      "display_name": "Potted Fern"
+    },
+    {
+      "id": "potted_dandelion",
+      "display_name": "Potted Dandelion"
+    },
+    {
+      "id": "potted_poppy",
+      "display_name": "Potted Poppy"
+    },
+    {
+      "id": "potted_blue_orchid",
+      "display_name": "Potted Blue Orchid"
+    },
+    {
+      "id": "potted_allium",
+      "display_name": "Potted Allium"
+    },
+    {
+      "id": "potted_azure_bluet",
+      "display_name": "Potted Azure Bluet"
+    },
+    {
+      "id": "potted_red_tulip",
+      "display_name": "Potted Red Tulip"
+    },
+    {
+      "id": "potted_orange_tulip",
+      "display_name": "Potted Orange Tulip"
+    },
+    {
+      "id": "potted_white_tulip",
+      "display_name": "Potted White Tulip"
+    },
+    {
+      "id": "potted_pink_tulip",
+      "display_name": "Potted Pink Tulip"
+    }
+  ],
+  "notes": [
+    "This file contains structured facts only. Add version-specific contextual facts from Minecraft Wiki before writing clues.",
+    "Facts with verified=false require a second source before use."
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "grindstone",
+      "display_name": "Grindstone",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "block",
+      "family": "sharpening utility",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "grindstone",
+      "anvil",
+      "stonecutter"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the sharpening utility family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "grindstone-family",
+        "matches_candidates": [
+          "grindstone",
+          "anvil",
+          "stonecutter"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I have two input slots for equipment or enchantments.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Grindstone",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "grindstone-obtaining",
+        "matches_candidates": [
+          "grindstone",
+          "anvil"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "I can remove an unwanted enchantment while returning some experience.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Grindstone",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "grindstone-use",
+        "matches_candidates": [
+          "grindstone",
+          "stonecutter"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the sharpening utility family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "grindstone",
+          "anvil",
+          "stonecutter"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I have two input slots for equipment or enchantments.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "grindstone",
+          "anvil"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "I can remove an unwanted enchantment while returning some experience.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "grindstone",
+          "stonecutter"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "anvil",
+        "grindstone",
+        "stonecutter"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "anvil",
+          "grindstone",
+          "stonecutter"
+        ],
+        "f_obtain": [
+          "anvil",
+          "grindstone"
+        ],
+        "f_use": [
+          "grindstone",
+          "stonecutter"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "grindstone",
+          "anvil",
+          "stonecutter"
+        ],
+        [
+          "anvil",
+          "grindstone"
+        ],
+        [
+          "grindstone",
+          "stonecutter"
+        ]
+      ],
+      "semantic_keys": [
+        "grindstone-family",
+        "grindstone-obtaining",
+        "grindstone-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Grindstone – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Grindstone"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}

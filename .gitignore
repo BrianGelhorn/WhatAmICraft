@@ -1,0 +1,22 @@
+node_modules
+dist
+.DS_Store
+.env
+.env.local
+data/publishing-secrets.json
+__pycache__
+*.pyc
+*.mp4
+*.tar
+*.tar.gz
+*.zip
+*.txt
+.secrets/
+backups/
+hosted-preview/
+legal-site/
+out/*
+!out/thumbnails/
+!out/thumbnails/**
+
+# Keep only the reusable thumbnail library from generated output.

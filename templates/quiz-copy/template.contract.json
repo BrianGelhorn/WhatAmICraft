@@ -1,0 +1,271 @@
+{
+  "template": "quiz-copy",
+  "compositionId": "QuizCapasCopy",
+  "fps": 30,
+  "durationInFrames": 855,
+  "automation": {
+    "format": "minecraft-quiz-copy",
+    "inputPath": "data/quiz-copy-episodes.json",
+    "schemaPath": "schemas/quiz-copy-episode.schema.json",
+    "producer": "scripts/produce_quiz_copy.py",
+    "generatedConfigPath": "src/generated/quiz-copy-episode.json",
+    "editableFields": [
+      "answer",
+      "background",
+      "hook",
+      "hintUi",
+      "thumbnail",
+      "clues",
+      "reveal",
+      "timeline",
+      "voiceGeneration",
+      "audio"
+    ],
+    "generatedFields": [
+      "durationInFrames",
+      "audio.music.publicSrc",
+      "audio.music.sourceName",
+      "thumbnail.outputs[]",
+      "audio.effects[].from",
+      "audio.effects[].publicSrc",
+      "audio.roulette.publicSrc",
+      "audio.voices[].from",
+      "audio.voices[].publicSrc",
+      "audio.voices[].durationInFrames",
+      "reveal.voice.answerStartMs"
+    ]
+  },
+  "intro": {
+    "hookDurationFrames": 30,
+    "handoffDurationFrames": 15,
+    "contentStartFrame": 180,
+    "maxContentStartFrame": 180,
+    "visualBeats": [
+      {
+        "id": "mystery-impact",
+        "from": 0,
+        "description": "horizontal reel locks on the black weapon silhouette and type label by frame 34; answer details stay hidden until reveal"
+      },
+      {
+        "id": "first-hint",
+        "from": 180,
+        "description": "first configured clue"
+      }
+    ]
+  },
+  "audio": {
+    "status": "complete",
+    "allowedSources": [
+      "audio/quiz-copy/music-cache/89915add3558bb75b643.m4a",
+      "audio/quiz-copy/normalized/a0f6111eb410e9bdad54.m4a",
+      "audio/quiz-copy/normalized/835fa4819df0abb21707.m4a",
+      "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+      "audio/quiz-copy/normalized/05aadec5f4025c8c1792.m4a",
+      "audio/quiz-copy/normalized/97387dbb94043c6f836b.m4a",
+      "audio/quiz-copy/normalized/643312963ea1ba69c1f5.m4a",
+      "audio/quiz-copy/normalized/e1fd39e405d1072bc59c.m4a",
+      "audio/quiz-copy/normalized/ce3eb307864a504b4a06.m4a",
+      "audio/quiz-copy/normalized/a620bfe4af78b93378f8.m4a"
+    ],
+    "cues": [
+      {
+        "id": "music-background",
+        "role": "music",
+        "src": "audio/quiz-copy/music-cache/89915add3558bb75b643.m4a",
+        "from": 0,
+        "durationInFrames": 855,
+        "volume": 0.16,
+        "visualEvent": "full-video-background-bed",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "voice-hook",
+        "role": "voice",
+        "src": "audio/quiz-copy/normalized/05aadec5f4025c8c1792.m4a",
+        "from": 48,
+        "durationInFrames": 28,
+        "volume": 1,
+        "visualEvent": "question-visible",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "voice-handoff",
+        "role": "voice",
+        "src": "audio/quiz-copy/normalized/97387dbb94043c6f836b.m4a",
+        "from": 80,
+        "durationInFrames": 54,
+        "volume": 1,
+        "visualEvent": "three-hints-card-visible",
+        "maxOffsetFrames": 0,
+        "playbackRate": 1.12,
+        "fadeOutFrames": 11
+      },
+      {
+        "id": "voice-clue-1",
+        "role": "voice",
+        "src": "audio/quiz-copy/normalized/643312963ea1ba69c1f5.m4a",
+        "from": 180,
+        "durationInFrames": 98,
+        "volume": 1,
+        "visualEvent": "clue-1-card-visible",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "voice-clue-2",
+        "role": "voice",
+        "src": "audio/quiz-copy/normalized/e1fd39e405d1072bc59c.m4a",
+        "from": 335,
+        "durationInFrames": 102,
+        "volume": 1,
+        "visualEvent": "clue-2-card-visible",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "voice-clue-3",
+        "role": "voice",
+        "src": "audio/quiz-copy/normalized/ce3eb307864a504b4a06.m4a",
+        "from": 490,
+        "durationInFrames": 84,
+        "volume": 1,
+        "visualEvent": "clue-3-card-visible",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "voice-reveal",
+        "role": "voice",
+        "src": "audio/quiz-copy/normalized/a620bfe4af78b93378f8.m4a",
+        "from": 675,
+        "durationInFrames": 66,
+        "volume": 1,
+        "visualEvent": "spoken-answer-matches-final-icon-and-text",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "sfx-roulette-ticks-unified",
+        "role": "sfx",
+        "src": "audio/quiz-copy/normalized/a0f6111eb410e9bdad54.m4a",
+        "from": 0,
+        "durationInFrames": 36,
+        "volume": 1,
+        "visualEvent": "each-reel-item-crossing-and-final-selection",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "sfx-roulette-select-bell",
+        "role": "sfx",
+        "src": "audio/quiz-copy/normalized/835fa4819df0abb21707.m4a",
+        "from": 34,
+        "durationInFrames": 16,
+        "volume": 0.85,
+        "visualEvent": "roulette-selection",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "sfx-countdown-3",
+        "role": "sfx",
+        "src": "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+        "from": 645,
+        "durationInFrames": 5,
+        "volume": 1,
+        "visualEvent": "countdown-number-change",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "sfx-countdown-2",
+        "role": "sfx",
+        "src": "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+        "from": 669,
+        "durationInFrames": 5,
+        "volume": 1,
+        "visualEvent": "countdown-number-change",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "sfx-countdown-1",
+        "role": "sfx",
+        "src": "audio/quiz-copy/normalized/d16c3081179b23fbe52c.m4a",
+        "from": 693,
+        "durationInFrames": 5,
+        "volume": 1,
+        "visualEvent": "countdown-number-change",
+        "maxOffsetFrames": 0
+      },
+      {
+        "id": "sfx-reveal-bell",
+        "role": "sfx",
+        "src": "audio/quiz-copy/normalized/835fa4819df0abb21707.m4a",
+        "from": 717,
+        "durationInFrames": 16,
+        "volume": 0.85,
+        "visualEvent": "answer-icon-appears",
+        "maxOffsetFrames": 0
+      }
+    ],
+    "normalization": {
+      "voiceTargetLufs": -16,
+      "voiceTruePeakDb": -1.5,
+      "voiceLoudnessRange": 11
+    }
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "from": 0,
+      "durationInFrames": 180
+    },
+    {
+      "id": "hint-1",
+      "from": 180,
+      "durationInFrames": 155
+    },
+    {
+      "id": "hint-2",
+      "from": 335,
+      "durationInFrames": 155
+    },
+    {
+      "id": "hint-3",
+      "from": 490,
+      "durationInFrames": 155
+    },
+    {
+      "id": "reveal",
+      "from": 645,
+      "durationInFrames": 210
+    }
+  ],
+  "animationPolicy": {
+    "allowed": [
+      "fade",
+      "translate",
+      "scale"
+    ],
+    "maxScale": 1.12,
+    "allowCssTransitions": false,
+    "allowRandomness": false
+  },
+  "thumbnail": {
+    "generatedConfigPath": "src/generated/thumbnail-config.json",
+    "platforms": {
+      "vertical": {
+        "compositionId": "ThumbnailVertical",
+        "width": 1080,
+        "height": 1920,
+        "variant": "silhouette"
+      },
+      "square": {
+        "compositionId": "ThumbnailSquare",
+        "width": 1080,
+        "height": 1080,
+        "variant": "roulette"
+      },
+      "youtube": {
+        "compositionId": "ThumbnailYoutube",
+        "width": 1280,
+        "height": 720,
+        "variant": "silhouette"
+      }
+    },
+    "outputDir": "out/thumbnails"
+  }
+}

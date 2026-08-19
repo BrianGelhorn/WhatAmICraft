@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "format", "episodes"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"type": "integer", "minimum": 1},
+    "format": {"const": "minecraft-quiz-copy"},
+    "episodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/episode"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "episode": {
+      "type": "object",
+      "required": ["id", "uniqueAnswer", "needsReview", "answer", "background", "hook", "hintUi", "thumbnail", "clues", "reveal", "timeline", "voiceGeneration", "audio"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "uniqueAnswer": {"const": true},
+        "needsReview": {"type": "boolean"},
+        "answer": {
+          "type": "object",
+          "required": ["id", "displayName", "guessType", "edition", "version"],
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "displayName": {"type": "string", "minLength": 1, "maxLength": 32},
+            "guessType": {"type": "string", "minLength": 1, "maxLength": 16},
+            "edition": {"enum": ["java", "bedrock"]},
+            "version": {"type": "string", "minLength": 1, "maxLength": 20}
+          },
+          "additionalProperties": false
+        },
+        "background": {"type": "string", "minLength": 1},
+        "hook": {
+          "type": "object",
+          "required": ["eyebrow", "title", "handoff", "categoryPrefix", "selectedIcon", "rouletteIcons"],
+          "properties": {
+            "eyebrow": {"type": "string", "minLength": 1, "maxLength": 24},
+            "title": {"type": "string", "minLength": 1, "maxLength": 24},
+            "handoff": {"type": "string", "minLength": 1, "maxLength": 28},
+            "categoryPrefix": {"type": "string", "minLength": 1, "maxLength": 12},
+            "selectedIcon": {"type": "string", "minLength": 1},
+            "rouletteIcons": {"type": "array", "minItems": 7, "maxItems": 7, "items": {"type": "string", "minLength": 1}}
+          },
+          "additionalProperties": false
+        },
+        "hintUi": {
+          "type": "object",
+          "required": ["label", "cta"],
+          "properties": {
+            "label": {"type": "string", "minLength": 1, "maxLength": 32},
+            "cta": {"type": "string", "minLength": 1, "maxLength": 32}
+          },
+          "additionalProperties": false
+        },
+        "thumbnail": {"$ref": "#/$defs/thumbnail"},
+        "clues": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["text", "voice"],
+            "properties": {
+              "text": {"type": "string", "minLength": 1, "maxLength": 90},
+              "voice": {"$ref": "#/$defs/voice"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "reveal": {
+          "type": "object",
+          "required": ["prompt", "answerLabel", "answerText", "cta", "icon", "countdownFrom", "voice"],
+          "properties": {
+            "prompt": {"type": "string", "minLength": 1, "maxLength": 20},
+            "answerLabel": {"type": "string", "minLength": 1, "maxLength": 20},
+            "answerText": {"type": "string", "minLength": 1, "maxLength": 32},
+            "cta": {"type": "string", "minLength": 1, "maxLength": 40},
+            "icon": {"type": "string", "minLength": 1},
+            "countdownFrom": {"type": "integer", "minimum": 1},
+            "voice": {"$ref": "#/$defs/voice"}
+          },
+          "additionalProperties": false
+        },
+        "timeline": {
+          "type": "object",
+          "required": ["contentStartFrame", "reelStopFrame", "hookTitleFromFrame", "handoffFromFrame", "categoryFromFrame", "hintDurationInFrames", "revealDurationInFrames", "answerStartFrame", "countdownStepInFrames"],
+          "properties": {
+            "contentStartFrame": {"type": "integer", "minimum": 1},
+            "reelStopFrame": {"const": 34},
+            "hookTitleFromFrame": {"type": "integer", "minimum": 0},
+            "handoffFromFrame": {"type": "integer", "minimum": 0},
+            "categoryFromFrame": {"type": "integer", "minimum": 0},
+            "hintDurationInFrames": {"type": "integer", "minimum": 30},
+            "revealDurationInFrames": {"type": "integer", "minimum": 30},
+            "answerStartFrame": {"type": "integer", "minimum": 1},
+            "countdownStepInFrames": {"type": "integer", "minimum": 1}
+          },
+          "additionalProperties": false
+        },
+        "voiceGeneration": {
+          "type": "object",
+          "required": ["voiceId", "model"],
+          "properties": {
+            "voiceId": {"type": "string", "minLength": 1},
+            "model": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "audio": {
+          "type": "object",
+          "required": ["normalization", "music", "roulette", "countdownClick", "revealBell", "genericVoices"],
+          "properties": {
+            "normalization": {"$ref": "#/$defs/audioNormalization"},
+            "music": {"$ref": "#/$defs/music"},
+            "roulette": {"$ref": "#/$defs/audioCue"},
+            "countdownClick": {"$ref": "#/$defs/sfxAsset"},
+            "revealBell": {"$ref": "#/$defs/sfxAsset"},
+            "genericVoices": {"type": "array", "items": {"$ref": "#/$defs/voice"}}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "thumbnail": {
+      "type": "object",
+      "required": ["eyebrow", "headlineTop", "headlineBottom", "difficulty", "subline", "mysteryLabel", "hintLabel", "background", "icon", "accent", "secondaryAccent", "iconScale", "iconOffsetY", "platforms", "outputDir"],
+      "properties": {
+        "eyebrow": {"type": "string", "minLength": 1, "maxLength": 24},
+        "headlineTop": {"type": "string", "minLength": 1, "maxLength": 12},
+        "headlineBottom": {"type": "string", "minLength": 1, "maxLength": 10},
+        "difficulty": {"type": "string", "minLength": 1, "maxLength": 8},
+        "subline": {"type": "string", "minLength": 1, "maxLength": 24},
+        "mysteryLabel": {"type": "string", "minLength": 1, "maxLength": 14},
+        "hintLabel": {"type": "string", "minLength": 1, "maxLength": 16},
+        "background": {"type": "string", "minLength": 1},
+        "icon": {"type": "string", "minLength": 1},
+        "accent": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+        "secondaryAccent": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"},
+        "iconScale": {"type": "number", "minimum": 0.5, "maximum": 1.5},
+        "iconOffsetY": {"type": "number", "minimum": -300, "maximum": 300},
+        "platforms": {
+          "type": "object",
+          "required": ["vertical", "square", "youtube"],
+          "properties": {
+            "vertical": {"enum": ["silhouette", "pixelated", "roulette"]},
+            "square": {"enum": ["silhouette", "pixelated", "roulette"]},
+            "youtube": {"enum": ["silhouette", "pixelated", "roulette"]}
+          },
+          "additionalProperties": false
+        },
+        "outputDir": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "music": {
+      "type": "object",
+      "required": ["folder", "targetLufs", "truePeakDb", "loudnessRange", "volume", "duckedVolume", "fadeInFrames", "fadeOutFrames", "duckFadeFrames"],
+      "properties": {
+        "folder": {"type": "string", "minLength": 1},
+        "targetLufs": {"type": "number", "minimum": -70, "maximum": -5},
+        "truePeakDb": {"type": "number", "minimum": -10, "maximum": 0},
+        "loudnessRange": {"type": "number", "minimum": 1, "maximum": 50},
+        "volume": {"type": "number", "minimum": 0, "maximum": 1},
+        "duckedVolume": {"type": "number", "minimum": 0, "maximum": 1},
+        "fadeInFrames": {"type": "integer", "minimum": 1},
+        "fadeOutFrames": {"type": "integer", "minimum": 1},
+        "duckFadeFrames": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "audioNormalization": {
+      "type": "object",
+      "required": ["voiceTargetLufs", "voiceTruePeakDb", "voiceLoudnessRange"],
+      "properties": {
+        "voiceTargetLufs": {"type": "number", "minimum": -70, "maximum": -5},
+        "voiceTruePeakDb": {"type": "number", "minimum": -10, "maximum": 0},
+        "voiceLoudnessRange": {"type": "number", "minimum": 1, "maximum": 50}
+      },
+      "additionalProperties": false
+    },
+    "audioCue": {
+      "type": "object",
+      "required": ["publicSrc", "from", "durationInFrames", "volume", "targetPeakDb"],
+      "properties": {
+        "publicSrc": {"type": "string", "minLength": 1},
+        "from": {"type": "integer", "minimum": 0},
+        "durationInFrames": {"type": "integer", "minimum": 1},
+        "volume": {"type": "number", "minimum": 0},
+        "targetPeakDb": {"type": "number", "minimum": -30, "maximum": 0}
+      },
+      "additionalProperties": false
+    },
+    "sfxAsset": {
+      "type": "object",
+      "required": ["publicSrc", "durationInFrames", "volume", "targetPeakDb"],
+      "properties": {
+        "publicSrc": {"type": "string", "minLength": 1},
+        "durationInFrames": {"type": "integer", "minimum": 1},
+        "volume": {"type": "number", "minimum": 0},
+        "targetPeakDb": {"type": "number", "minimum": -30, "maximum": 0}
+      },
+      "additionalProperties": false
+    },
+    "voice": {
+      "type": "object",
+      "required": ["generate", "text", "publicSrc", "volume"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "generate": {"type": "boolean"},
+        "text": {"type": "string", "minLength": 1, "maxLength": 160},
+        "publicSrc": {"type": "string", "minLength": 1},
+        "seedSrc": {"type": "string", "minLength": 1},
+        "durationMs": {"type": "number", "exclusiveMinimum": 0},
+        "answerStartMs": {"type": "number", "exclusiveMinimum": 0},
+        "durationInFrames": {"type": "integer", "minimum": 1},
+        "from": {"type": "integer", "minimum": 0},
+        "fromOffsetFrames": {"type": "integer", "minimum": 0},
+        "syncOffsetFrames": {"type": "integer", "minimum": 0},
+        "volume": {"type": "number", "minimum": 0},
+        "speed": {"type": "number", "minimum": 0.7, "maximum": 1.2},
+        "playbackRate": {"type": "number", "minimum": 0.5, "maximum": 2},
+        "fadeOutFrames": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  }
+}

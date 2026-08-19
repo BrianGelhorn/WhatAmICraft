@@ -1,0 +1,178 @@
+{
+  "episode": {
+    "target": {
+      "id": "cactus",
+      "display_name": "Cactus",
+      "edition": "java",
+      "version": "1.21.5",
+      "kind": "plant",
+      "family": "desert plant block",
+      "forbidden_terms": [],
+      "forbidden_clue_terms": []
+    },
+    "mode": "open_answer",
+    "difficulty": "medium",
+    "clue_count": 3,
+    "clue_count_reason": "Three independent facts narrow a small family of candidates to one answer.",
+    "candidates": [
+      "cactus",
+      "sugar_cane",
+      "sweet_berry_bush"
+    ],
+    "facts": [
+      {
+        "id": "f_family",
+        "type": "family",
+        "value": "Belongs to the desert plant block family used in this audit.",
+        "scope": "family",
+        "source_type": "minecraft-data",
+        "source": "minecraft-data 3.112.0 for Minecraft 1.21.5",
+        "verified": true,
+        "relation": "family",
+        "semantic_key": "cactus-family",
+        "matches_candidates": [
+          "cactus",
+          "sugar_cane",
+          "sweet_berry_bush"
+        ]
+      },
+      {
+        "id": "f_obtain",
+        "type": "obtaining",
+        "value": "I can grow without farmland in a natural overworld biome.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Cactus",
+        "verified": true,
+        "relation": "obtaining",
+        "semantic_key": "cactus-obtaining",
+        "matches_candidates": [
+          "cactus",
+          "sugar_cane"
+        ]
+      },
+      {
+        "id": "f_use",
+        "type": "use",
+        "value": "Touching me can hurt an entity.",
+        "scope": "target",
+        "source_type": "wiki",
+        "source": "https://minecraft.wiki/w/Cactus",
+        "verified": true,
+        "relation": "use",
+        "semantic_key": "cactus-use",
+        "matches_candidates": [
+          "cactus",
+          "sweet_berry_bush"
+        ]
+      }
+    ],
+    "clues": [
+      {
+        "order": 1,
+        "text": "I belong to the desert plant block family.",
+        "referent": "target",
+        "fact_ids": [
+          "f_family"
+        ],
+        "matches_candidates": [
+          "cactus",
+          "sugar_cane",
+          "sweet_berry_bush"
+        ]
+      },
+      {
+        "order": 2,
+        "text": "I can grow without farmland in a natural overworld biome.",
+        "referent": "target",
+        "fact_ids": [
+          "f_obtain"
+        ],
+        "matches_candidates": [
+          "cactus",
+          "sugar_cane"
+        ]
+      },
+      {
+        "order": 3,
+        "text": "Touching me can hurt an entity.",
+        "referent": "target",
+        "fact_ids": [
+          "f_use"
+        ],
+        "matches_candidates": [
+          "cactus",
+          "sweet_berry_bush"
+        ]
+      }
+    ],
+    "remaining_after_each_clue": [
+      3,
+      2,
+      1
+    ],
+    "audit": {
+      "candidate_universe": [
+        "cactus",
+        "sugar_cane",
+        "sweet_berry_bush"
+      ],
+      "fact_matches": {
+        "f_family": [
+          "cactus",
+          "sugar_cane",
+          "sweet_berry_bush"
+        ],
+        "f_obtain": [
+          "cactus",
+          "sugar_cane"
+        ],
+        "f_use": [
+          "cactus",
+          "sweet_berry_bush"
+        ]
+      },
+      "computed_clue_matches": [
+        [
+          "cactus",
+          "sugar_cane",
+          "sweet_berry_bush"
+        ],
+        [
+          "cactus",
+          "sugar_cane"
+        ],
+        [
+          "cactus",
+          "sweet_berry_bush"
+        ]
+      ],
+      "semantic_keys": [
+        "cactus-family",
+        "cactus-obtaining",
+        "cactus-use"
+      ]
+    },
+    "unique_answer": true,
+    "needs_review": false,
+    "human_validation": {
+      "stable_referent": true,
+      "progressive_reduction": true,
+      "no_named_comparisons": true,
+      "exact_answer_recoverable": true,
+      "final_clue_rationale": "The final property is shared by one rival in isolation but becomes unique when combined with the first two clues."
+    },
+    "warnings": [],
+    "sources": [
+      {
+        "title": "Cactus – Minecraft Wiki",
+        "url": "https://minecraft.wiki/w/Cactus"
+      },
+      {
+        "title": "minecraft-data 3.112.0",
+        "url": "https://github.com/PrismarineJS/minecraft-data"
+      }
+    ],
+    "narration": ""
+  }
+}
