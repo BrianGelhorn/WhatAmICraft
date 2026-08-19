@@ -120,6 +120,24 @@ jobs:
           PYTHONPATH=scripts python scripts/test_clues_api.py
           PYTHONPATH=scripts python scripts/test_clues_api_catalog.py
 
+  analytics-api:
+    name: Analytics API service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Analytics API behavior contract with provider fake
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/analytics.py scripts/analytics_client.py scripts/analytics_service.py
+          PYTHONPATH=scripts python scripts/test_dashboard_analytics.py
+          PYTHONPATH=scripts python scripts/test_analytics_service.py
+
   media:
     name: Media service
     runs-on: ubuntu-latest
@@ -173,7 +191,7 @@ jobs:
 
   dashboard-media-integration:
     name: Dashboard/media integration
-    needs: [dashboard, bot, publisher-worker, producer, clues-api, media]
+    needs: [dashboard, bot, publisher-worker, producer, clues-api, analytics-api, media]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -197,11 +215,12 @@ jobs:
           project="whatamicraft-ci-${GITHUB_RUN_ID}"
           echo "COMPOSE_PROJECT=$project" >> "$GITHUB_ENV"
           trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
-          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api media
+          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api analytics-api media
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
               && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
               && curl --fail --silent http://127.0.0.1:8790/health >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8791/health >/dev/null \
               && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
               break
             fi
@@ -214,4 +233,5 @@ jobs:
           PYTHONPATH=scripts python scripts/ci/service_smoke.py \
             --dashboard http://127.0.0.1:8788 \
             --media http://127.0.0.1:8081 \
+            --analytics http://127.0.0.1:8791 \
             --fixture mc-ci-test.mp4

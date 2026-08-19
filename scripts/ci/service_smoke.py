@@ -54,11 +54,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dashboard", required=True)
     parser.add_argument("--media", required=True)
+    parser.add_argument("--analytics", required=True)
     parser.add_argument("--fixture", required=True)
     args = parser.parse_args()
 
     dashboard = args.dashboard.rstrip("/")
     media = args.media.rstrip("/")
+    analytics = args.analytics.rstrip("/")
     fixture = args.fixture.lstrip("/")
 
     status, headers, _ = get(f"{dashboard}/")
@@ -71,6 +73,21 @@ def main() -> None:
     state = json.loads(state_body)
     if not isinstance(state.get("episodes"), list):
         raise RuntimeError("dashboard state has no episode list")
+
+    _, analytics_headers, analytics_health_body = get(f"{analytics}/health")
+    if not analytics_headers.get("content-type", "").startswith("application/json"):
+        raise RuntimeError("analytics service health is not JSON")
+    analytics_health = json.loads(analytics_health_body)
+    if analytics_health.get("service") != "analytics-api":
+        raise RuntimeError("analytics service health returned the wrong service")
+    _, analytics_headers, analytics_body = get(f"{analytics}/api/analytics")
+    if not analytics_headers.get("content-type", "").startswith("application/json"):
+        raise RuntimeError("analytics service snapshot is not JSON")
+    analytics_snapshot = json.loads(analytics_body)
+    if not isinstance(analytics_snapshot.get("platforms"), list) or not isinstance(analytics_snapshot.get("summary"), dict):
+        raise RuntimeError("analytics service returned an invalid snapshot")
+    if state.get("analytics", {}).get("schemaVersion") != analytics_snapshot.get("schemaVersion"):
+        raise RuntimeError("dashboard is not receiving analytics from the service")
 
     _, clues_headers, clues_body = get(f"{dashboard}/api/clues?status=unused")
     if not clues_headers.get("content-type", "").startswith("application/json"):
@@ -122,7 +139,7 @@ def main() -> None:
     get(f"{media}/%2e%2e%2fdata%2fquiz-copy-episodes.json", {400, 404})
 
     get(f"{dashboard}/videos/%2e%2e%2fdata%2fquiz-copy-episodes.json", {404})
-    print("ok: dashboard/media service contract and path guard")
+    print("ok: dashboard/media/analytics service contract and path guard")
 
 
 if __name__ == "__main__":

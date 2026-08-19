@@ -9,6 +9,7 @@ services:
     environment:
       DASHBOARD_PORT: 8787
       CLUES_API_URL: http://clues-api:8790
+      ANALYTICS_API_URL: http://analytics-api:8791
       PUBLIC_VIDEO_BASE_URL: http://127.0.0.1:8081
       YOUTUBE_PRIVACY_STATUS: private
       YOUTUBE_CATEGORY_ID: 20
@@ -33,6 +34,7 @@ services:
       - ../public/audio:/app/public/audio
     depends_on:
       - clues-api
+      - analytics-api
 
   clues-api:
     image: minecraft-quiz-guesser:dev
@@ -48,6 +50,20 @@ services:
       - "127.0.0.1:8790:8790"
     volumes:
       - ../data:/app/data
+
+  analytics-api:
+    image: minecraft-quiz-guesser:dev
+    build: ..
+    entrypoint: ["python3", "scripts/analytics_service.py"]
+    restart: unless-stopped
+    environment:
+      ANALYTICS_PORT: 8791
+    ports:
+      - "127.0.0.1:8791:8791"
+    volumes:
+      - ../data:/app/data
+      - ../out:/app/out
+      - ../backups:/app/backups
 
   media:
     image: nginx:alpine
