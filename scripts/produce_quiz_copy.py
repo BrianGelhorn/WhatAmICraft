@@ -676,6 +676,7 @@ def update_contract(config: dict) -> None:
     music = config["audio"]["music"]
     effects = config["audio"]["effects"]
     contract["durationInFrames"] = config["durationInFrames"]
+    contract["intro"]["hookDurationFrames"] = timeline["contentStartFrame"]
     contract["intro"]["contentStartFrame"] = timeline["contentStartFrame"]
     contract["intro"]["maxContentStartFrame"] = timeline["contentStartFrame"]
     contract["intro"]["visualBeats"] = [
