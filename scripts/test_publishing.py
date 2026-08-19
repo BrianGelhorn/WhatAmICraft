@@ -29,9 +29,9 @@ def main() -> None:
     item = PublishRequest("mc-01", Path("video.mp4"), None, "Title", "Caption", ["minecraft", "shorts"])
     assert item.description == "Caption\n\n#minecraft #shorts"
     original_output_dir = publish_script.OUTPUT_DIR
-    publish_script.OUTPUT_DIR = Path(__file__).resolve().parents[1] / "out/test-publish-selection"
+    publish_script.OUTPUT_DIR = Path(__file__).resolve().parents[1] / "out/test-publish-selection/episodes"
     try:
-        (publish_script.OUTPUT_DIR / "episodes").mkdir(parents=True, exist_ok=True)
+        publish_script.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         episode = {"id": "mc-01", "target": {"id": "test"}}
         video = publish_script.video_for(episode)
         video.write_bytes(b"video")

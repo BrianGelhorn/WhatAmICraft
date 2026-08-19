@@ -11,7 +11,7 @@ from publishing import PUBLISHERS
 from publishing.common import PublishRequest, sha256
 from publishing.settings import apply_runtime, enabled_platforms, load_config
 from review.storage import pending_queue_ids, publishing_state, save_published_platform, set_queue_status
-from video_formats import ready_episodes, thumbnail_path, video_path
+from video_formats import ready_episodes, thumbnail_path, video_stem
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
@@ -29,7 +29,7 @@ def episodes() -> list[dict]:
 
 
 def video_for(episode: dict) -> Path:
-    return video_path(episode)
+    return OUTPUT_DIR / f"{video_stem(episode)}.mp4"
 
 
 def thumbnail_for(episode: dict) -> Path | None:
