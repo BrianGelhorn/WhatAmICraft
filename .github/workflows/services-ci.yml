@@ -102,6 +102,23 @@ jobs:
           npx remotion render QuizCapasCopy out/ci-producer-check.mp4 --frames=0-1
           test -s out/ci-producer-check.mp4
 
+  clues-api:
+    name: Clues API service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Clues API behavior contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/clues_api.py scripts/clues_client.py
+          PYTHONPATH=scripts python scripts/test_clues_api.py
+
   media:
     name: Media service
     runs-on: ubuntu-latest
@@ -136,7 +153,7 @@ jobs:
 
   dashboard-media-integration:
     name: Dashboard/media integration
-    needs: [dashboard, bot, publisher-worker, producer, media]
+    needs: [dashboard, bot, publisher-worker, producer, clues-api, media]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -160,10 +177,11 @@ jobs:
           project="whatamicraft-ci-${GITHUB_RUN_ID}"
           echo "COMPOSE_PROJECT=$project" >> "$GITHUB_ENV"
           trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
-          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard media
+          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api media
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
-              && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null; then
+              && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
+              && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
               break
             fi
             if [ "$attempt" = "60" ]; then

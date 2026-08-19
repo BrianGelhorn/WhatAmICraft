@@ -36,10 +36,11 @@ jobs:
           project="whatamicraft-staging-${GITHUB_RUN_ID}"
           trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
           docker compose -p "$project" -f staging/compose.yaml config --quiet
-          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard media
+          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api media
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
-              && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null; then
+              && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
+              && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
               break
             fi
             if [ "$attempt" = "60" ]; then

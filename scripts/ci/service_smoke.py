@@ -72,6 +72,13 @@ def main() -> None:
     if not isinstance(state.get("episodes"), list):
         raise RuntimeError("dashboard state has no episode list")
 
+    _, clues_headers, clues_body = get(f"{dashboard}/api/clues?status=unused")
+    if not clues_headers.get("content-type", "").startswith("application/json"):
+        raise RuntimeError("dashboard clues proxy is not JSON")
+    clues = json.loads(clues_body)
+    if not isinstance(clues.get("items"), list) or clues.get("status") != "unused":
+        raise RuntimeError("dashboard clues proxy returned an invalid catalog")
+
     original_config = state.get("publishing", {}).get("config")
     if not isinstance(original_config, dict):
         raise RuntimeError("dashboard state has no publishing config")

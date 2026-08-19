@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
     environment:
       DASHBOARD_PORT: 8787
+      CLUES_API_URL: http://clues-api:8790
       PUBLIC_VIDEO_BASE_URL: http://127.0.0.1:8081
       YOUTUBE_PRIVACY_STATUS: private
       YOUTUBE_CATEGORY_ID: 20
@@ -30,6 +31,23 @@ services:
       - ../out:/app/out
       - ../backups:/app/backups
       - ../public/audio:/app/public/audio
+    depends_on:
+      - clues-api
+
+  clues-api:
+    image: minecraft-quiz-guesser:dev
+    build: ..
+    entrypoint: ["python3", "scripts/clues_api.py"]
+    restart: unless-stopped
+    environment:
+      CLUES_PORT: 8790
+      CLUES_SOURCE_DIR: /app/data/new-clues-20260815
+      CLUES_UPLOAD_DIR: /app/data/clues/inbox
+      CLUES_USED_TARGETS_PATH: /app/data/used-targets.json
+    ports:
+      - "127.0.0.1:8790:8790"
+    volumes:
+      - ../data:/app/data
 
   media:
     image: nginx:alpine

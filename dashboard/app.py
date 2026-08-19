@@ -33,6 +33,7 @@ from review.storage import (  # noqa: E402
     reject_episode,
 )
 from analytics import build_snapshot, sync_all, write_exports  # noqa: E402
+from clues_client import CluesApiError, request_json as clues_request  # noqa: E402
 from publishing import PUBLISHERS  # noqa: E402
 from publishing.common import json_request, sha256  # noqa: E402
 from publishing.settings import (  # noqa: E402
@@ -758,6 +759,15 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
         elif path == "/api/state":
             self.send_json(dashboard_state())
+        elif path == "/api/clues":
+            if not os.getenv("CLUES_API_URL"):
+                self.send_json({"ok": False, "error": "La API de pistas no está configurada"}, HTTPStatus.SERVICE_UNAVAILABLE)
+            else:
+                try:
+                    status, result = clues_request(f"/api/clues?{urlparse(self.path).query}" if urlparse(self.path).query else "/api/clues")
+                    self.send_json(result, status)
+                except CluesApiError:
+                    self.send_json({"ok": False, "error": "La API de pistas no responde"}, HTTPStatus.BAD_GATEWAY)
         elif path == "/api/diagnostics":
             self.send_json(diagnostics_state())
         elif path == "/api/analytics/export.json":
