@@ -31,7 +31,7 @@ def main() -> None:
     original_output_dir = publish_script.OUTPUT_DIR
     publish_script.OUTPUT_DIR = Path(__file__).resolve().parents[1] / "out/test-publish-selection"
     try:
-        publish_script.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        (publish_script.OUTPUT_DIR / "episodes").mkdir(parents=True, exist_ok=True)
         episode = {"id": "mc-01", "target": {"id": "test"}}
         video = publish_script.video_for(episode)
         video.write_bytes(b"video")
