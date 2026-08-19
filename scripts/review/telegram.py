@@ -14,6 +14,9 @@ def _api(method: str, fields: dict, video: Path | None = None) -> dict:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
         raise RuntimeError("Falta TELEGRAM_BOT_TOKEN")
+    api_base = "https://api.telegram.org"
+    if os.getenv("WHATAMICRAFT_TEST_TELEGRAM") == "1":
+        api_base = os.getenv("TELEGRAM_API_BASE_URL", api_base).rstrip("/")
     headers: dict[str, str]
     if video:
         boundary = f"----MinecraftQuiz{uuid.uuid4().hex}"
@@ -33,7 +36,7 @@ def _api(method: str, fields: dict, video: Path | None = None) -> dict:
         body = json.dumps(fields, ensure_ascii=False).encode("utf-8")
         headers = {"Content-Type": "application/json; charset=UTF-8"}
     _, _, raw = request(
-        f"https://api.telegram.org/bot{token}/{method}",
+        f"{api_base}/bot{token}/{method}",
         method="POST",
         headers=headers,
         data=body,

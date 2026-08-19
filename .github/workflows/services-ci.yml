@@ -47,12 +47,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Bot checks without Telegram network access
+      - name: Bot behavior contract against fake Telegram API
         shell: bash
         run: |
           set -euo pipefail
           python -m py_compile scripts/review/bot.py scripts/review/telegram.py
-          PYTHONPATH=scripts python -c "import review.bot as bot, review.telegram as telegram; assert bot.menu_keyboard(); assert bot.help_text(); assert not telegram.configured(); print('ok: bot command surface and no-network guard')"
+          PYTHONPATH=scripts python scripts/ci/service_contracts.py --bot
 
   publisher-worker:
     name: Publisher and worker services
@@ -64,14 +64,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Publisher checks with provider calls disabled
+      - name: Publisher and worker behavior contract with provider fake
         shell: bash
         run: |
           set -euo pipefail
           python -m py_compile scripts/publish.py scripts/publish_worker.py scripts/publishing/*.py
           PYTHONPATH=scripts python scripts/test_publishing.py
           PYTHONPATH=scripts python scripts/test_priorities.py
-          PYTHONPATH=scripts python -c "import publish, publish_worker; print('ok: publisher modules import')"
+          PYTHONPATH=scripts python scripts/ci/service_contracts.py --publisher
 
   producer:
     name: Producer and generation contracts
@@ -83,28 +83,60 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
       - name: Producer checks without external voice generation
         shell: bash
         run: |
           set -euo pipefail
+          npm ci
+          npx remotion browser ensure
           python -m py_compile scripts/produce_quiz_copy.py scripts/thumbnails.py
           PYTHONPATH=scripts python scripts/test_quiz_copy_validation.py
           PYTHONPATH=scripts python scripts/test_thumbnails.py
           python skills/remotion-template-builder/scripts/validate_template_contract.py \
             --manifest templates/quiz-copy/template.contract.json \
             --source-dir src
+          npx remotion render QuizCapasCopy out/ci-producer-check.mp4 --frames=0-1
+          test -s out/ci-producer-check.mp4
 
   media:
     name: Media service
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate nginx service image
-        run: docker run --rm nginx:alpine nginx -t
+      - name: Media behavior contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixture_dir="$(mktemp -d)"
+          fixture="$fixture_dir/mc-ci-test.mp4"
+          container=""
+          cleanup() {
+            if [ -n "$container" ]; then docker rm -f "$container" >/dev/null 2>&1 || true; fi
+            rm -rf "$fixture_dir"
+          }
+          trap cleanup EXIT
+          printf 'whatamicraft-ci-video' > "$fixture"
+          container="$(docker run -d --rm -p 18081:80 -v "$fixture_dir:/usr/share/nginx/html:ro" nginx:alpine)"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18081/mc-ci-test.mp4 >/dev/null; then break; fi
+            if [ "$attempt" = "30" ]; then exit 1; fi
+            sleep 1
+          done
+          curl --fail --silent --head http://127.0.0.1:18081/mc-ci-test.mp4 | grep -i '^Content-Type: video/mp4'
+          test "$(curl --silent --show-error --output "$fixture_dir/body" --write-out '%{http_code}' http://127.0.0.1:18081/mc-ci-test.mp4)" = "200"
+          cmp "$fixture" "$fixture_dir/body"
+          test "$(curl --silent --show-error --range 0-4 --output "$fixture_dir/range" --write-out '%{http_code}' http://127.0.0.1:18081/mc-ci-test.mp4)" = "206"
+          test "$(wc -c < "$fixture_dir/range")" -eq 5
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:18081/missing.mp4)" = "404"
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:18081/../data/quiz-copy-episodes.json)" = "404"
 
   dashboard-media-integration:
     name: Dashboard/media integration
-    needs: [dashboard, producer, media]
+    needs: [dashboard, bot, publisher-worker, producer, media]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
