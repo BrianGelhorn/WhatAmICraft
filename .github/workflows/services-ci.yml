@@ -53,6 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m py_compile scripts/review/bot.py scripts/review/telegram.py
+          PYTHONPATH=scripts python scripts/test_telegram_bot.py
           PYTHONPATH=scripts python scripts/ci/service_contracts.py --bot
 
   publisher-worker:
