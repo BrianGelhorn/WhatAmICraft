@@ -38,6 +38,9 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Verify locked ESLint toolchain
+        run: node scripts/test_lint_toolchain.mjs
+
       - name: Lint and type-check
         run: npm run lint
 
