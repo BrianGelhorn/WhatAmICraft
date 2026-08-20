@@ -127,6 +127,7 @@ services:
       - "8080:80"
     volumes:
       - ${VIDEO_STORAGE_PATH:-./out/episodes}:/usr/share/nginx/html:ro
+      - ./out/thumbnails:/usr/share/nginx/html/thumbnails:ro
 
   tunnel:
     # ponytail: quick tunnel URL changes on recreation; use a named tunnel for a stable production domain.
