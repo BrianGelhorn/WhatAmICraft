@@ -49,6 +49,7 @@ services:
     restart: unless-stopped
     environment:
       CLUES_PORT: 8790
+      CLUES_DB_PATH: /app/data/clues.sqlite3
       CLUES_SOURCE_DIR: /app/data/new-clues-20260815
       CLUES_UPLOAD_DIR: /app/data/clues/inbox
       CLUES_USED_TARGETS_PATH: /app/data/used-targets.json

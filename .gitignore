@@ -4,6 +4,7 @@ dist
 .env
 .env.local
 data/publishing-secrets.json
+data/clues.sqlite3*
 __pycache__
 *.pyc
 *.mp4

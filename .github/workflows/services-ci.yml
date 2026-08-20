@@ -122,7 +122,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile scripts/clues_api.py scripts/clues_client.py
+          python -m py_compile scripts/clues_api.py scripts/clues_database.py scripts/clues_client.py
           PYTHONPATH=scripts python scripts/test_clues_api.py
           PYTHONPATH=scripts python scripts/test_clues_api_catalog.py
 

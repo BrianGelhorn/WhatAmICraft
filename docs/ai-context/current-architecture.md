@@ -14,7 +14,7 @@ MinecraftQuizGuesser runs on the Debian mini PC at `/home/brian/MinecraftQuizGue
 
 - Private dashboard: `https://what-am-i-craft.tail6cc348.ts.net:8443/`
 - Public video base: `https://what-am-i-craft.tail6cc348.ts.net/`
-- Docker services: `dashboard`, `bot`, `publisher-worker`, `media`; `clues-api`, `analytics-api`, and `monitor` are currently staging-only.
+- Docker services: `dashboard`, `bot`, `publisher-worker`, `media`; `clues-api`, `analytics-api`, and `monitor` are currently staging-only. The clues API bootstraps `data/clues.sqlite3` once from the legacy clue JSON files, then uses SQLite as its source of truth.
 - Operational state: `out/app-state.sqlite3`.
 - Target history: `data/used-targets.json`.
 - Videos are stored on the USB disk mounted at `/app/out/episodes`.

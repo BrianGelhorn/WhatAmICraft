@@ -12,6 +12,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+from clues_database import CluesDatabase
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET_ID = re.compile(r"^[a-z0-9]+(?:[_-][a-z0-9]+)*$")
@@ -25,15 +27,6 @@ class UsageConflict(CatalogError):
     pass
 
 
-def read_json(path: Path, default):
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return default
-    except json.JSONDecodeError as error:
-        raise CatalogError(f"JSON inválido: {path.name}") from error
-
-
 class ClueCatalog:
     def __init__(
         self,
@@ -41,80 +34,37 @@ class ClueCatalog:
         source_dirs: list[Path] | None = None,
         upload_dir: Path | None = None,
         used_targets_path: Path | None = None,
+        db_path: Path | None = None,
     ):
         self.root = root
         self.source_dirs = source_dirs or [root / "data/new-clues-20260815"]
         self.upload_dir = upload_dir or root / "data/clues/inbox"
         self.used_targets_path = used_targets_path or root / "data/used-targets.json"
         self._write_lock = threading.Lock()
-
-    def _files(self) -> list[Path]:
-        paths = []
+        self.db = CluesDatabase(db_path or root / "data/clues.sqlite3")
+        migration_files = []
+        seen = set()
         for directory in [*self.source_dirs, self.upload_dir]:
-            if directory.exists():
-                paths.extend(sorted(path for path in directory.glob("*.json") if path.name != "manifest.json"))
-        return paths
-
-    def _load_episode(self, path: Path) -> dict:
-        value = read_json(path, None)
-        episode = value.get("episode") if isinstance(value, dict) else None
-        if not isinstance(episode, dict):
-            raise CatalogError(f"La carga {path.name} no contiene episode")
-        target = episode.get("target")
-        target_id = target.get("id") if isinstance(target, dict) else None
-        if not isinstance(target_id, str) or not TARGET_ID.fullmatch(target_id):
-            raise CatalogError(f"ID de objetivo inválido en {path.name}")
-        self.validate_upload(value)
-        return episode
-
-    def _used(self) -> dict[str, dict]:
-        value = read_json(self.used_targets_path, {"targets": []})
-        result = {
-            target_id: {"id": target_id, "sources": [], "episode_ids": [], "video_files": []}
-            for target_id in value.get("target_ids", [])
-            if isinstance(target_id, str)
-        }
-        result.update({
-            item["id"]: item
-            for item in value.get("targets", [])
-            if isinstance(item, dict) and isinstance(item.get("id"), str)
-        })
-        return result
+            if not directory.exists():
+                continue
+            for path in sorted(directory.glob("*.json")):
+                if path.name == "manifest.json" or path in seen:
+                    continue
+                seen.add(path)
+                source_file = str(path.relative_to(self.root)) if path.is_relative_to(self.root) else path.name
+                migration_files.append((path, source_file))
+        self.db.initialize(migration_files, self.used_targets_path, self.validate_upload)
 
     def records(self) -> list[dict]:
-        used = self._used()
-        result = {}
-        for path in self._files():
-            episode = self._load_episode(path)
-            target_id = episode["target"]["id"]
-            if target_id in result:
-                raise CatalogError(f"Hay más de una carga para {target_id}")
-            history = used.get(target_id)
-            result[target_id] = {
-                "id": target_id,
-                "status": "used" if history else "unused",
-                "used": bool(history),
-                "sourceFile": str(path.relative_to(self.root)) if path.is_relative_to(self.root) else path.name,
-                "usage": history or {"sources": [], "episode_ids": [], "video_files": []},
-                "target": episode["target"],
-                "candidates": episode.get("candidates", []),
-                "clues": episode.get("clues", []),
-                "facts": episode.get("facts", []),
-                "sources": episode.get("sources", []),
-                "remainingAfterEachClue": episode.get("remaining_after_each_clue", []),
-                "uniqueAnswer": episode.get("unique_answer") is True,
-                "needsReview": episode.get("needs_review") is True,
-                "episode": episode,
-            }
-        return [result[target_id] for target_id in sorted(result)]
+        return self.db.records()
 
     def list(self, status: str = "all") -> dict:
         if status not in {"all", "used", "unused"}:
             raise CatalogError("status debe ser all, used o unused")
-        items = self.records()
+        all_items = self.records()
+        items = all_items
         if status != "all":
             items = [item for item in items if item["status"] == status]
-        all_items = self.records()
         return {
             "status": status,
             "items": items,
@@ -128,10 +78,7 @@ class ClueCatalog:
     def get(self, target_id: str) -> dict:
         if not TARGET_ID.fullmatch(target_id):
             raise CatalogError("ID de objetivo inválido")
-        item = next((item for item in self.records() if item["id"] == target_id), None)
-        if not item:
-            raise FileNotFoundError(target_id)
-        return item
+        return self.db.get(target_id)
 
     @staticmethod
     def validate_upload(value: dict) -> dict:
@@ -203,13 +150,9 @@ class ClueCatalog:
         value = self.validate_upload(value)
         target_id = value["episode"]["target"]["id"]
         with self._write_lock:
-            if target_id in self._used() or any(item["id"] == target_id for item in self.records()):
+            if self.db.has_target(target_id):
                 raise FileExistsError(target_id)
-            self.upload_dir.mkdir(parents=True, exist_ok=True)
-            destination = self.upload_dir / f"{target_id}.json"
-            temporary = destination.with_suffix(".json.tmp")
-            temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            temporary.replace(destination)
+            self.db.insert(value)
         return self.get(target_id)
 
     def update_usage(
@@ -228,20 +171,14 @@ class ClueCatalog:
                 raise CatalogError(f"{name} inválido")
         current = self.get(target_id)
         with self._write_lock:
-            document = read_json(self.used_targets_path, {"target_ids": [], "targets": []})
-            if not isinstance(document, dict):
-                raise CatalogError("used-targets.json inválido")
-            target_ids = list(dict.fromkeys(item for item in document.get("target_ids", []) if isinstance(item, str)))
-            targets = [item for item in document.get("targets", []) if isinstance(item, dict) and isinstance(item.get("id"), str)]
-            existing = next((item for item in targets if item["id"] == target_id), None)
-            is_used = target_id in target_ids or existing is not None
+            existing = self.db.usage(target_id)
+            is_used = existing is not None
 
             if status == "unused":
                 sources = existing.get("sources", []) if existing else []
                 if is_used and sources != ["clues_api"]:
                     raise UsageConflict("No se puede quitar un uso registrado fuera de esta API")
-                target_ids = [item for item in target_ids if item != target_id]
-                targets = [item for item in targets if item["id"] != target_id]
+                self.db.set_usage(target_id, None)
             elif not is_used:
                 target = current["target"]
                 record = {
@@ -252,8 +189,6 @@ class ClueCatalog:
                     "episode_ids": [],
                     "video_files": [],
                 }
-                targets.append(record)
-                target_ids.append(target_id)
                 existing = record
             elif existing and existing.get("sources") == ["clues_api"]:
                 existing.setdefault("episode_ids", [])
@@ -264,12 +199,7 @@ class ClueCatalog:
                     existing["episode_ids"].append(episode_id)
                 if video_file and video_file not in existing["video_files"]:
                     existing["video_files"].append(video_file)
-            document["target_ids"] = sorted(target_ids)
-            document["targets"] = sorted(targets, key=lambda item: item["id"])
-            self.used_targets_path.parent.mkdir(parents=True, exist_ok=True)
-            temporary = self.used_targets_path.with_suffix(".json.tmp")
-            temporary.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            temporary.replace(self.used_targets_path)
+                self.db.set_usage(target_id, existing)
         return self.get(target_id)
 
 
@@ -370,7 +300,12 @@ def main() -> None:
     source = Path(os.getenv("CLUES_SOURCE_DIR", str(root / "data/new-clues-20260815")))
     upload = Path(os.getenv("CLUES_UPLOAD_DIR", str(root / "data/clues/inbox")))
     used = Path(os.getenv("CLUES_USED_TARGETS_PATH", str(root / "data/used-targets.json")))
-    server = make_server(os.getenv("CLUES_HOST", "0.0.0.0"), int(os.getenv("CLUES_PORT", "8790")), ClueCatalog(root, [source], upload, used))
+    database = Path(os.getenv("CLUES_DB_PATH", str(root / "data/clues.sqlite3")))
+    server = make_server(
+        os.getenv("CLUES_HOST", "0.0.0.0"),
+        int(os.getenv("CLUES_PORT", "8790")),
+        ClueCatalog(root, [source], upload, used, database),
+    )
     print(f"Clues API activo en el puerto {server.server_port}", flush=True)
     server.serve_forever()
 

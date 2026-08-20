@@ -2,6 +2,7 @@
 import json
 import os
 import shutil
+import sqlite3
 import threading
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -61,9 +62,11 @@ def main() -> None:
     source.mkdir(parents=True)
     shutil.copy(ROOT / "data/new-clues-20260815/amethyst_block.json", source / "amethyst_block.json")
     used_path = fixture / "data/used-targets.json"
+    db_path = fixture / "data/clues.sqlite3"
     used_path.parent.mkdir(parents=True, exist_ok=True)
     used_path.write_text(json.dumps({"target_ids": ["amethyst_block"], "targets": [{"id": "amethyst_block", "sources": ["clue_bank"], "episode_ids": [], "video_files": []}]}), encoding="utf-8")
-    server = make_server("127.0.0.1", 0, ClueCatalog(fixture, [source], fixture / "data/clues/inbox", used_path))
+    used_before_api_writes = used_path.read_text(encoding="utf-8")
+    server = make_server("127.0.0.1", 0, ClueCatalog(fixture, [source], fixture / "data/clues/inbox", used_path, db_path))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     base = f"http://127.0.0.1:{server.server_port}"
@@ -90,6 +93,8 @@ def main() -> None:
         assert marked["status"] == "used" and marked["usage"]["sources"] == ["clues_api"]
         assert marked["usage"]["episode_ids"] == ["mc-ci"]
         assert marked["usage"]["video_files"] == ["mc-ci-ci_clue.mp4"]
+        assert used_path.read_text(encoding="utf-8") == used_before_api_writes
+        assert not (fixture / "data/clues/inbox/ci_clue.json").exists()
         assert list_clues("used")["counts"] == {"all": 2, "used": 2, "unused": 0}
         released = update_usage("ci_clue", "unused")
         assert released["status"] == "unused"
@@ -97,8 +102,7 @@ def main() -> None:
         duplicate_status, _ = call(base, "/api/clues", "POST", value)
         assert duplicate_status == 409
 
-        used_path.write_text(json.dumps({"target_ids": ["amethyst_block", "ci_clue"], "targets": [{"id": "amethyst_block", "sources": ["clue_bank"]}, {"id": "ci_clue", "sources": ["rendered_video"], "episode_ids": ["mc-ci"]}]}), encoding="utf-8")
-        assert get_clue("ci_clue")["status"] == "used"
+        assert get_clue("ci_clue")["status"] == "unused"
         protected_status, _ = call(base, "/api/clues/amethyst_block", "PATCH", {"status": "unused"})
         assert protected_status == 409
         invalid_usage_status, _ = call(base, "/api/clues/ci_clue", "PATCH", {"status": "pending"})
@@ -116,6 +120,18 @@ def main() -> None:
         invalid["episode"]["clue_count"] = 2
         invalid_status, _ = call(base, "/api/clues", "POST", invalid)
         assert invalid_status == 400
+
+        server.shutdown()
+        thread.join(timeout=5)
+        server.server_close()
+        source.joinpath("amethyst_block.json").write_text("not json", encoding="utf-8")
+        used_path.write_text("not json", encoding="utf-8")
+        restarted = ClueCatalog(fixture, [source], fixture / "data/clues/inbox", used_path, db_path)
+        assert restarted.list()["counts"] == {"all": 2, "used": 1, "unused": 1}
+        assert restarted.get("ci_clue")["status"] == "unused"
+        with sqlite3.connect(db_path) as connection:
+            tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+        assert {"targets", "target_candidates", "facts", "clues", "clue_facts", "clue_sources", "target_usage"} <= tables
     finally:
         server.shutdown()
         thread.join(timeout=5)
