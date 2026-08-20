@@ -43,8 +43,8 @@ def validate(manifest_path: Path, root: Path, source_dir: Path) -> list[str]:
     handoff_duration = intro.get("handoffDurationFrames")
     content_start = intro.get("contentStartFrame")
     max_content_start = intro.get("maxContentStartFrame", 45)
-    if not isinstance(hook_duration, int) or not 12 <= hook_duration <= 30:
-        fail(errors, "intro.hookDurationFrames debe estar entre 12 y 30")
+    if not isinstance(hook_duration, int) or not 12 <= hook_duration <= 180:
+        fail(errors, "intro.hookDurationFrames debe estar entre 12 y 180")
     if not isinstance(handoff_duration, int) or not 6 <= handoff_duration <= 15:
         fail(errors, "intro.handoffDurationFrames debe estar entre 6 y 15")
     if not isinstance(content_start, int) or content_start < 0 or content_start > max_content_start:

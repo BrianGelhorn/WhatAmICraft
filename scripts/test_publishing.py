@@ -17,6 +17,8 @@ from dashboard.app import _pkce_challenge
 
 
 def main() -> None:
+    compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+    assert "./out/thumbnails:/usr/share/nginx/html/thumbnails:ro" in compose
     verifier = "a" * 43
     assert _pkce_challenge(verifier) == hashlib.sha256(verifier.encode("ascii")).hexdigest()
     assert _graph("me").startswith("https://graph.facebook.com/")
@@ -29,7 +31,7 @@ def main() -> None:
     item = PublishRequest("mc-01", Path("video.mp4"), None, "Title", "Caption", ["minecraft", "shorts"])
     assert item.description == "Caption\n\n#minecraft #shorts"
     original_output_dir = publish_script.OUTPUT_DIR
-    publish_script.OUTPUT_DIR = Path(__file__).resolve().parents[1] / "out/test-publish-selection"
+    publish_script.OUTPUT_DIR = Path(__file__).resolve().parents[1] / "out/test-publish-selection/episodes"
     try:
         publish_script.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         episode = {"id": "mc-01", "target": {"id": "test"}}

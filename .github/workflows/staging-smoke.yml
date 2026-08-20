@@ -1,0 +1,60 @@
+name: Staging Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Commit or branch to verify"
+        required: true
+        default: "develop"
+
+permissions:
+  contents: read
+
+jobs:
+  staging:
+    name: Isolated staging verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Create isolated media fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/episodes
+          printf 'whatamicraft-ci-video' > out/episodes/mc-ci-test.mp4
+      - name: Validate and start staging services
+        shell: bash
+        run: |
+          set -euo pipefail
+          project="whatamicraft-staging-${GITHUB_RUN_ID}"
+          trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
+          docker compose -p "$project" -f staging/compose.yaml config --quiet
+          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api analytics-api monitor media
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8790/health >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8791/health >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8792/health >/dev/null \
+              && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
+              break
+            fi
+            if [ "$attempt" = "60" ]; then
+              docker compose -p "$project" -f staging/compose.yaml ps
+              exit 1
+            fi
+            sleep 2
+          done
+          PYTHONPATH=scripts python scripts/ci/service_smoke.py \
+            --dashboard http://127.0.0.1:8788 \
+            --media http://127.0.0.1:8081 \
+            --analytics http://127.0.0.1:8791 \
+            --monitor http://127.0.0.1:8792 \
+            --fixture mc-ci-test.mp4
