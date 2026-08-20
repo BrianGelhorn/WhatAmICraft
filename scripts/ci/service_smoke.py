@@ -3,6 +3,7 @@
 
 import argparse
 import json
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -56,6 +57,8 @@ def main() -> None:
     parser.add_argument("--media", required=True)
     parser.add_argument("--analytics", required=True)
     parser.add_argument("--monitor", required=True)
+    parser.add_argument("--backup", required=True)
+    parser.add_argument("--backup-token", required=True)
     parser.add_argument("--fixture", required=True)
     args = parser.parse_args()
 
@@ -63,7 +66,47 @@ def main() -> None:
     media = args.media.rstrip("/")
     analytics = args.analytics.rstrip("/")
     monitor = args.monitor.rstrip("/")
+    backup = args.backup.rstrip("/")
     fixture = args.fixture.lstrip("/")
+
+    _, backup_headers, backup_health_body = get(f"{backup}/health")
+    if not backup_headers.get("content-type", "").startswith("application/json"):
+        raise RuntimeError("backup service health is not JSON")
+    backup_health = json.loads(backup_health_body)
+    if backup_health.get("service") != "backup-rollback":
+        raise RuntimeError("backup service health returned the wrong service")
+    marker = Path("out/backup-ci-marker.json")
+    previous_marker = marker.read_bytes() if marker.exists() else None
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    marker.write_bytes(b'{"state":"original"}\n')
+    try:
+        _, _, backup_body = request(
+            f"{backup}/api/backups",
+            method="POST",
+            payload={},
+            headers={"X-Backup-Token": args.backup_token},
+            expected={201},
+        )
+        backup_name = json.loads(backup_body).get("backup", {}).get("backup")
+        if not isinstance(backup_name, str):
+            raise RuntimeError("backup service did not return a backup name")
+        marker.write_bytes(b'{"state":"corrupted"}\n')
+        _, _, restore_body = request(
+            f"{backup}/api/rollback",
+            method="POST",
+            payload={"backup": backup_name, "confirm": True},
+            headers={"X-Backup-Token": args.backup_token},
+            expected={200},
+        )
+        if json.loads(restore_body).get("restore", {}).get("backup") != backup_name:
+            raise RuntimeError("backup service restored an unexpected snapshot")
+        if marker.read_bytes() != b'{"state":"original"}\n':
+            raise RuntimeError("backup service did not restore the fixture state")
+    finally:
+        if previous_marker is None:
+            marker.unlink(missing_ok=True)
+        else:
+            marker.write_bytes(previous_marker)
 
     status, headers, _ = get(f"{dashboard}/")
     if status != 200 or not headers.get("content-type", "").startswith("text/html"):
@@ -100,9 +143,9 @@ def main() -> None:
     _, _, monitor_status_body = request(f"{monitor}/api/monitor/check", method="POST")
     monitor_status = json.loads(monitor_status_body)
     monitored = {item.get("service"): item.get("status") for item in monitor_status.get("services", [])}
-    if not {"dashboard", "clues-api", "analytics-api", "media"}.issubset(monitored):
+    if not {"dashboard", "clues-api", "analytics-api", "backup-rollback", "media"}.issubset(monitored):
         raise RuntimeError("monitor service did not check every staging dependency")
-    if any(monitored[name] != "up" for name in ("dashboard", "clues-api", "analytics-api", "media")):
+    if any(monitored[name] != "up" for name in ("dashboard", "clues-api", "analytics-api", "backup-rollback", "media")):
         raise RuntimeError(f"monitor service found a staging dependency down: {monitored}")
     _, _, proxied_monitor_body = get(f"{dashboard}/api/monitor/status")
     if not isinstance(json.loads(proxied_monitor_body).get("services"), list):
