@@ -25,7 +25,7 @@ jobs:
     name: Dashboard service
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -43,7 +43,7 @@ jobs:
     name: Telegram bot service
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -61,7 +61,7 @@ jobs:
     name: Publisher and worker services
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -81,7 +81,7 @@ jobs:
     name: Producer and generation contracts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -112,7 +112,7 @@ jobs:
     name: Clues API service
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -130,7 +130,7 @@ jobs:
     name: Analytics API service
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -148,7 +148,7 @@ jobs:
     name: Monitoring service
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
@@ -165,7 +165,7 @@ jobs:
     name: Media service
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Media behavior contract
         shell: bash
         run: |
@@ -217,7 +217,7 @@ jobs:
     needs: [dashboard, bot, publisher-worker, producer, clues-api, analytics-api, monitor, media]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - uses: actions/setup-python@v7
