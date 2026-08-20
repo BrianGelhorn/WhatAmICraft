@@ -24,6 +24,9 @@
     "prettier": "3.8.1",
     "typescript": "5.9.3"
   },
+  "overrides": {
+    "eslint": "9.19.0"
+  },
   "scripts": {
     "dev": "remotion studio --no-open",
     "build": "remotion bundle --out-dir=out/bundle",
