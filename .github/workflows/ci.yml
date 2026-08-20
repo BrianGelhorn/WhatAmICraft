@@ -10,6 +10,7 @@ on:
       - "chore/**"
       - "docs/**"
       - "hotfix/**"
+      - "fix/**"
   pull_request:
   workflow_dispatch:
 
