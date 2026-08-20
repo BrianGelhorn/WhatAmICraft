@@ -34,14 +34,16 @@ jobs:
         run: |
           set -euo pipefail
           project="whatamicraft-staging-${GITHUB_RUN_ID}"
+          export BACKUP_ADMIN_TOKEN=ci-only-backup-token
           trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
           docker compose -p "$project" -f staging/compose.yaml config --quiet
-          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api analytics-api monitor media
+          docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api analytics-api backup-rollback monitor media
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
               && curl --fail --silent http://127.0.0.1:8081/mc-ci-test.mp4 >/dev/null \
               && curl --fail --silent http://127.0.0.1:8790/health >/dev/null \
               && curl --fail --silent http://127.0.0.1:8791/health >/dev/null \
+              && curl --fail --silent http://127.0.0.1:8793/health >/dev/null \
               && curl --fail --silent http://127.0.0.1:8792/health >/dev/null \
               && curl --fail --silent 'http://127.0.0.1:8788/api/clues?status=unused' >/dev/null; then
               break
@@ -57,4 +59,6 @@ jobs:
             --media http://127.0.0.1:8081 \
             --analytics http://127.0.0.1:8791 \
             --monitor http://127.0.0.1:8792 \
+            --backup http://127.0.0.1:8793 \
+            --backup-token ci-only-backup-token \
             --fixture mc-ci-test.mp4
