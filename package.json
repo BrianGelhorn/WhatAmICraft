@@ -12,13 +12,13 @@
     "@remotion/media": "4.0.505",
     "dotenv": "^17.4.2",
     "minecraft-data": "^3.112.0",
-    "react": "19.2.3",
+    "react": "19.2.8",
     "react-dom": "19.2.3",
     "remotion": "4.0.512"
   },
   "devDependencies": {
     "@remotion/eslint-config-flat": "4.0.512",
-    "@types/react": "19.2.7",
+    "@types/react": "19.2.18",
     "@types/web": "0.0.166",
     "eslint": "9.19.0",
     "prettier": "3.8.1",
