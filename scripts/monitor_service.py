@@ -50,6 +50,7 @@ class MonitorService:
             {"service": "dashboard", "url": f"{os.getenv('MONITOR_DASHBOARD_URL', 'http://dashboard:8787').rstrip('/')}/api/state", "expected": {200}},
             {"service": "clues-api", "url": f"{os.getenv('MONITOR_CLUES_URL', 'http://clues-api:8790').rstrip('/')}/health", "expected": {200}},
             {"service": "analytics-api", "url": f"{os.getenv('MONITOR_ANALYTICS_URL', 'http://analytics-api:8791').rstrip('/')}/health", "expected": {200}},
+            {"service": "backup-rollback", "url": f"{os.getenv('MONITOR_BACKUP_URL', 'http://backup-rollback:8793').rstrip('/')}/health", "expected": {200}},
             {"service": "media", "url": os.getenv("MONITOR_MEDIA_URL", "http://media"), "expected": set(range(200, 500))},
         ]
 

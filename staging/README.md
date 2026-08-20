@@ -9,3 +9,5 @@ Por seguridad, `bot` y `publisher-worker` están detrás del perfil `integration
 `analytics-api` escucha en `8791` y expone `GET /api/analytics`, `GET /api/analytics/sync`, `POST /api/analytics/sync`, `GET /api/analytics/export.json` y `GET /api/analytics/export.md`. El dashboard consume este servicio por HTTP cuando `ANALYTICS_API_URL` está configurada.
 
 `monitor` escucha en `8792`, comprueba dashboard, pistas, analytics y media cada 60 segundos, guarda eventos sanitizados en `out/monitor/events.jsonl` y expone `GET /health`, `GET /api/monitor/status`, `POST /api/monitor/check` y `GET/POST /api/monitor/events`. El dashboard lo proxifica cuando `MONITOR_API_URL` está configurada.
+
+`backup-rollback` escucha en `8793`, crea un backup diario de `data/` y del estado JSON/SQLite relevante de `out/`, conserva los últimos 14 y expone `GET /health` y `GET /api/backups`. Las operaciones de creación manual y rollback requieren `X-Backup-Token`; el rollback además exige `{"confirm":true}`. Antes de restaurar crea automáticamente un backup preventivo. Configurá `BACKUP_ADMIN_TOKEN` solo en el entorno aislado: no se incluye ningún token en el repositorio.
