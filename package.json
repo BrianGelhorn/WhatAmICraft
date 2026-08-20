@@ -13,7 +13,7 @@
     "dotenv": "^17.4.2",
     "minecraft-data": "^3.112.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react-dom": "19.2.8",
     "remotion": "4.0.512"
   },
   "devDependencies": {
