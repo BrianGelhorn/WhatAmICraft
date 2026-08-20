@@ -1,5 +1,9 @@
 name: minecraftquizguesser-dev
 
+x-service-build: &service-build
+  context: ..
+  dockerfile: Dockerfile.service
+
 services:
   dashboard:
     image: minecraft-quiz-guesser:dev
@@ -39,8 +43,8 @@ services:
       - monitor
 
   clues-api:
-    image: minecraft-quiz-guesser:dev
-    build: ..
+    image: minecraft-quiz-guesser:service
+    build: *service-build
     entrypoint: ["python3", "scripts/clues_api.py"]
     restart: unless-stopped
     environment:
@@ -54,8 +58,8 @@ services:
       - ../data:/app/data
 
   analytics-api:
-    image: minecraft-quiz-guesser:dev
-    build: ..
+    image: minecraft-quiz-guesser:service
+    build: *service-build
     entrypoint: ["python3", "scripts/analytics_service.py"]
     restart: unless-stopped
     environment:
@@ -68,8 +72,8 @@ services:
       - ../backups:/app/backups
 
   monitor:
-    image: minecraft-quiz-guesser:dev
-    build: ..
+    image: minecraft-quiz-guesser:service
+    build: *service-build
     entrypoint: ["python3", "scripts/monitor_service.py"]
     restart: unless-stopped
     environment:
