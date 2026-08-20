@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def main() -> None:
     episodes = all_episodes()
     assert episodes
+    for answer_type in thumbnails.type_names():
+        assert thumbnails.type_thumbnail_path(answer_type, "vertical").is_file()
     for episode in episodes:
         path = thumbnail_path(episode, "vertical")
         expected_type = episode["target"]["kind"].replace(" ", "_")

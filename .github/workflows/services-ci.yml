@@ -107,8 +107,6 @@ jobs:
             --source-dir src
           npx remotion render QuizCapasCopy out/ci-producer-check.mp4 --frames=0-1
           test -s out/ci-producer-check.mp4
-          npx remotion still ThumbnailVertical out/ci-thumbnail-check.jpg --props='{"variant":"silhouette"}'
-          test -s out/ci-thumbnail-check.jpg
 
   clues-api:
     name: Clues API service
