@@ -258,35 +258,89 @@
       .toolbar-intro { grid-column:auto; }
       .toolbar button, .toolbar select { width:100%; }
     }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .stat-filter { width:100%; min-height:112px; border-radius:14px; color:var(--text); text-align:left; }
+    .stat-filter:hover, .stat-filter.active { border-color:var(--green); transform:translateY(-1px); }
+    .stat-filter.active { box-shadow:0 0 0 1px rgba(140,240,170,.25), var(--shadow); }
+    .operation-job { margin-bottom:18px; padding:16px 18px; }
+    .operation-job .job-head { align-items:center; margin:0; }
+    .operation-job .job-head > div:first-child { display:grid; gap:4px; }
+    .operation-job details { margin-top:12px; padding-top:12px; }
+    .operation-job summary { color:var(--muted); font-size:12px; }
+    .operation-job pre { margin-top:10px; }
+    .operation-workspace { grid-template-columns:minmax(0,1.65fr) minmax(300px,.65fr); align-items:start; }
+    .operation-workspace aside { position:sticky; top:20px; }
+    .inventory-panel { padding:18px; }
+    .inventory-tools { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .search-field { flex:1; }
+    .search-field input { width:100%; min-height:40px; }
+    .inventory-tools > button.active { border-color:var(--green); background:rgba(140,240,170,.12); color:var(--green); }
+    .episode-cell { display:grid; gap:4px; }
+    .episode-cell small { color:var(--muted); }
+    .row-actions { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+    .row-actions button { min-height:34px; padding:6px 9px; font-size:12px; }
+    .row-menu { margin:0; padding:0; border:0; }
+    .row-menu summary { min-height:34px; display:flex; align-items:center; list-style:none; border:1px solid var(--line); border-radius:9px; padding:6px 9px; background:var(--soft); color:var(--muted); font-size:12px; }
+    .row-menu summary::-webkit-details-marker { display:none; }
+    .row-menu[open] .row-menu-content { display:flex; }
+    .row-menu-content { display:none; width:210px; flex-direction:column; gap:5px; margin-top:6px; padding:8px; border:1px solid var(--line-strong); border-radius:10px; background:var(--panel-2); }
+    .row-menu-content button { width:100%; text-align:left; }
+    .status.attention { color:var(--yellow); }
+    .status.queued { color:var(--blue); border-color:rgba(141,217,255,.24); background:rgba(141,217,255,.08); }
+    .status.published { color:var(--green); border-color:rgba(140,240,170,.24); background:rgba(140,240,170,.08); }
+    .status.failed { color:var(--red); border-color:rgba(255,127,136,.3); background:rgba(255,127,136,.08); }
+    .live.bad { color:var(--red); border-color:rgba(255,127,136,.3); background:rgba(90,24,31,.35); }
+    .live.bad .dot { background:var(--red); box-shadow:0 0 14px var(--red); }
+    .automation-details { margin:0; border:1px solid var(--line); padding:18px; }
+    .automation-details > summary { display:flex; justify-content:space-between; gap:12px; align-items:center; list-style:none; }
+    .automation-details > summary::-webkit-details-marker { display:none; }
+    .automation-details > summary::after { content:"Abrir"; color:var(--green); font-size:12px; }
+    .automation-details[open] > summary::after { content:"Cerrar"; }
+    .automation-details > summary span { color:var(--muted); font-size:12px; font-weight:400; }
+    .details-body { margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
+    .credentials-details { margin-top:16px; }
+    .system-details { margin-top:14px; padding-top:14px; }
+    .system-details > summary { color:var(--text); }
+    @media (max-width:1150px) {
+      .operation-workspace { grid-template-columns:1fr; }
+      .operation-workspace aside { position:static; }
+      .inventory-tools { align-items:stretch; flex-direction:column; }
+    }
+    @media (max-width:620px) {
+      .stats { grid-template-columns:1fr 1fr; }
+      .stat-filter { min-height:92px; }
+      .operation-job .job-head { align-items:flex-start; flex-direction:column; }
+    }
   </style>
 </head>
 <body>
   <main>
     <header>
-      <div><h1>Minecraft Quiz Studio</h1><p>Generación, revisión y publicación desde un solo lugar.</p></div>
-      <div class="live"><span class="dot"></span> Sistema activo</div>
+      <div><h1>WhatAmICraft</h1><p>Control de producción, revisión y publicación.</p></div>
+      <div class="live" id="live-status"><span class="dot"></span><span id="live-status-text">Sistema activo</span></div>
     </header>
 
     <nav class="section-nav" aria-label="Secciones del dashboard">
-      <button class="active" id="home-jump" data-view="home">Resumen</button>
-      <button id="videos-jump" data-view="videos">Videos</button>
+      <button class="active" id="home-jump" data-view="home">Operación</button>
       <button id="music-jump" data-view="music">Música</button>
-      <button id="analytics-jump" data-view="analytics">Análisis</button>
-      <button id="publishing-jump" data-view="publishing">Publicación</button>
+      <button id="analytics-jump" data-view="analytics">Rendimiento</button>
+      <button id="publishing-jump" data-view="publishing">Automatización</button>
       <button id="system-jump" data-view="system">Sistema</button>
     </nav>
 
     <div class="view" data-view-panel="home">
 
-    <section class="stats" aria-label="Resumen">
-      <div class="stat"><span>Episodios</span><strong id="total">—</strong></div>
-      <div class="stat"><span>Videos listos</span><strong id="rendered">—</strong></div>
-      <div class="stat"><span>Esperando aprobación</span><strong id="review">—</strong></div>
-      <div class="stat"><span>En cola</span><strong id="queued">—</strong></div>
+    <div class="section-head view-head"><div><h2>Operación</h2><p>Todo el flujo diario en una sola pantalla.</p></div></div>
+
+    <section class="stats" aria-label="Estado de producción">
+      <button class="stat stat-filter active" data-video-filter="attention" aria-pressed="true"><span>Requieren atención</span><strong id="review">—</strong></button>
+      <button class="stat stat-filter" data-video-filter="queued" aria-pressed="false"><span>En cola</span><strong id="queued">—</strong></button>
+      <button class="stat stat-filter" data-video-filter="generate" aria-pressed="false"><span>Por generar</span><strong id="to-generate-total">—</strong></button>
+      <button class="stat stat-filter" data-video-filter="published" aria-pressed="false"><span>Publicados</span><strong id="published-total">—</strong></button>
     </section>
 
-    <section class="panel toolbar" aria-label="Generación">
-      <div class="toolbar-intro"><span class="eyebrow">Próxima acción</span><strong>Generar un nuevo video</strong><p>Elegí un episodio o dejá que el sistema use la prioridad configurada.</p></div>
+    <section class="panel toolbar" aria-label="Generación rápida">
+      <div class="toolbar-intro"><span class="eyebrow">Acción rápida</span><strong>Generar un video</strong><p>Elegí un episodio o usá la prioridad automática.</p></div>
       <select id="format-select" aria-label="Elegir formato"><option value="all">Formato según prioridad</option></select>
       <select id="episode-select" aria-label="Elegir episodio"></select>
       <button class="primary" id="generate">Generar seleccionado</button>
@@ -294,10 +348,57 @@
       <button id="refresh">Actualizar</button>
     </section>
 
-    <section class="panel publishing" aria-label="Formatos de video">
-      <div class="section-head"><div><h2>Formatos de video</h2><p>La prioridad reparte la generación. Un formato con prioridad baja sigue recibiendo videos mientras esté activado.</p></div></div>
-      <div class="format-grid" id="format-summary"></div>
+    <section class="error-banner" id="job-error" role="alert" hidden>
+      <div class="error-banner-head"><strong>Hay una tarea con errores</strong><button class="error-dismiss" data-dismiss-job-error>Ocultar</button></div>
+      <pre id="job-error-log"></pre>
     </section>
+
+    <section class="panel operation-job" aria-label="Actividad actual">
+      <div class="job-head">
+        <div><span class="eyebrow">Actividad actual</span><strong id="job-label">Sin tareas activas</strong></div>
+        <div class="actions"><span class="status" id="job-source">—</span><span class="status" id="job-status">En espera</span><button data-cancel-job class="danger" hidden>Cancelar</button></div>
+      </div>
+      <details id="job-details"><summary>Ver registro de actividad</summary><pre id="job-log">La actividad de generación aparecerá acá.</pre></details>
+    </section>
+
+    <div class="workspace operation-workspace">
+      <section class="panel video-section inventory-panel" aria-label="Inventario de videos">
+        <div class="section-head inventory-head">
+          <div><h2>Videos</h2><p>Buscá, filtrá y actuá sin cambiar de pantalla.</p></div>
+          <span class="status" id="video-result-count">0 resultados</span>
+        </div>
+        <div class="inventory-tools">
+          <label class="search-field"><span class="sr-only">Buscar episodio</span><input id="video-search" type="search" placeholder="Buscar por ID, objetivo o tipo"></label>
+          <button data-video-filter="all" aria-pressed="false">Ver todos</button>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Episodio</th><th>Objetivo</th><th>Estado</th><th class="hide-mobile">Destino</th><th>Acciones</th></tr></thead>
+          <tbody id="video-inventory"></tbody>
+        </table></div>
+      </section>
+
+      <aside class="panel" aria-label="Inspector del episodio">
+        <h2 id="preview-title">Inspector</h2>
+        <div class="empty" id="preview-empty">Seleccioná un episodio para revisar su video, miniatura, pistas y publicación.</div>
+        <img class="thumbnail-preview" id="thumbnail-preview" alt="Miniatura vertical" hidden>
+        <video id="preview" controls hidden></video>
+        <section class="clue-review" id="clue-review" hidden>
+          <h3>Pistas y voces</h3>
+          <p id="clue-answer" class="hint"></p>
+          <ol id="clue-list"></ol>
+          <p id="reveal-text" class="hint"></p>
+        </section>
+        <div class="job" id="manual-publish" hidden>
+          <strong>Publicar este video</strong>
+          <div class="actions" style="margin-top:9px">
+            <button data-publish-platform="youtube">YouTube</button>
+            <button data-publish-platform="tiktok">TikTok</button>
+            <button data-publish-platform="instagram">Instagram</button>
+            <button data-publish-platform="facebook">Facebook</button>
+          </div>
+        </div>
+      </aside>
+    </div>
     </div>
 
     <div class="view" data-view-panel="analytics" hidden>
@@ -328,69 +429,6 @@
     </section>
     </div>
 
-    <div class="view" data-view-panel="videos" hidden>
-    <div class="section-head view-head"><div><h2>Videos y episodios</h2><p>Generación, revisión, cola y vista previa.</p></div></div>
-    <section class="error-banner" id="job-error" role="alert" hidden>
-      <div class="error-banner-head"><strong>La tarea terminó con errores</strong><button class="error-dismiss" data-dismiss-job-error>Ocultar</button></div>
-      <pre id="job-error-log"></pre>
-    </section>
-
-    <div class="workspace">
-      <div class="video-sections">
-        <section class="panel video-section">
-          <div class="section-head"><div><h2>Videos generados</h2><p>Separados por la versión del template.</p></div><span class="status" id="generated-count">0</span></div>
-          <h3>Template nuevo</h3>
-          <div class="table-wrap"><table>
-            <thead><tr><th>Episodio</th><th>Formato</th><th>Objetivo</th><th class="hide-mobile">Tipo</th><th>Estado</th><th class="hide-mobile">Publicado en</th><th>Acciones</th></tr></thead>
-            <tbody id="generated-new"></tbody>
-          </table></div>
-        </section>
-
-        <section class="panel video-section">
-          <div class="section-head"><div><h2>Videos publicados</h2><p>Archivados para no mezclarlos con los pendientes.</p></div><span class="status" id="published-count">0</span></div>
-          <div class="table-wrap"><table>
-            <thead><tr><th>Episodio</th><th>Formato</th><th>Objetivo</th><th class="hide-mobile">Publicado en</th><th>Acción</th></tr></thead>
-            <tbody id="published-videos"></tbody>
-          </table></div>
-        </section>
-
-        <section class="panel video-section">
-          <div class="section-head"><div><h2>Videos por generar</h2><p>Episodios sin video nuevo ni video heredado.</p></div><span class="status" id="to-generate-count">0</span></div>
-          <div class="table-wrap"><table>
-            <thead><tr><th>Episodio</th><th>Formato</th><th>Objetivo</th><th>Estado</th><th>Acción</th></tr></thead>
-            <tbody id="episodes-to-generate"></tbody>
-          </table></div>
-        </section>
-      </div>
-
-      <aside class="panel">
-        <h2 id="preview-title">Vista previa</h2>
-        <div class="empty" id="preview-empty">Seleccioná un episodio con video para verlo.</div>
-        <img class="thumbnail-preview" id="thumbnail-preview" alt="Miniatura" hidden>
-        <video id="preview" controls hidden></video>
-        <section class="clue-review" id="clue-review" hidden>
-          <h3>Pistas y voces</h3>
-          <p id="clue-answer" class="hint"></p>
-          <ol id="clue-list"></ol>
-          <p id="reveal-text" class="hint"></p>
-        </section>
-        <div class="job" id="manual-publish" hidden>
-          <strong>Publicar este video</strong>
-          <div class="actions" style="margin-top:9px">
-            <button data-publish-platform="youtube">YouTube</button>
-            <button data-publish-platform="tiktok">TikTok</button>
-            <button data-publish-platform="instagram">Instagram</button>
-            <button data-publish-platform="facebook">Facebook</button>
-          </div>
-        </div>
-        <div class="job">
-          <div class="job-head"><strong id="job-label">Sin tareas activas</strong><span class="status" id="job-source">—</span><span class="status" id="job-status">En espera</span><button data-cancel-job class="danger" hidden>Cancelar</button></div>
-          <pre id="job-log">La actividad de generación aparecerá acá.</pre>
-        </div>
-      </aside>
-    </div>
-    </div>
-
     <div class="view" data-view-panel="music" hidden>
       <div class="section-head view-head"><div><h2>Biblioteca musical</h2><p>Un link se descarga una sola vez. Cada momento crea una opción independiente para las plantillas seleccionadas.</p></div></div>
       <div class="music-grid">
@@ -418,15 +456,15 @@
     </div>
 
     <div class="view" data-view-panel="publishing" hidden>
-    <section class="panel publishing" id="publishing" aria-label="Publicación automática">
+    <section class="panel publishing" id="publishing" aria-label="Automatización y publicación">
       <div class="section-head">
-        <div><h2>Publicación automática</h2><p>Un video aprobado por turno, en todas las redes activadas.</p></div>
-        <span class="status" id="schedule-status">Desactivada</span>
+        <div><h2>Automatización</h2><p>Cuándo generar, cuándo publicar y qué usa cada plataforma.</p></div>
+        <div class="actions"><span class="status" id="schedule-status">Desactivada</span><span class="configured" id="save-status">Guardado</span><button id="save-publishing">Guardar ahora</button><button class="primary" id="publish-now">Publicar próximo</button></div>
       </div>
 
-      <div class="settings-grid">
+      <div class="settings-grid automation-grid">
         <div class="settings-box">
-          <h3>Calendario</h3>
+          <h3>Generación y calendario</h3>
           <div class="fields">
             <label class="check field wide"><input id="schedule-enabled" type="checkbox"> Activar publicaciones automáticas</label>
             <label class="field">Cada cuántas horas<input id="interval-hours" type="number" min="1" max="168" step="1"></label>
@@ -439,16 +477,13 @@
           </div>
           <div class="format-grid" id="format-controls"></div>
           <p class="hint">La escala va de 1 a 10. La prioridad ajusta el reparto al stock actual y cada formato activado conserva una oportunidad de generación.</p>
-          <div class="settings-actions">
-            <button class="primary" id="save-publishing">Guardar todos los cambios</button><span class="configured" id="save-status">Guardado</span>
-            <button id="publish-now">Publicar próximo ahora</button>
-          </div>
         </div>
 
-        <div class="settings-box">
-          <h3>Texto por plataforma</h3>
-          <p class="hint">Cada red usa su propio título y descripción. Las variables disponibles son <code>{kind}</code> y <code>{episode_id}</code>.</p>
-          <div class="fields">
+        <details class="settings-box automation-details">
+          <summary><strong>Textos por plataforma</strong><span>Títulos, descripciones y hashtags</span></summary>
+          <div class="details-body">
+            <p class="hint">Cada red usa su propio título y descripción. Las variables disponibles son <code>{kind}</code> y <code>{episode_id}</code>.</p>
+            <div class="fields">
             <label class="field wide">YouTube · Título<input id="youtube-title" maxlength="100"></label>
             <label class="field wide">YouTube · Descripción<textarea id="youtube-caption" maxlength="2200"></textarea></label>
             <label class="field wide">Instagram · Título<input id="instagram-title" maxlength="100"></label>
@@ -458,13 +493,16 @@
             <label class="field wide">Facebook · Título<input id="facebook-title" maxlength="100"></label>
             <label class="field wide">Facebook · Descripción<textarea id="facebook-caption" maxlength="2200"></textarea></label>
             <label class="field wide">Hashtags, separados por comas<input id="post-hashtags"></label>
+            </div>
           </div>
-          <div class="settings-actions"><button class="primary" id="save-copy">Guardar todos los cambios</button></div>
-        </div>
+        </details>
       </div>
 
-      <div class="section-head" style="margin-top:20px;margin-bottom:0"><div><h3>Redes sociales</h3><p>Activá solamente las cuentas que quieras usar.</p></div></div>
-      <div class="platform-grid">
+      <details class="settings-box automation-details" style="margin-top:16px">
+        <summary><strong>Redes sociales y cuentas</strong><span>Conexiones, destinos y credenciales</span></summary>
+        <div class="details-body">
+        <p class="hint">Activá solamente las cuentas que quieras usar.</p>
+        <div class="platform-grid">
         <div class="platform">
           <div class="platform-head"><label class="check"><input id="youtube-enabled" type="checkbox"> YouTube Shorts</label><span id="youtube-status"></span></div>
           <div class="fields">
@@ -497,10 +535,10 @@
             <label class="field wide">Estado<select id="facebook-state"><option value="PUBLISHED">Publicar</option><option value="DRAFT">Borrador</option></select></label>
           </div>
         </div>
-      </div>
+        </div>
 
-      <details>
-        <summary>Credenciales de las cuentas</summary>
+      <details class="credentials-details">
+        <summary>Credenciales manuales</summary>
         <p class="hint">Se guardan localmente, nunca vuelven al navegador y solo se muestra si están configuradas.</p>
         <div class="fields" id="credentials-form">
           <label class="field">YouTube Client ID<input name="YOUTUBE_CLIENT_ID" autocomplete="off"></label>
@@ -517,6 +555,8 @@
         </div>
         <div class="settings-actions"><button id="save-secrets">Guardar credenciales ingresadas</button></div>
       </details>
+        </div>
+      </details>
     </section>
     </div>
 
@@ -525,9 +565,9 @@
       <div class="section-head">
         <div><h2>Sistema</h2><p>Estado real del servidor, servicios y almacenamiento.</p></div>
         <div class="settings-actions">
-          <button id="make-backup">Backup estado</button>
-          <button id="make-snapshot">Snapshot Codex</button>
-          <button id="refresh-system">Actualizar sistema</button>
+          <button id="make-backup">Crear backup</button>
+          <button id="make-snapshot">Guardar contexto</button>
+          <button id="refresh-system">Actualizar</button>
         </div>
       </div>
       <div class="diagnostics-grid">
@@ -550,12 +590,17 @@
         <div class="diag-card" style="grid-column:span 2"><span>Dashboard privado</span><strong><a id="diag-dashboard-url" href="#" target="_blank" rel="noreferrer">...</a></strong></div>
         <div class="diag-card" style="grid-column:span 2"><span>Videos publicos</span><strong><a id="diag-video-url" href="#" target="_blank" rel="noreferrer">...</a></strong></div>
       </div>
+      <details class="system-details" open>
+        <summary>Servicios</summary>
       <div class="diag-table">
         <table>
           <thead><tr><th>Servicio</th><th>Estado</th><th>Detalle</th></tr></thead>
           <tbody id="diag-services"></tbody>
         </table>
       </div>
+      </details>
+      <details class="system-details">
+        <summary>Errores y logs recientes</summary>
       <div class="diag-log">
         <div>
           <h3>Errores recientes</h3>
@@ -566,6 +611,7 @@
           <pre id="diag-logs">Sin datos.</pre>
         </div>
       </div>
+      </details>
     </section>
     </div>
   </main>
@@ -580,6 +626,8 @@
     let formatControlsHydrated = false;
     let saveTimer = null;
     let dismissedErrorKey = localStorage.getItem('minecraft-quiz-dismissed-error') || '';
+    let videoFilter = localStorage.getItem('minecraft-quiz-video-filter') || 'attention';
+    let videoSearch = '';
 
     function toast(message) {
       $('toast').textContent = message;
@@ -589,7 +637,8 @@
     }
 
     function showView(name, updateUrl = true) {
-      const valid = ['home','videos','music','analytics','publishing','system'];
+      if (name === 'videos') name = 'home';
+      const valid = ['home','music','analytics','publishing','system'];
       if (!valid.includes(name)) name = 'home';
       document.querySelectorAll('[data-view-panel]').forEach(panel => panel.hidden = panel.dataset.viewPanel !== name);
       document.querySelectorAll('.section-nav [data-view]').forEach(button => {
@@ -628,10 +677,6 @@
     function renderFormatControls() {
       const formats = state.formats || [];
       const configured = state.publishing?.config?.generation?.formats || {};
-      $('format-summary').innerHTML = formats.map(format => {
-        const priority = Number(configured[format.id]?.priority || format.priority || 1);
-        return `<div class="format-card"><div class="format-card-head"><strong>${escapeHtml(format.label)}</strong><span class="format-badge">${format.enabled ? 'Activado' : 'Pausado'}</span></div><div class="meter-track"><div class="meter-fill" style="width:${format.sharePct}%"></div></div><small>Prioridad ${priority}/10 · ${format.sharePct}% del reparto · Stock ${format.stock}/${format.targetStock}</small></div>`;
-      }).join('');
       if (!formatControlsHydrated) {
         $('format-controls').innerHTML = formats.map(format => {
           const settings = configured[format.id] || {enabled:format.enabled, priority:format.priority};
@@ -711,48 +756,71 @@
       };
     }
 
+    function videoBucket(episode) {
+      if (episode.platforms.length) return 'published';
+      if (episode.queueStatus === 'pending') return 'queued';
+      if (!episode.hasVideo) return 'generate';
+      return 'attention';
+    }
+
+    function statusClass(episode) {
+      if (episode.queueStatus === 'failed') return 'failed';
+      return videoBucket(episode);
+    }
+
+    function renderVideoInventory(episodes, jobRunning) {
+      const query = videoSearch.trim().toLocaleLowerCase('es');
+      const visible = episodes.filter(episode => {
+        const matchesFilter = videoFilter === 'all' || videoBucket(episode) === videoFilter;
+        const haystack = `${episode.id} ${episode.target} ${episode.kind} ${episode.status}`.toLocaleLowerCase('es');
+        return matchesFilter && (!query || haystack.includes(query));
+      });
+      document.querySelectorAll('[data-video-filter]').forEach(button => {
+        const active = button.dataset.videoFilter === videoFilter;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active);
+      });
+      $('video-result-count').textContent = `${visible.length} ${visible.length === 1 ? 'resultado' : 'resultados'}`;
+      $('video-inventory').innerHTML = visible.map(episode => {
+        const published = episode.platforms.length > 0;
+        const canApprove = episode.hasVideo && !episode.needsReview && !episode.queueStatus && !published;
+        const secondary = episode.hasVideo ? `
+          <details class="row-menu"><summary>Más</summary><div class="row-menu-content">
+            <button data-action="video" ${jobRunning ? 'disabled' : ''}>Regenerar video</button>
+            ${episode.format === 'clues' ? `<button data-action="audio" ${jobRunning ? 'disabled' : ''}>Regenerar audio y video</button><button data-action="${episode.needsReview ? 'clear-hints' : 'hints'}">${episode.needsReview ? 'Quitar pistas pendientes' : 'Marcar pistas pendientes'}</button>` : ''}
+            ${published ? '' : '<button class="danger" data-action="reject">Eliminar generación</button>'}
+          </div></details>` : '';
+        return `<tr data-id="${escapeHtml(episode.id)}" class="${selectedId === episode.id ? 'selected' : ''}">
+          <td><div class="episode-cell"><strong>${escapeHtml(episode.id)}</strong><small>${escapeHtml(episode.formatLabel)}</small></div></td>
+          <td><div class="episode-cell"><strong>${escapeHtml(episode.target)}</strong><small>${escapeHtml(episode.kind)}</small></div></td>
+          <td><span class="status ${statusClass(episode)}">${escapeHtml(episode.status)}</span></td>
+          <td class="hide-mobile published">${published ? episode.platforms.map(escapeHtml).join(' · ') : '—'}</td>
+          <td><div class="row-actions">
+            ${episode.hasVideo ? '<button data-action="inspect">Ver</button>' : `<button class="primary" data-action="generate" ${jobRunning ? 'disabled' : ''}>Generar</button>`}
+            ${canApprove ? '<button class="primary" data-action="approve">Aprobar</button>' : ''}
+            ${episode.queueStatus ? '<button data-action="unqueue">Quitar de cola</button>' : ''}
+            ${secondary}
+          </div></td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="5" class="empty">No hay videos para este filtro.</td></tr>';
+    }
+
     function render() {
       const episodes = state.episodes;
       const jobRunning = state.job.status === 'running';
       renderFormatControls();
       renderMusic();
       renderAnalytics();
-      $('total').textContent = episodes.length;
-      $('rendered').textContent = episodes.filter(x => x.hasVideo).length;
-      $('review').textContent = episodes.filter(x => x.status === 'Esperando aprobación').length;
+      $('review').textContent = episodes.filter(x => videoBucket(x) === 'attention').length;
       $('queued').textContent = episodes.filter(x => x.queueStatus === 'pending').length;
+      $('to-generate-total').textContent = episodes.filter(x => videoBucket(x) === 'generate').length;
+      $('published-total').textContent = episodes.filter(x => videoBucket(x) === 'published').length;
 
       const previous = $('episode-select').value;
       $('episode-select').innerHTML = episodes.map(x => `<option value="${x.id}">${x.id} · ${x.target}</option>`).join('');
       if (episodes.some(x => x.id === previous)) $('episode-select').value = previous;
 
-      const generated = episodes.filter(x => x.hasVideo && !x.platforms.length);
-      const published = episodes.filter(x => x.hasVideo && x.platforms.length);
-      const toGenerate = state.toGenerate || episodes.filter(x => !x.hasVideo && !x.hasLegacyVideo);
-      $('generated-count').textContent = `${generated.length} videos`;
-      $('published-count').textContent = `${published.length} videos`;
-      $('to-generate-count').textContent = `${toGenerate.length} episodios`;
-      $('generated-new').innerHTML = generated.map(x => `
-        <tr data-id="${x.id}" class="${selectedId === x.id ? 'selected' : ''}">
-          <td><strong>${x.id}</strong></td><td><span class="format-badge" data-format-id="${x.format}">${escapeHtml(x.formatLabel)}</span></td><td>${escapeHtml(x.target)}</td><td class="hide-mobile">${escapeHtml(x.kind)}</td>
-          <td><span class="status">${x.status}</span></td><td class="hide-mobile published">${x.platforms.length ? x.platforms.join(' · ') : '—'}</td>
-          <td><div class="actions">
-            ${x.hasVideo && !x.needsReview && !x.queueStatus ? `<button data-action="approve">Aceptar</button>` : ''}
-            <button data-action="${x.hasVideo ? 'video' : 'generate'}" ${jobRunning ? 'disabled' : ''}>${x.hasVideo ? 'Render' : 'Generar'}</button>
-            ${x.hasVideo ? `${x.format === 'clues' ? `<button data-action="audio" ${jobRunning ? 'disabled' : ''}>Audio</button><button data-action="${x.needsReview ? 'clear-hints' : 'hints'}">${x.needsReview ? 'Quitar pendientes' : 'Marcar pistas'}</button>` : ''}${x.queueStatus ? '<button data-action="unqueue">Quitar de cola</button>' : '<button class="danger" data-action="reject">Rechazar</button>'}` : ''}
-          </div></td>
-        </tr>`).join('') || `<tr><td colspan="7" class="empty">Todavía no hay videos del template nuevo.</td></tr>`;
-      $('published-videos').innerHTML = published.map(x => `
-        <tr data-id="${x.id}" class="${selectedId === x.id ? 'selected' : ''}">
-          <td><strong>${x.id}</strong></td><td><span class="format-badge" data-format-id="${x.format}">${escapeHtml(x.formatLabel)}</span></td><td>${escapeHtml(x.target)}</td>
-          <td class="hide-mobile published">${x.platforms.join(' · ')}</td>
-          <td><button data-action="video">Ver</button></td>
-        </tr>`).join('') || `<tr><td colspan="5" class="empty">No hay videos publicados.</td></tr>`;
-      $('episodes-to-generate').innerHTML = toGenerate.map(x => `
-        <tr data-id="${x.id}">
-          <td><strong>${x.id}</strong></td><td><span class="format-badge">${escapeHtml(x.formatLabel)}</span></td><td>${escapeHtml(x.target)}</td><td><span class="status">Sin generar</span></td>
-          <td><button data-action="generate" ${jobRunning ? 'disabled' : ''}>Generar</button></td>
-        </tr>`).join('') || `<tr><td colspan="5" class="empty">No quedan episodios por generar.</td></tr>`;
+      renderVideoInventory(episodes, jobRunning);
 
       const selected = episodes.find(x => x.id === selectedId);
       if (selected?.hasVideo) {
@@ -787,6 +855,7 @@
       $('job-label').textContent = state.job.label || 'Sin tareas activas';
       $('job-source').textContent = {automatic:'Automática', manual:'Manual'}[state.job.source] || '—';
       $('job-log').textContent = state.job.lines.length ? state.job.lines.join('\n') : 'La actividad de generación aparecerá acá.';
+      if (jobRunning || state.job.status === 'failed') $('job-details').open = true;
       const persistentError = state.publishing?.lastError;
       const errorLines = state.job.status === 'failed' ? state.job.lines : persistentError ? [`${persistentError.episodeId}: ${persistentError.error}`] : [];
       const errorKey = currentErrorKey();
@@ -897,6 +966,10 @@
     function renderDiagnostics() {
       if (!diagnostics) return;
       const c = diagnostics.counts, d = diagnostics.disk, db = diagnostics.database;
+      const failingStates = new Set(['failed', 'stopped', 'unhealthy', 'missing']);
+      const healthy = diagnostics.internet && !diagnostics.services.some(service => failingStates.has(service.state));
+      $('live-status').classList.toggle('bad', !healthy);
+      $('live-status-text').textContent = healthy ? 'Sistema operativo' : 'Revisar sistema';
       $('diag-internet').textContent = diagnostics.internet ? 'OK' : 'Sin salida';
       $('diag-internet').className = diagnostics.internet ? 'ok' : 'bad';
       $('diag-disk').textContent = `${d.freeGb} GB libres`;
@@ -949,6 +1022,16 @@
     document.querySelector('.section-nav').onclick = event => {
       const button = event.target.closest('[data-view]');
       if (button) showView(button.dataset.view);
+    };
+    document.querySelectorAll('[data-video-filter]').forEach(button => button.onclick = () => {
+      videoFilter = button.dataset.videoFilter;
+      localStorage.setItem('minecraft-quiz-video-filter', videoFilter);
+      showView('home');
+      renderVideoInventory(state.episodes, state.job.status === 'running');
+    });
+    $('video-search').oninput = event => {
+      videoSearch = event.target.value;
+      renderVideoInventory(state.episodes, state.job.status === 'running');
     };
     $('generate').onclick = async () => { try { await api('/api/generate',{episodeId:$('episode-select').value,formatId:$('format-select').value}); toast('Generación iniciada'); refresh(); } catch(e){ toast(e.message); } };
     $('random').onclick = async () => { try { await api('/api/generate',{formatId:$('format-select').value}); toast('Generación aleatoria iniciada'); refresh(); } catch(e){ toast(e.message); } };
@@ -1031,7 +1114,6 @@
       }
     });
     $('save-publishing').onclick = () => savePublishing(true);
-    $('save-copy').onclick = () => savePublishing(true);
     $('save-secrets').onclick = async () => {
       try {
         const values = {};
@@ -1061,9 +1143,10 @@
     };
     async function handleEpisodeRows(event) {
       const row = event.target.closest('tr'); if (!row) return;
+      if (event.target.closest('.row-menu') && !event.target.closest('[data-action]')) return;
       selectedId = row.dataset.id;
-      const action = event.target.dataset.action;
-      if (!action) { render(); return; }
+      const action = event.target.closest('[data-action]')?.dataset.action;
+      if (!action || action === 'inspect') { render(); return; }
       if (action === 'reject' && !confirm(`¿Eliminar definitivamente ${selectedId}, incluyendo JSON, audio y video?`)) return;
       try {
         if (action === 'generate') await api('/api/generate',{episodeId:selectedId,formatId:row.querySelector('[data-format-id]')?.dataset.formatId || 'clues'});
@@ -1073,8 +1156,7 @@
         refresh();
       } catch(e) { toast(e.message); }
     }
-    $('generated-new').onclick = handleEpisodeRows;
-    $('episodes-to-generate').onclick = handleEpisodeRows;
+    $('video-inventory').onclick = handleEpisodeRows;
     const oauth = new URLSearchParams(location.search);
     if (oauth.get('tiktok') === 'connected') { toast('TikTok conectado correctamente'); history.replaceState({},'',location.pathname); }
     if (oauth.get('tiktok') === 'error') { toast(oauth.get('message') || 'No se pudo conectar TikTok'); history.replaceState({},'',location.pathname); }
