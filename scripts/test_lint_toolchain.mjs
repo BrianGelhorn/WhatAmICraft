@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 
 const require = createRequire(import.meta.url);
 const eslintVersion = require("eslint/package.json").version;
@@ -16,6 +17,13 @@ const remotionPackages = [
 assert.equal(eslintVersion, "9.19.0");
 assert.equal(reactVersion, reactDomVersion);
 assert.equal(new Set(remotionPackages).size, 1);
+const lock = JSON.parse(readFileSync(new URL("../package-lock.json", import.meta.url)));
+const remotionLock = lock.packages["node_modules/remotion"];
+const compositorPackages = Object.keys(remotionLock.optionalDependencies ?? {});
+assert.ok(compositorPackages.length > 0);
+for (const name of compositorPackages) {
+  assert.equal(lock.packages[`node_modules/${name}`]?.version, remotionPackages[0]);
+}
 const { default: config } = await import("../eslint.config.mjs");
 assert.ok(Array.isArray(config) && config.length > 0);
 
