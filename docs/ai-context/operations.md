@@ -9,11 +9,25 @@ cd /home/brian/MinecraftQuizGuesser
 python3 scripts/doctor.py
 python3 scripts/context_snapshot.py
 python3 scripts/backup_state.py
-docker compose ps
-docker compose logs --tail=80 dashboard bot publisher-worker
-docker compose run --rm producer --all --dry-run
+sudo docker compose --env-file /etc/whatamicraft/production.env ps
+sudo docker compose --env-file /etc/whatamicraft/production.env logs --tail=80 dashboard bot publisher-worker
+sudo docker compose --env-file /etc/whatamicraft/production.env run --rm producer --all --dry-run
 sudo systemctl restart minecraft-quiz.service
 ```
+
+## Production secrets
+
+- Production variables live in `/etc/whatamicraft/production.env`, owned by `root:root` with mode `600`.
+- The project `.env` is not used in production and must not be copied from the repository.
+- `.secrets/` stays outside version control and is readable only by root; deployment archives exclude it.
+- `brian` must not belong to the `docker` group. Reconnect after changing group membership.
+- Rebuild or start the production services only through the privileged command:
+
+```bash
+sudo docker compose --env-file /etc/whatamicraft/production.env up -d --build dashboard bot publisher-worker backup-rollback media
+```
+
+The environment file survives code deployments and image rebuilds. Rotating a secret is a one-time edit of `/etc/whatamicraft/production.env`, followed by this command; values must never be printed in logs or chat.
 
 ## Publishing rules
 
