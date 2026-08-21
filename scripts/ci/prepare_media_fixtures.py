@@ -55,7 +55,7 @@ def media_targets() -> set[Path]:
                 if path.suffix.lower() in MEDIA_SUFFIXES:
                     targets.add(path)
     kinds = set()
-    for source in (ROOT / "data").glob("*.json"):
+    for source in json_sources:
         for value in strings(json.loads(source.read_text(encoding="utf-8"))):
             if value in {"Block", "Enchantment", "Food", "Item", "Mineral", "Mob", "Plant", "Potion", "Structure", "Tool", "Weapon"}:
                 kinds.add(value)

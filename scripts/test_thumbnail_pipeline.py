@@ -50,6 +50,9 @@ def main() -> None:
         expected.unlink(missing_ok=True)
 
     original_thumbnail_path = publish.thumbnail_path
+    episode_thumbnail = thumbnail_path(episode, "vertical")
+    episode_thumbnail.parent.mkdir(parents=True, exist_ok=True)
+    episode_thumbnail.write_bytes(b"thumbnail-fixture")
     try:
         publish.thumbnail_path = lambda _episode, platform="vertical": thumbnail_path(episode, platform)
         request = publish.publish_request(
@@ -60,6 +63,7 @@ def main() -> None:
         assert request.thumbnail != thumbnail_path(episode, "square")
     finally:
         publish.thumbnail_path = original_thumbnail_path
+        episode_thumbnail.unlink(missing_ok=True)
 
     invalid = deepcopy(config)
     invalid["thumbnail"]["platforms"]["vertical"] = "unknown"
