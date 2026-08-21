@@ -82,7 +82,7 @@ def main() -> None:
         with tempfile.TemporaryDirectory() as directory:
             for suffix, codec, container in (
                 (".mp3", "libmp3lame", "mp3"),
-                (".m4a", "aac", "ipod"),
+                (".m4a", "aac", "mp4"),
                 (".wav", "pcm_s16le", "wav"),
                 (".ogg", "libvorbis", "ogg"),
             ):
