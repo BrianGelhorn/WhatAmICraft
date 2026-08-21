@@ -86,6 +86,9 @@ def main() -> None:
                 (".wav", "pcm_s16le", "wav"),
                 (".ogg", "libvorbis", "ogg"),
             ):
+                targets_for_suffix = {path for path in audio_targets if path.suffix.lower() == suffix}
+                if not targets_for_suffix:
+                    continue
                 source = Path(directory) / f"fixture{suffix}"
                 subprocess.run(
                     [
@@ -107,7 +110,7 @@ def main() -> None:
                     ],
                     check=True,
                 )
-                for path in (target for target in audio_targets if target.suffix.lower() == suffix):
+                for path in targets_for_suffix:
                     path.parent.mkdir(parents=True, exist_ok=True)
                     if not path.exists():
                         path.write_bytes(source.read_bytes())
