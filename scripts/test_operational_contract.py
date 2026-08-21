@@ -28,7 +28,10 @@ def main() -> None:
     assert "BACKUP_ADMIN_TOKEN" in staging
     assert "dockerfile: Dockerfile.media" in compose
     assert "dockerfile: Dockerfile.media" in staging
-    assert "RUN mkdir -p /usr/share/nginx/html/thumbnails" in media_dockerfile
+    assert "COPY nginx.media.conf /etc/nginx/conf.d/default.conf" in media_dockerfile
+    nginx_media = (ROOT / "nginx.media.conf").read_text(encoding="utf-8")
+    assert "root /mnt/out/episodes;" in nginx_media
+    assert "alias /mnt/out/thumbnails/;" in nginx_media
     assert "./runtime/data:/app/data" in staging
     assert "./runtime/out:/app/out" in staging
     assert "STAGING_DASHBOARD_PORT" in staging

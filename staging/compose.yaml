@@ -116,7 +116,8 @@ services:
     ports:
       - "127.0.0.1:${STAGING_MEDIA_PORT:-8081}:80"
     volumes:
-      - ./runtime/out/episodes:/usr/share/nginx/html:ro
+      - ./runtime/out/episodes:/mnt/out/episodes:ro
+      - ./runtime/out/thumbnails:/mnt/out/thumbnails:ro
 
   bot:
     profiles: ["integrations"]
