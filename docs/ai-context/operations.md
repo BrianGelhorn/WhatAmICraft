@@ -21,10 +21,18 @@ sudo systemctl restart minecraft-quiz.service
 - The project `.env` is not used in production and must not be copied from the repository.
 - `.secrets/` stays outside version control and is readable only by root; deployment archives exclude it.
 - `brian` must not belong to the `docker` group. Reconnect after changing group membership.
-- Rebuild or start the production services only through the privileged command:
+- Install the root-owned launcher once from a checked-out release:
 
 ```bash
-sudo docker compose --env-file /etc/whatamicraft/production.env up -d --build dashboard bot publisher-worker backup-rollback media
+sudo sh ops/install-production-launcher.sh
+```
+
+The installer creates `/usr/local/sbin/whatamicraft-up` with owner `root:root`, mode `700`, and a sudoers rule that permits only that exact command without arguments. The launcher cannot be read or modified by `brian`, does not accept user-supplied Docker arguments, and never prints the environment file.
+
+Rebuild or start the production services through the launcher:
+
+```bash
+sudo /usr/local/sbin/whatamicraft-up
 ```
 
 The environment file survives code deployments and image rebuilds. Rotating a secret is a one-time edit of `/etc/whatamicraft/production.env`, followed by this command; values must never be printed in logs or chat.
