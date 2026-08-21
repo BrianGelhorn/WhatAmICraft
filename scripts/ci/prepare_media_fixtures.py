@@ -80,10 +80,31 @@ def main() -> None:
         if not ffmpeg:
             raise RuntimeError("No se encontro ffmpeg del sistema ni el binario de Remotion")
         with tempfile.TemporaryDirectory() as directory:
-            for suffix, codec in ((".mp3", "libmp3lame"), (".m4a", "aac"), (".wav", "pcm_s16le"), (".ogg", "libvorbis")):
+            for suffix, codec, container in (
+                (".mp3", "libmp3lame", "mp3"),
+                (".m4a", "aac", "ipod"),
+                (".wav", "pcm_s16le", "wav"),
+                (".ogg", "libvorbis", "ogg"),
+            ):
                 source = Path(directory) / f"fixture{suffix}"
                 subprocess.run(
-                    [ffmpeg, "-v", "error", "-y", "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono", "-t", "1", "-c:a", codec, str(source)],
+                    [
+                        ffmpeg,
+                        "-v",
+                        "error",
+                        "-y",
+                        "-f",
+                        "lavfi",
+                        "-i",
+                        "anullsrc=r=44100:cl=mono",
+                        "-t",
+                        "1",
+                        "-c:a",
+                        codec,
+                        "-f",
+                        container,
+                        str(source),
+                    ],
                     check=True,
                 )
                 for path in (target for target in audio_targets if target.suffix.lower() == suffix):

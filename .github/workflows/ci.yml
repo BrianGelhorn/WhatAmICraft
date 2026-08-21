@@ -57,6 +57,9 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall dashboard scripts
 
+      - name: Prepare disposable media fixtures
+        run: python scripts/ci/prepare_media_fixtures.py
+
       - name: Run Python tests
         shell: bash
         run: |
