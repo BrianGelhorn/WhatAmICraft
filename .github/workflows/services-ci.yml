@@ -70,6 +70,25 @@ jobs:
           python -m py_compile scripts/review/bot.py scripts/review/telegram.py
           PYTHONPATH=scripts python scripts/test_telegram_bot.py
           PYTHONPATH=scripts python scripts/ci/service_contracts.py --bot
+          PYTHONPATH=scripts python scripts/ci/process_smoke.py
+
+  operational-contract:
+    name: Operational startup and recovery contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Validate mini PC and isolated staging contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/linux/*.sh
+          python -m py_compile scripts/test_operational_contract.py
+          PYTHONPATH=scripts python scripts/test_operational_contract.py
 
   publisher-worker:
     name: Publisher and worker services
@@ -245,7 +264,7 @@ jobs:
 
   dashboard-media-integration:
     name: Dashboard/media integration
-    needs: [dashboard, bot, publisher-worker, producer, clues-api, analytics-api, monitor, backup-rollback, media]
+    needs: [dashboard, bot, publisher-worker, producer, clues-api, analytics-api, monitor, backup-rollback, media, operational-contract]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
