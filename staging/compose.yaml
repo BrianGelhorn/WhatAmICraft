@@ -71,6 +71,24 @@ services:
       - ../out:/app/out
       - ../backups:/app/backups
 
+  backup-rollback:
+    image: minecraft-quiz-guesser:service
+    build: *service-build
+    entrypoint: ["python3", "scripts/backup_service.py"]
+    restart: unless-stopped
+    environment:
+      BACKUP_PORT: 8793
+      BACKUP_DIR: /app/backups/ops
+      BACKUP_KEEP: 14
+      BACKUP_INTERVAL_SECONDS: 86400
+      BACKUP_ADMIN_TOKEN: ${BACKUP_ADMIN_TOKEN:-}
+    ports:
+      - "127.0.0.1:8793:8793"
+    volumes:
+      - ../data:/app/data
+      - ../out:/app/out
+      - ../backups:/app/backups
+
   monitor:
     image: minecraft-quiz-guesser:service
     build: *service-build
@@ -81,6 +99,7 @@ services:
       MONITOR_DASHBOARD_URL: http://dashboard:8787
       MONITOR_CLUES_URL: http://clues-api:8790
       MONITOR_ANALYTICS_URL: http://analytics-api:8791
+      MONITOR_BACKUP_URL: http://backup-rollback:8793
       MONITOR_MEDIA_URL: http://media
       MONITOR_EVENTS_PATH: /app/out/monitor/events.jsonl
       MONITOR_INTERVAL_SECONDS: 60
