@@ -1,6 +1,9 @@
 name: Staging Smoke
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ref:
@@ -18,24 +21,34 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.ref || github.sha }}
           submodules: recursive
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Create isolated media fixture
+      - name: Prepare isolated persistent staging runtime
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p out/episodes
-          printf 'whatamicraft-ci-video' > out/episodes/mc-ci-test.mp4
+          PYTHONPATH=scripts python scripts/ci/prepare_staging.py --reset
       - name: Validate and start staging services
         shell: bash
         run: |
           set -euo pipefail
           project="whatamicraft-staging-${GITHUB_RUN_ID}"
           export BACKUP_ADMIN_TOKEN=ci-only-backup-token
-          trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              echo "::group::staging diagnostics"
+              docker compose -p "$project" -f staging/compose.yaml ps || true
+              docker compose -p "$project" -f staging/compose.yaml logs --no-color --tail=200 || true
+              echo "::endgroup::"
+            fi
+            docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans || true
+            exit "$status"
+          }
+          trap cleanup EXIT
           docker compose -p "$project" -f staging/compose.yaml config --quiet
           docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api analytics-api backup-rollback monitor media
           for attempt in $(seq 1 60); do
@@ -61,4 +74,5 @@ jobs:
             --monitor http://127.0.0.1:8792 \
             --backup http://127.0.0.1:8793 \
             --backup-token ci-only-backup-token \
+            --runtime-root staging/runtime \
             --fixture mc-ci-test.mp4

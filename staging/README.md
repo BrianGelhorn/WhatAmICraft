@@ -1,6 +1,22 @@
-# Entorno de desarrollo aislado
+# Entorno de staging aislado
 
-Este compose usa el proyecto `minecraftquizguesser-dev`, los puertos `8788` y `8081`, y volúmenes propios.
+Este compose usa el proyecto `minecraftquizguesser-dev`, los puertos `8788` y `8081`, y el runtime persistente `staging/runtime/`. Ese runtime se crea con datos de prueba separados; nunca monta `data/`, `out/` ni `backups/` del proyecto principal.
+
+Preparación y arranque local:
+
+```powershell
+$env:PYTHONPATH = "scripts"
+python scripts/ci/prepare_staging.py
+docker compose -f staging/compose.yaml up -d --build dashboard clues-api analytics-api backup-rollback monitor media
+```
+
+Si algún puerto está ocupado, podés cambiar solo los puertos externos con `STAGING_DASHBOARD_PORT`, `STAGING_CLUES_PORT`, `STAGING_ANALYTICS_PORT`, `STAGING_BACKUP_PORT`, `STAGING_MONITOR_PORT` y `STAGING_MEDIA_PORT`; los puertos internos no cambian.
+
+Para descartar solamente el estado de staging y recrearlo desde cero, agregá `--reset` al primer comando. La verificación integral usa el mismo runtime:
+
+```powershell
+python scripts/ci/service_smoke.py --dashboard http://127.0.0.1:8788 --media http://127.0.0.1:8081 --analytics http://127.0.0.1:8791 --monitor http://127.0.0.1:8792 --backup http://127.0.0.1:8793 --backup-token <token-local> --runtime-root staging/runtime --fixture mc-ci-test.mp4
+```
 
 Incluye la API local de pistas en `8790`. Sus endpoints principales son `GET /api/clues?status=unused|used|all`, `GET /api/clues/<target_id>`, `POST /api/clues` para cargar un paquete validado y `PATCH /api/clues/<target_id>` con `{\"status\":\"used\",\"episodeId\":\"mc-01\",\"videoFile\":\"mc-01-target.mp4\"}` para registrar su uso. Se puede revertir una reserva creada por la API con `status=unused`; los usos provenientes del banco o de videos quedan protegidos. El estado utilizado se calcula desde `data/used-targets.json`; no se mantiene una copia paralela.
 
