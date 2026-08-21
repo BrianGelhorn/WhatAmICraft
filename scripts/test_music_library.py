@@ -1,3 +1,5 @@
+import shutil
+import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -59,16 +61,20 @@ finally:
 test_library_path = library.ROOT / "out/test-music-library.json"
 test_library_path.unlink(missing_ok=True)
 test_library_path.with_suffix(".json.tmp").unlink(missing_ok=True)
+test_original = library.ORIGINAL_ROOT / ".ci-test-original.ogg"
+test_original.parent.mkdir(parents=True, exist_ok=True)
+test_original.write_bytes(b"audio-fixture")
 original_library_path, original_run = library.LIBRARY_PATH, library._run
 try:
     library.LIBRARY_PATH = test_library_path
     library._run = lambda *args, **kwargs: SimpleNamespace(stdout="185.0\n")
-    assert library.set_original_starts("Cat.ogg", ["0:12", "0:34"]) == [12, 34]
-    assert library.original_starts("Cat.ogg") == [12, 34]
+    assert library.set_original_starts(test_original.name, ["0:12", "0:34"]) == [12, 34]
+    assert library.original_starts(test_original.name) == [12, 34]
 finally:
     library.LIBRARY_PATH, library._run = original_library_path, original_run
     test_library_path.unlink(missing_ok=True)
     test_library_path.with_suffix(".json.tmp").unlink(missing_ok=True)
+    test_original.unlink(missing_ok=True)
 
 for invalid in ("https://example.com/watch?v=abc", "http://youtube.com/watch?v=abc"):
     try:
@@ -82,21 +88,30 @@ producer.ready_clips_for_template = lambda _: [{
 }]
 producer.normalize_audio = lambda *args: "audio/quiz-copy/music-cache/test.m4a"
 producer.random.SystemRandom = lambda: type("FirstChoice", (), {"choice": lambda self, values: values[0]})()
-music = producer.prepare_music({
-    "folder": "public/audio/music", "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
-    "volume": .16, "duckedVolume": .07, "fadeInFrames": 24, "fadeOutFrames": 36, "duckFadeFrames": 6,
-}, True)
-assert music["sourceName"] == "Cat @ 32s" and music["from"] == 0 and music["trackCount"] == 8
+with tempfile.TemporaryDirectory(prefix="whatamicraft-music-test-") as directory:
+    fragment_folder = Path(directory) / "fragments"
+    fragment_folder.mkdir()
+    for index in range(7):
+        (fragment_folder / f"fixture-{index}.ogg").write_bytes(b"audio-fixture")
+    music = producer.prepare_music({
+        "folder": str(fragment_folder), "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
+        "volume": .16, "duckedVolume": .07, "fadeInFrames": 24, "fadeOutFrames": 36, "duckFadeFrames": 6,
+    }, True)
+    assert music["sourceName"] == "Cat @ 32s" and music["from"] == 0 and music["trackCount"] == 8
 
-normalization = {}
-producer.ready_clips_for_template = lambda _: []
-producer.original_starts = lambda _: [12, 34]
-producer.normalize_audio = lambda source, cache, settings, dry_run: normalization.update(settings) or "audio/quiz-copy/music-cache/test.m4a"
-music = producer.prepare_music({
-    "folder": "public/audio/music", "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
-    "volume": .16, "duckedVolume": .07, "fadeInFrames": 24, "fadeOutFrames": 36, "duckFadeFrames": 6,
-}, True)
-assert music["sourceName"] == "Cat.ogg @ 12s" and music["trackCount"] == 14
-assert normalization["trimStartSeconds"] == 12 and normalization["trimDurationSeconds"] == 120
+    normalization = {}
+    producer.ready_clips_for_template = lambda _: []
+    producer.original_starts = lambda _: [12, 34]
+    producer.normalize_audio = lambda source, cache, settings, dry_run: normalization.update(settings) or "audio/quiz-copy/music-cache/test.m4a"
+    original_folder = Path(directory) / "original"
+    original_folder.mkdir()
+    test_music_source = original_folder / "ci-original.ogg"
+    test_music_source.write_bytes(b"audio-fixture")
+    music = producer.prepare_music({
+        "folder": str(original_folder), "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
+        "volume": .16, "duckedVolume": .07, "fadeInFrames": 24, "fadeOutFrames": 36, "duckFadeFrames": 6,
+    }, True)
+    assert music["sourceName"] == f"{test_music_source.name} @ 12s" and music["trackCount"] == 2
+    assert normalization["trimStartSeconds"] == 12 and normalization["trimDurationSeconds"] == 120
 
 print("ok: music library timestamps and URL guards")
