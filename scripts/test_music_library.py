@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -86,8 +87,13 @@ producer.ready_clips_for_template = lambda _: [{
 }]
 producer.normalize_audio = lambda *args: "audio/quiz-copy/music-cache/test.m4a"
 producer.random.SystemRandom = lambda: type("FirstChoice", (), {"choice": lambda self, values: values[0]})()
+test_music_folder = library.ROOT / "out/test-music-source"
+shutil.rmtree(test_music_folder, ignore_errors=True)
+test_music_folder.mkdir(parents=True)
+for index in range(7):
+    (test_music_folder / f"fixture-{index}.ogg").write_bytes(b"audio-fixture")
 music = producer.prepare_music({
-    "folder": "public/audio/music", "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
+    "folder": str(test_music_folder), "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
     "volume": .16, "duckedVolume": .07, "fadeInFrames": 24, "fadeOutFrames": 36, "duckFadeFrames": 6,
 }, True)
 assert music["sourceName"] == "Cat @ 32s" and music["from"] == 0 and music["trackCount"] == 8
@@ -96,11 +102,16 @@ normalization = {}
 producer.ready_clips_for_template = lambda _: []
 producer.original_starts = lambda _: [12, 34]
 producer.normalize_audio = lambda source, cache, settings, dry_run: normalization.update(settings) or "audio/quiz-copy/music-cache/test.m4a"
+shutil.rmtree(test_music_folder, ignore_errors=True)
+test_music_folder.mkdir(parents=True)
+test_music_source = test_music_folder / "ci-original.ogg"
+test_music_source.write_bytes(b"audio-fixture")
 music = producer.prepare_music({
-    "folder": "public/audio/music", "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
+    "folder": str(test_music_folder), "targetLufs": -16, "truePeakDb": -1.5, "loudnessRange": 11,
     "volume": .16, "duckedVolume": .07, "fadeInFrames": 24, "fadeOutFrames": 36, "duckFadeFrames": 6,
 }, True)
-assert music["sourceName"] == "Cat.ogg @ 12s" and music["trackCount"] == 14
+assert music["sourceName"] == f"{test_music_source.name} @ 12s" and music["trackCount"] == 2
 assert normalization["trimStartSeconds"] == 12 and normalization["trimDurationSeconds"] == 120
+shutil.rmtree(test_music_folder, ignore_errors=True)
 
 print("ok: music library timestamps and URL guards")
