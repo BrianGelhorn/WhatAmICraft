@@ -59,16 +59,20 @@ finally:
 test_library_path = library.ROOT / "out/test-music-library.json"
 test_library_path.unlink(missing_ok=True)
 test_library_path.with_suffix(".json.tmp").unlink(missing_ok=True)
+test_original = library.ORIGINAL_ROOT / ".ci-test-original.ogg"
+test_original.parent.mkdir(parents=True, exist_ok=True)
+test_original.write_bytes(b"audio-fixture")
 original_library_path, original_run = library.LIBRARY_PATH, library._run
 try:
     library.LIBRARY_PATH = test_library_path
     library._run = lambda *args, **kwargs: SimpleNamespace(stdout="185.0\n")
-    assert library.set_original_starts("Cat.ogg", ["0:12", "0:34"]) == [12, 34]
-    assert library.original_starts("Cat.ogg") == [12, 34]
+    assert library.set_original_starts(test_original.name, ["0:12", "0:34"]) == [12, 34]
+    assert library.original_starts(test_original.name) == [12, 34]
 finally:
     library.LIBRARY_PATH, library._run = original_library_path, original_run
     test_library_path.unlink(missing_ok=True)
     test_library_path.with_suffix(".json.tmp").unlink(missing_ok=True)
+    test_original.unlink(missing_ok=True)
 
 for invalid in ("https://example.com/watch?v=abc", "http://youtube.com/watch?v=abc"):
     try:
