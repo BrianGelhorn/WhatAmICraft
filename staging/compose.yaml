@@ -31,12 +31,11 @@ services:
       META_ACCESS_TOKEN: ""
       FACEBOOK_PAGE_ID: ""
     ports:
-      - "127.0.0.1:8788:8787"
+      - "127.0.0.1:${STAGING_DASHBOARD_PORT:-8788}:8787"
     volumes:
-      - ../data:/app/data
-      - ../out:/app/out
-      - ../backups:/app/backups
-      - ../public/audio:/app/public/audio
+      - ./runtime/data:/app/data
+      - ./runtime/out:/app/out
+      - ./runtime/backups:/app/backups
     depends_on:
       - clues-api
       - analytics-api
@@ -53,9 +52,9 @@ services:
       CLUES_UPLOAD_DIR: /app/data/clues/inbox
       CLUES_USED_TARGETS_PATH: /app/data/used-targets.json
     ports:
-      - "127.0.0.1:8790:8790"
+      - "127.0.0.1:${STAGING_CLUES_PORT:-8790}:8790"
     volumes:
-      - ../data:/app/data
+      - ./runtime/data:/app/data
 
   analytics-api:
     image: minecraft-quiz-guesser:service
@@ -65,11 +64,11 @@ services:
     environment:
       ANALYTICS_PORT: 8791
     ports:
-      - "127.0.0.1:8791:8791"
+      - "127.0.0.1:${STAGING_ANALYTICS_PORT:-8791}:8791"
     volumes:
-      - ../data:/app/data
-      - ../out:/app/out
-      - ../backups:/app/backups
+      - ./runtime/data:/app/data
+      - ./runtime/out:/app/out
+      - ./runtime/backups:/app/backups
 
   backup-rollback:
     image: minecraft-quiz-guesser:service
@@ -83,11 +82,11 @@ services:
       BACKUP_INTERVAL_SECONDS: 86400
       BACKUP_ADMIN_TOKEN: ${BACKUP_ADMIN_TOKEN:-}
     ports:
-      - "127.0.0.1:8793:8793"
+      - "127.0.0.1:${STAGING_BACKUP_PORT:-8793}:8793"
     volumes:
-      - ../data:/app/data
-      - ../out:/app/out
-      - ../backups:/app/backups
+      - ./runtime/data:/app/data
+      - ./runtime/out:/app/out
+      - ./runtime/backups:/app/backups
 
   monitor:
     image: minecraft-quiz-guesser:service
@@ -104,17 +103,17 @@ services:
       MONITOR_EVENTS_PATH: /app/out/monitor/events.jsonl
       MONITOR_INTERVAL_SECONDS: 60
     ports:
-      - "127.0.0.1:8792:8792"
+      - "127.0.0.1:${STAGING_MONITOR_PORT:-8792}:8792"
     volumes:
-      - ../out:/app/out
+      - ./runtime/out:/app/out
 
   media:
     image: nginx:alpine
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8081:80"
+      - "127.0.0.1:${STAGING_MEDIA_PORT:-8081}:80"
     volumes:
-      - ../out/episodes:/usr/share/nginx/html:ro
+      - ./runtime/out/episodes:/usr/share/nginx/html:ro
 
   bot:
     profiles: ["integrations"]
@@ -126,9 +125,8 @@ services:
       TELEGRAM_BOT_TOKEN: ""
       TELEGRAM_REVIEW_CHAT_ID: ""
     volumes:
-      - ../data:/app/data
-      - ../out:/app/out
-      - ../public/audio:/app/public/audio
+      - ./runtime/data:/app/data
+      - ./runtime/out:/app/out
 
   publisher-worker:
     profiles: ["integrations"]
@@ -148,6 +146,5 @@ services:
       FACEBOOK_PAGE_ID: ""
       PUBLISH_QUEUE_INTERVAL: 30
     volumes:
-      - ../data:/app/data
-      - ../out:/app/out
-      - ../public/audio:/app/public/audio
+      - ./runtime/data:/app/data
+      - ./runtime/out:/app/out

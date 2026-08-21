@@ -25,7 +25,15 @@ def main() -> None:
         assert "restart: unless-stopped" in section.split("\n  ", 1)[0] or "restart: unless-stopped" in section[:300]
     assert "backup-rollback:" in staging
     assert "BACKUP_ADMIN_TOKEN" in staging
+    assert "./runtime/data:/app/data" in staging
+    assert "./runtime/out:/app/out" in staging
+    assert "STAGING_DASHBOARD_PORT" in staging
+    assert "STAGING_MEDIA_PORT" in staging
+    assert "../data:/app/data" not in staging
+    assert "../out:/app/out" not in staging
     assert 'profiles: ["integrations"]' in staging
+    assert "prepare_staging.py --reset" in staging_ci
+    assert "--runtime-root staging/runtime" in staging_ci
     assert "whatamicraft-ci-${GITHUB_RUN_ID}" in services_ci
     assert "down -v --remove-orphans" in services_ci
     assert "whatamicraft-staging-${GITHUB_RUN_ID}" in staging_ci

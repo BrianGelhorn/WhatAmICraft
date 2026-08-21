@@ -277,8 +277,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p out/episodes
-          printf 'whatamicraft-ci-video' > out/episodes/mc-ci-test.mp4
+          PYTHONPATH=scripts python scripts/ci/prepare_staging.py --reset
       - name: Validate staging compose contract
         run: docker compose -f staging/compose.yaml config --quiet
       - name: Start isolated dashboard and media services
@@ -288,7 +287,18 @@ jobs:
           project="whatamicraft-ci-${GITHUB_RUN_ID}"
           export BACKUP_ADMIN_TOKEN=ci-only-backup-token
           echo "COMPOSE_PROJECT=$project" >> "$GITHUB_ENV"
-          trap 'docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans' EXIT
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              echo "::group::staging diagnostics"
+              docker compose -p "$project" -f staging/compose.yaml ps || true
+              docker compose -p "$project" -f staging/compose.yaml logs --no-color --tail=200 || true
+              echo "::endgroup::"
+            fi
+            docker compose -p "$project" -f staging/compose.yaml down -v --remove-orphans || true
+            exit "$status"
+          }
+          trap cleanup EXIT
           docker compose -p "$project" -f staging/compose.yaml up -d --build dashboard clues-api analytics-api backup-rollback monitor media
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/ >/dev/null \
@@ -313,4 +323,5 @@ jobs:
             --monitor http://127.0.0.1:8792 \
             --backup http://127.0.0.1:8793 \
             --backup-token ci-only-backup-token \
+            --runtime-root staging/runtime \
             --fixture mc-ci-test.mp4

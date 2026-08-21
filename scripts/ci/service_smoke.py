@@ -60,6 +60,7 @@ def main() -> None:
     parser.add_argument("--backup", required=True)
     parser.add_argument("--backup-token", required=True)
     parser.add_argument("--fixture", required=True)
+    parser.add_argument("--runtime-root", required=True)
     args = parser.parse_args()
 
     dashboard = args.dashboard.rstrip("/")
@@ -75,7 +76,7 @@ def main() -> None:
     backup_health = json.loads(backup_health_body)
     if backup_health.get("service") != "backup-rollback":
         raise RuntimeError("backup service health returned the wrong service")
-    marker = Path("out/backup-ci-marker.json")
+    marker = Path(args.runtime_root).resolve() / "out/backup-ci-marker.json"
     previous_marker = marker.read_bytes() if marker.exists() else None
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_bytes(b'{"state":"original"}\n')
