@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
+import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +19,9 @@ def main() -> None:
     staging = (ROOT / "staging/compose.yaml").read_text(encoding="utf-8")
     services_ci = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     staging_ci = (ROOT / ".github/workflows/staging-smoke.yml").read_text(encoding="utf-8")
+    tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True).stdout.split(b"\0")
+    media_pattern = re.compile(rb"(?i)(^out/|^public/(audio|images|fonts)/|^references/|\.(mp4|mp3|m4a|wav|ogg|flac|aac|png|jpe?g|webp|gif|bmp|svg|mov|webm|avi|mkv|ttf|otf|woff2?)$)")
+    assert not [path for path in tracked if path and media_pattern.search(path)]
 
     assert "scripts/backup_state.py --quiet" in start
     assert "docker compose up -d" in start

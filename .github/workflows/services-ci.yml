@@ -130,6 +130,7 @@ jobs:
           set -euo pipefail
           npm ci
           npx remotion browser ensure
+          python scripts/ci/prepare_media_fixtures.py
           python -m py_compile scripts/produce_quiz_copy.py scripts/thumbnails.py
           PYTHONPATH=scripts python scripts/test_quiz_copy_validation.py
           PYTHONPATH=scripts python scripts/test_automatic_rendering.py
