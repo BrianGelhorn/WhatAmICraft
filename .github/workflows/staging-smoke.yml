@@ -1,6 +1,9 @@
 name: Staging Smoke
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ref:
@@ -18,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.ref || github.sha }}
           submodules: recursive
       - uses: actions/setup-python@v7
         with:

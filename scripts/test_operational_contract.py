@@ -34,6 +34,8 @@ def main() -> None:
     assert 'profiles: ["integrations"]' in staging
     assert "prepare_staging.py --reset" in staging_ci
     assert "--runtime-root staging/runtime" in staging_ci
+    assert "pull_request:" in staging_ci
+    assert "inputs.ref || github.sha" in staging_ci
     assert "whatamicraft-ci-${GITHUB_RUN_ID}" in services_ci
     assert "down -v --remove-orphans" in services_ci
     assert "whatamicraft-staging-${GITHUB_RUN_ID}" in staging_ci
