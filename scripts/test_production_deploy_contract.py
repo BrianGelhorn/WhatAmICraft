@@ -15,6 +15,7 @@ def main() -> None:
 
     assert "workflow_run:" in workflow and 'workflows: ["Staging Smoke"]' in workflow
     assert "conclusion == 'success'" in workflow and "head_branch == 'main'" in workflow
+    assert "workflow_run.event == 'push'" in workflow
     assert "head_sha" in workflow and "whatamicraft-mini-pc" in workflow
     assert "push:" in staging and "- main" in staging
     for required in (

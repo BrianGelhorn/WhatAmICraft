@@ -17,7 +17,8 @@ jobs:
     name: Deploy main to mini PC
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'main'
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
     runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     environment: production
     steps:
