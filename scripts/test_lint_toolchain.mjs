@@ -18,9 +18,10 @@ assert.equal(eslintVersion, "9.19.0");
 assert.equal(reactVersion, reactDomVersion);
 assert.equal(new Set(remotionPackages).size, 1);
 const lock = JSON.parse(readFileSync(new URL("../package-lock.json", import.meta.url)));
-const remotionLock = lock.packages["node_modules/remotion"];
-const compositorPackages = Object.keys(remotionLock.optionalDependencies ?? {});
+const rendererLock = lock.packages["node_modules/@remotion/renderer"];
+const compositorPackages = Object.keys(rendererLock?.optionalDependencies ?? {});
 assert.ok(compositorPackages.length > 0);
+assert.equal(rendererLock.version, remotionPackages[0]);
 for (const name of compositorPackages) {
   assert.equal(lock.packages[`node_modules/${name}`]?.version, remotionPackages[0]);
 }
