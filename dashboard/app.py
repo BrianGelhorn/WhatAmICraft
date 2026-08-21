@@ -652,7 +652,13 @@ def start_job(
         format_id = format_id_for(episode) if episode else None
     if not format_id or format_id == "all":
         format_id = choose_weighted_format(config["generation"].get("formats", {}))
-    command = [sys.executable, "-u", str(ROOT / "scripts/produce_quiz_copy.py"), "--render"]
+    command = [
+        sys.executable,
+        "-u",
+        str(ROOT / "scripts/produce_quiz_copy.py"),
+        "--render",
+        "--generate-audio",
+    ]
     if episode_id:
         command.extend(["--episode", episode_id])
     if force_audio:
