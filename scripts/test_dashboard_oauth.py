@@ -15,6 +15,7 @@ class DashboardMarkup(HTMLParser):
         super().__init__()
         self.ids = []
         self.views = []
+        self.video_filters = []
 
     def handle_starttag(self, tag, attrs):
         values = dict(attrs)
@@ -22,14 +23,17 @@ class DashboardMarkup(HTMLParser):
             self.ids.append(values["id"])
         if values.get("data-view-panel"):
             self.views.append(values["data-view-panel"])
+        if values.get("data-video-filter"):
+            self.video_filters.append(values["data-video-filter"])
 
 
 markup = DashboardMarkup()
 markup.feed((ROOT / "dashboard/index.html").read_text(encoding="utf-8"))
 assert len(markup.ids) == len(set(markup.ids))
-assert set(markup.views) == {"home", "videos", "music", "analytics", "publishing", "system"}
+assert set(markup.views) == {"home", "music", "analytics", "publishing", "system"}
 assert {"music-url", "music-starts", "music-templates", "music-rights", "music-import", "music-tracks"} <= set(markup.ids)
-assert {"generated-new", "episodes-to-generate"} <= set(markup.ids)
+assert {"video-search", "video-inventory", "job-details", "live-status"} <= set(markup.ids)
+assert set(markup.video_filters) == {"attention", "queued", "generate", "published", "all"}
 state = app.dashboard_state()
 legacy_ids = {item["id"] for item in state["legacyVideos"]}
 assert not any(item["id"] in legacy_ids for item in state["toGenerate"])
