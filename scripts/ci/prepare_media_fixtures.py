@@ -29,6 +29,17 @@ def strings(value: object):
         yield value
 
 
+def bundled_ffmpeg() -> str | None:
+    names = ("ffmpeg.exe", "ffmpeg")
+    for name in names:
+        if executable := shutil.which(name):
+            return executable
+        for path in (ROOT / "node_modules").glob(f"@remotion/compositor-*/{name}"):
+            if path.is_file():
+                return str(path)
+    return None
+
+
 def media_targets() -> set[Path]:
     targets: set[Path] = {
         ROOT / "public/images/template-layers/background.png",
@@ -65,9 +76,9 @@ def main() -> None:
 
     audio_targets = {path for path in targets if path.suffix.lower() in {".mp3", ".m4a", ".wav", ".ogg"}}
     if audio_targets:
-        ffmpeg = shutil.which("ffmpeg")
+        ffmpeg = bundled_ffmpeg()
         if not ffmpeg:
-            raise RuntimeError("CI necesita ffmpeg para crear audio fixture")
+            raise RuntimeError("No se encontro ffmpeg del sistema ni el binario de Remotion")
         with tempfile.TemporaryDirectory() as directory:
             for suffix, codec in ((".mp3", "libmp3lame"), (".m4a", "aac"), (".wav", "pcm_s16le"), (".ogg", "libvorbis")):
                 source = Path(directory) / f"fixture{suffix}"
