@@ -244,7 +244,9 @@ jobs:
           printf 'whatamicraft-ci-video' > "$fixture"
           chmod 755 "$fixture_dir"
           chmod 644 "$fixture"
-          container="$(docker run -d --rm -p 18081:80 -v "$fixture_dir:/usr/share/nginx/html:ro" nginx:alpine)"
+          docker build --file Dockerfile.media --tag whatamicraft-media-ci .
+          docker run --rm whatamicraft-media-ci test -d /usr/share/nginx/html/thumbnails
+          container="$(docker run -d --rm -p 18081:80 -v "$fixture_dir:/usr/share/nginx/html:ro" whatamicraft-media-ci)"
           for attempt in $(seq 1 30); do
             if curl --fail --silent --max-time 5 http://127.0.0.1:18081/mc-ci-test.mp4 >/dev/null; then break; fi
             if [ "$attempt" = "30" ]; then exit 1; fi
