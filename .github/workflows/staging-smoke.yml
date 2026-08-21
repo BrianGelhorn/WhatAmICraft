@@ -1,6 +1,9 @@
 name: Staging Smoke
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main

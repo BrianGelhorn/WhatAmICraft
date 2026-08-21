@@ -19,6 +19,7 @@ def main() -> None:
     staging = (ROOT / "staging/compose.yaml").read_text(encoding="utf-8")
     services_ci = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     staging_ci = (ROOT / ".github/workflows/staging-smoke.yml").read_text(encoding="utf-8")
+    deploy_ci = (ROOT / ".github/workflows/deploy-production.yml").read_text(encoding="utf-8")
     tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True).stdout.split(b"\0")
     media_pattern = re.compile(rb"(?i)(^out/|^public/(audio|images|fonts)/|^references/|\.(mp4|mp3|m4a|wav|ogg|flac|aac|png|jpe?g|webp|gif|bmp|svg|mov|webm|avi|mkv|ttf|otf|woff2?)$)")
     assert not [path for path in tracked if path and media_pattern.search(path)]
@@ -47,7 +48,9 @@ def main() -> None:
     assert "prepare_staging.py --reset" in staging_ci
     assert "--runtime-root staging/runtime" in staging_ci
     assert "pull_request:" in staging_ci
+    assert "push:" in staging_ci and "- main" in staging_ci
     assert "inputs.ref || github.sha" in staging_ci
+    assert "workflow_run:" in deploy_ci and "head_sha" in deploy_ci
     assert "whatamicraft-ci-${GITHUB_RUN_ID}" in services_ci
     assert "down -v --remove-orphans" in services_ci
     assert "whatamicraft-staging-${GITHUB_RUN_ID}" in staging_ci
