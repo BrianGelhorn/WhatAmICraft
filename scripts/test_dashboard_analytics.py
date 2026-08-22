@@ -48,6 +48,18 @@ assert snapshot["trends"][1]["trend"] == "up"
 assert snapshot["alerts"] == []
 assert snapshot["recommendations"][0]["dimension"] == "trend"
 
+props_path = ROOT / "out/test-analytics-props.json"
+props_path.write_text('{"config":{"music":{"sourceName":"Fixture track @ 12s"}}}', encoding="utf-8")
+old_read_artifact = analytics.read_artifact
+analytics.read_artifact = lambda _video: {"templateVersion": "fixture-template", "configPath": "out/test-analytics-props.json"}
+try:
+    metadata = analytics._creative_metadata({"format": "clues", "target": {"kind": "food"}}, now.isoformat())
+    assert metadata["musicSource"] == "Fixture track @ 12s"
+    assert metadata["templateVersion"] == "fixture-template"
+finally:
+    analytics.read_artifact = old_read_artifact
+    props_path.unlink(missing_ok=True)
+
 export_root = ROOT / "out/test-analytics-export"
 export_root.mkdir(parents=True, exist_ok=True)
 old_export_dir = analytics.EXPORT_DIR

@@ -92,22 +92,30 @@ def _build_series(snapshots: list[dict]) -> list[dict]:
 
 def _creative_metadata(episode: dict | None, published_at: str | None) -> dict:
     if not episode:
-        return {"targetKind": "unknown", "templateVersion": "unknown", "durationSeconds": None, "publishHourUtc": None}
+        return {"targetKind": "unknown", "templateVersion": "unknown", "musicSource": "unknown", "durationSeconds": None, "publishHourUtc": None}
     format_id = format_id_for(episode)
     artifact = read_artifact(video_path(episode))
+    music_source = "unknown"
+    if artifact and artifact.get("configPath"):
+        try:
+            config = json.loads((ROOT / str(artifact["configPath"])).read_text(encoding="utf-8"))
+            music_source = str(config.get("config", {}).get("music", {}).get("sourceName") or "unknown")
+        except (OSError, json.JSONDecodeError, TypeError):
+            pass
     publish_hour = None
     if published_at:
         publish_hour = datetime.fromisoformat(published_at).astimezone(timezone.utc).hour
     return {
         "targetKind": episode.get("target", {}).get("kind", "unknown").replace("_", " ").title(),
         "templateVersion": artifact.get("templateVersion", "unknown") if artifact else "unknown",
+        "musicSource": music_source,
         "durationSeconds": FORMAT_DEFINITIONS.get(format_id, {}).get("durationSeconds"),
         "publishHourUtc": publish_hour,
     }
 
 
 def _build_cohorts(items: list[dict]) -> list[dict]:
-    dimensions = ("formatLabel", "targetKind", "templateVersion", "publishHourUtc")
+    dimensions = ("formatLabel", "targetKind", "templateVersion", "musicSource", "publishHourUtc")
     groups = {}
     for item in items:
         for dimension in dimensions:
@@ -249,6 +257,7 @@ def _build_recommendations(cohorts: list[dict], trends: list[dict]) -> list[dict
                 "formatLabel": f"Repetir el formato {best['value']}",
                 "targetKind": f"Priorizar targets de tipo {best['value']}",
                 "templateVersion": f"Mantener la plantilla {best['value']} mientras siga superando al resto",
+                "musicSource": f"Repetir el audio {best['value']} en nuevos videos",
                 "publishHourUtc": f"Probar más publicaciones cerca de las {best['value']}",
             }[dimension]
             recommendations.append({
