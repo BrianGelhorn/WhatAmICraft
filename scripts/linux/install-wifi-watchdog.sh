@@ -28,7 +28,7 @@ After=network-online.target
 Type=simple
 Environment=WIFI_IFACE=wlan0
 Environment=CHECK_INTERVAL=30
-Environment=FAILS_BEFORE_RECOVERY=2
+Environment=FAILS_BEFORE_RECOVERY=6
 ExecStart=/usr/local/sbin/wifi-watchdog.sh
 Restart=always
 RestartSec=10
