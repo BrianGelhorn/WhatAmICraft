@@ -98,12 +98,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Backup/restore del estado critico sin duplicar videos")
     parser.add_argument("--restore", type=Path, help="Restaura un zip creado por este script")
     parser.add_argument("--keep", type=int, default=DEFAULT_KEEP, help="Cantidad de backups a conservar")
+    parser.add_argument("--root", type=Path, default=ROOT, help="Raiz del estado a respaldar o restaurar")
+    parser.add_argument("--backup-dir", type=Path, default=BACKUP_DIR, help="Directorio donde guardar backups")
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args()
     if args.restore:
-        restore(args.restore)
+        restore(args.restore, root=args.root)
     else:
-        backup(max(args.keep, 1), args.quiet)
+        backup(max(args.keep, 1), args.quiet, root=args.root, backup_dir=args.backup_dir)
     return 0
 
 
