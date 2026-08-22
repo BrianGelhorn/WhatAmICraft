@@ -574,6 +574,9 @@ def cancel_active_job(lane: str | None = None) -> None:
         pid = process.pid if process else job.get("pid") if job.get("pid") != os.getpid() else None
     _terminate_process(process, pid)
     append_job_line("Cancelación solicitada por el usuario", lane)
+    finish_job("cancelled", -15, "Cancelada por el usuario.", lane)
+    with JOB_LOCK:
+        JOB.update({"status": "cancelled", "returnCode": -15})
 
 
 def start_command(
