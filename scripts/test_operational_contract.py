@@ -41,15 +41,17 @@ def main() -> None:
     nginx_media = (ROOT / "nginx.media.conf").read_text(encoding="utf-8")
     assert "root /mnt/out/episodes;" in nginx_media
     assert "alias /mnt/out/thumbnails/;" in nginx_media
-    assert "./runtime/data:/app/data" in staging
-    assert "./runtime/out:/app/out" in staging
+    assert "${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data" in staging
+    assert "${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out" in staging
     assert "STAGING_DASHBOARD_PORT" in staging
     assert "STAGING_MEDIA_PORT" in staging
     assert "../data:/app/data" not in staging
     assert "../out:/app/out" not in staging
     assert 'profiles: ["integrations"]' in staging
-    assert "prepare_staging.py --reset" in staging_ci
-    assert "--runtime-root staging/runtime" in staging_ci
+    for workflow in (services_ci, staging_ci):
+        assert 'STAGING_RUNTIME_DIR="${RUNNER_TEMP}/whatamicraft-staging-${GITHUB_RUN_ID}"' in workflow
+        assert '--runtime-root "$STAGING_RUNTIME_DIR" --reset' in workflow
+        assert '--runtime-root "$STAGING_RUNTIME_DIR"' in workflow
     assert "pull_request:" in staging_ci
     assert "push:" in staging_ci and "- main" in staging_ci
     assert "inputs.ref || github.sha" in staging_ci
