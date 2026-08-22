@@ -427,6 +427,10 @@
       <div class="table-wrap" id="analytics-cohorts-wrap" hidden>
         <table><thead><tr><th>Plataforma</th><th>Cohorte</th><th>Videos</th><th>Vistas/video</th><th>Vistas/h</th><th>Engagement</th><th>Retención</th></tr></thead><tbody id="analytics-cohorts-rows"></tbody></table>
       </div>
+      <div class="table-wrap analytics-cohorts" id="analytics-quality-wrap" hidden>
+        <h3>Funnel y calidad de datos</h3>
+        <table><thead><tr><th>Plataforma</th><th>Medidos</th><th>Alcance/vista</th><th>Watch time</th><th>Finalización</th><th>Cobertura</th><th>Estado</th></tr></thead><tbody id="analytics-quality-rows"></tbody></table>
+      </div>
       <section class="stats" aria-label="Resumen de estadísticas">
         <div class="stat"><span>Videos medidos</span><strong id="analytics-videos">0</strong></div>
         <div class="stat"><span>Vistas</span><strong id="analytics-views">0</strong></div>
@@ -968,6 +972,7 @@
         </div>`).join('');
       renderAnalyticsChart(analytics);
       renderAnalyticsCohorts(analytics);
+      renderAnalyticsQuality(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
       $('analytics-rows').innerHTML = (analytics.videos || []).map(item => `
@@ -1018,6 +1023,18 @@
       $('analytics-cohorts-wrap').hidden = !rows.length;
       $('analytics-cohorts-rows').innerHTML = rows.map(item => `
         <tr><td><strong>${escapeHtml(item.platform)}</strong></td><td>${escapeHtml(item.value)}</td><td>${number(item.videos)} <span class="hint">(${number(item.measuredVideos)} medidos)</span></td><td>${metric(item.viewsPerVideo)}</td><td>${metric(item.lifetimeViewsPerHour)}</td><td>${metric(item.engagementRateByViews, '%')}</td><td>${metric(item.completionRate, '%')}</td></tr>`).join('');
+    }
+
+    function renderAnalyticsQuality(analytics) {
+      const number = value => Number(value || 0).toLocaleString('es-AR');
+      const metric = (value, suffix = '') => value == null ? '—' : `${Number(value).toLocaleString('es-AR')}${suffix}`;
+      const rows = analytics.quality || [];
+      $('analytics-quality-wrap').hidden = !rows.length;
+      $('analytics-quality-rows').innerHTML = rows.map(item => {
+        const warnings = item.warnings || [];
+        const status = warnings.length ? `<span class="bad">${escapeHtml(warnings.join(' · '))}</span>` : '<span class="ok">Datos utilizables</span>';
+        return `<tr><td><strong>${escapeHtml(item.platform)}</strong></td><td>${number(item.measuredVideos)}/${number(item.videos)}</td><td>${metric(item.reachPerView)}</td><td>${metric(item.averageWatchSeconds, ' s')}</td><td>${metric(item.completionRate, '%')}</td><td>${metric(item.coveragePercent, '%')}</td><td>${status}</td></tr>`;
+      }).join('');
     }
 
     function renderDiagnostics() {

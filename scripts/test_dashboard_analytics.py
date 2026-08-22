@@ -41,6 +41,8 @@ assert [point["views"] for point in snapshot["series"]] == [80, 100]
 assert [point["engagements"] for point in snapshot["series"]] == [10, 13]
 assert snapshot["cohorts"][0]["dimension"] == "formatLabel"
 assert snapshot["cohorts"][0]["viewsPerVideo"] == 100
+quality = {item["platform"]: item for item in snapshot["quality"]}
+assert quality["tiktok"]["coveragePercent"] == 100.0
 assert "raw" not in snapshot["videos"][0]
 assert [len(batch) for batch in analytics._chunks(list(range(41)), 20)] == [20, 20, 1]
 

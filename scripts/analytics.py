@@ -16,6 +16,12 @@ from video_formats import FORMAT_DEFINITIONS, all_episodes, format_id_for, forma
 ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = ROOT / "out/analytics"
 PLATFORMS = ("youtube", "tiktok", "instagram", "facebook")
+QUALITY_FIELDS = {
+    "youtube": ("views", "likes", "comments", "averageWatchSeconds", "completionRate"),
+    "tiktok": ("views", "likes", "comments", "shares"),
+    "instagram": ("views", "reach", "likes", "comments", "shares", "saves", "averageWatchSeconds"),
+    "facebook": ("views", "likes", "comments", "completionRate"),
+}
 
 
 def _chunks(items: list, size: int):
@@ -128,6 +134,48 @@ def _build_cohorts(items: list[dict]) -> list[dict]:
         group["measuredVideos"] = measured
         result.append(group)
     return sorted(result, key=lambda group: (group["dimension"], group["platform"], -(group["viewsPerVideo"] or 0)))
+
+
+def _build_quality(items: list[dict]) -> list[dict]:
+    quality = []
+    for platform in PLATFORMS:
+        rows = [item for item in items if item["platform"] == platform]
+        expected = QUALITY_FIELDS[platform]
+        availability = {
+            field: sum(item.get(field) is not None for item in rows)
+            for field in expected
+        }
+        slots = len(rows) * len(expected)
+        available_slots = sum(availability.values())
+        views = [item["views"] for item in rows if item.get("views") is not None]
+        reach = [item["reach"] for item in rows if item.get("reach") is not None]
+        watch = [item["averageWatchSeconds"] for item in rows if item.get("averageWatchSeconds") is not None]
+        completion = [item["completionRate"] for item in rows if item.get("completionRate") is not None]
+        total_views = sum(views)
+        total_reach = sum(reach)
+        warnings = []
+        coverage_percent = round(available_slots / slots * 100, 1) if slots else 0
+        if rows and not views:
+            warnings.append("No hay vistas medibles")
+        if rows and coverage_percent < 60:
+            warnings.append("Cobertura de métricas baja")
+        quality.append({
+            "platform": platform,
+            "videos": len(rows),
+            "measuredVideos": len(views),
+            "views": total_views,
+            "reach": total_reach if reach else None,
+            "reachPerView": round(total_reach / total_views, 2) if total_views and reach else None,
+            "averageWatchSeconds": round(sum(watch) / len(watch), 2) if watch else None,
+            "completionRate": round(sum(completion) / len(completion), 2) if completion else None,
+            "metricCoverage": {
+                field: round(count / len(rows) * 100, 1) if rows else 0
+                for field, count in availability.items()
+            },
+            "coveragePercent": coverage_percent,
+            "warnings": warnings,
+        })
+    return quality
 
 
 def _insight_values(response: dict) -> dict:
@@ -456,6 +504,7 @@ def build_snapshot() -> dict:
         "platforms": platform_summaries,
         "series": _build_series(video_metric_snapshots()),
         "cohorts": _build_cohorts(items),
+        "quality": _build_quality(items),
         "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),
         "observations": observations,
         "definitions": {

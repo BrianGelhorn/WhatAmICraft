@@ -369,6 +369,7 @@ def analytics_snapshot() -> dict:
             "platforms": [{"platform": platform, "videos": 0, "views": 0, "engagements": 0, "error": message} for platform in ("youtube", "tiktok", "instagram", "facebook")],
             "series": [],
             "cohorts": [],
+            "quality": [],
             "videos": [],
             "observations": [f"Analytics no disponible: {message}"],
             "definitions": {},
