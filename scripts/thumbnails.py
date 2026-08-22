@@ -4,6 +4,8 @@ import subprocess
 from copy import deepcopy
 from pathlib import Path
 
+from template_artifacts import render_props_path
+
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED_PATH = ROOT / "src/generated/thumbnail-config.json"
 FORMATS = {
@@ -86,8 +88,13 @@ def write_config(config: dict) -> None:
 
 def render_thumbnails(config: dict, stem: str | None = None) -> list[Path]:
     validate_config(config)
-    write_config(config)
     if stem:
+        props_path = render_props_path(stem, "thumbnail")
+        props_path.parent.mkdir(parents=True, exist_ok=True)
+        _write_json(
+            props_path,
+            {"config": config, "variant": config["thumbnail"]["platforms"]["vertical"]},
+        )
         output = (
             ROOT
             / config["thumbnail"]["outputDir"]
@@ -103,13 +110,14 @@ def render_thumbnails(config: dict, stem: str | None = None) -> list[Path]:
                 "still",
                 FORMATS["vertical"],
                 str(output),
-                f"--props={json.dumps({'variant': config['thumbnail']['platforms']['vertical']})}",
+                f"--props={props_path.relative_to(ROOT).as_posix()}",
             ],
             cwd=ROOT,
             check=True,
             timeout=THUMBNAIL_RENDER_TIMEOUT_SECONDS,
         )
         return [output]
+    write_config(config)
     answer_types = type_names()
     outputs = [type_thumbnail_path(answer_type, "vertical") for answer_type in answer_types]
     if outputs and all(path.is_file() for path in outputs):

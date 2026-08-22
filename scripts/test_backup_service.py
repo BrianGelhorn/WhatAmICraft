@@ -58,6 +58,7 @@ def main() -> None:
             backup_name = created["backup"]["backup"]
             assert (backup_dir / backup_name).is_file()
             with zipfile.ZipFile(backup_dir / backup_name) as archive:
+                assert "data/state.json" in archive.namelist()
                 assert "data/publishing-secrets.json" not in archive.namelist()
                 assert ".env" not in archive.namelist()
             assert service.keep == 2

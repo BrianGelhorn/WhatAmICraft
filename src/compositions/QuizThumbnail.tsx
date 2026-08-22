@@ -1,7 +1,8 @@
 import {AbsoluteFill, CanvasImage, staticFile, useVideoConfig} from "remotion";
-import config from "../generated/thumbnail-config.json";
+import defaultConfig from "../generated/thumbnail-config.json";
 
 export type ThumbnailVariant = "silhouette" | "pixelated" | "roulette";
+type ThumbnailConfig = typeof defaultConfig;
 
 const Text3D: React.FC<{
   children: React.ReactNode;
@@ -25,7 +26,7 @@ const Text3D: React.FC<{
   </div>
 );
 
-const CategoryIcon: React.FC<{width: number; height: number}> = ({width, height}) => (
+const CategoryIcon: React.FC<{width: number; height: number; config: ThumbnailConfig}> = ({width, height, config}) => (
   <CanvasImage
     src={staticFile(config.categoryIcon)}
     style={{
@@ -54,8 +55,9 @@ const Player: React.FC<{wide: boolean; square: boolean}> = ({wide, square}) => (
   />
 );
 
-export const QuizThumbnail: React.FC<{variant: ThumbnailVariant}> = () => {
+export const QuizThumbnail: React.FC<{variant?: ThumbnailVariant; config?: ThumbnailConfig}> = ({config: inputConfig = defaultConfig}) => {
   const {width, height} = useVideoConfig();
+  const config = inputConfig;
   const wide = width > height;
   const square = width === height;
   const thumbnail = config.thumbnail;
@@ -171,7 +173,7 @@ export const QuizThumbnail: React.FC<{variant: ThumbnailVariant}> = () => {
       </Text3D>
 
       <div style={{position: "absolute", left: layout.mysteryLeft, top: layout.mysteryTop, width: layout.mysteryWidth, height: layout.mysteryHeight}}>
-        <CategoryIcon width={layout.mysteryWidth} height={layout.mysteryHeight} />
+        <CategoryIcon config={config} width={layout.mysteryWidth} height={layout.mysteryHeight} />
       </div>
       <Text3D color="#ffd52b" fontSize={layout.questionSize} style={{position: "absolute", left: layout.questionLeft, top: layout.questionTop, transform: "rotate(10deg)"}}>
         ?

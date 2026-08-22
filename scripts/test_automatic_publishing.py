@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import publish  # noqa: E402
 import publish_worker as worker  # noqa: E402
+from template_artifacts import render_props_path, write_artifact  # noqa: E402
 
 
 def check_generation_lane_guard() -> None:
@@ -62,6 +63,13 @@ def main() -> None:
     output.mkdir(parents=True)
     video = output / "mc-01-stone.mp4"
     video.write_bytes(b"automatic-publish-video")
+    thumbnail = fixture / "out/thumbnails/item/default/mc-01-stone.vertical.jpg"
+    thumbnail.parent.mkdir(parents=True)
+    thumbnail.write_bytes(b"automatic-publish-thumbnail")
+    props = render_props_path(video.stem, "video", fixture)
+    props.parent.mkdir(parents=True, exist_ok=True)
+    props.write_text('{"config": {}}', encoding="utf-8")
+    write_artifact(episode_id="mc-01", video=video, config={}, thumbnail=thumbnail, root=fixture)
     episode = {
         "id": "mc-01",
         "target": {"id": "stone", "kind": "item", "display_name": "Stone"},
@@ -80,6 +88,7 @@ def main() -> None:
     commands: list[list[str]] = []
     notifications: list[str] = []
     original_publish = {
+        "root": publish.ROOT,
         "output": publish.OUTPUT_DIR,
         "episodes": publish.episodes,
         "config": publish.load_config,
@@ -128,6 +137,7 @@ def main() -> None:
         raise KeyboardInterrupt
 
     try:
+        publish.ROOT = fixture
         publish.OUTPUT_DIR = output
         publish.episodes = lambda: [episode]
         publish.load_config = lambda: {**config, "platforms": {"fake": {"enabled": True}}}
@@ -188,7 +198,7 @@ def main() -> None:
         assert len(saved_schedules) == 2
     finally:
         for name, value in original_publish.items():
-            setattr(publish, {"output": "OUTPUT_DIR", "episodes": "episodes", "config": "load_config", "runtime": "apply_runtime", "platforms": "enabled_platforms", "queue_ids": "pending_queue_ids", "state": "publishing_state", "save": "save_published_platform", "queue_status": "set_queue_status", "publishers": "PUBLISHERS"}[name], value)
+            setattr(publish, {"root": "ROOT", "output": "OUTPUT_DIR", "episodes": "episodes", "config": "load_config", "runtime": "apply_runtime", "platforms": "enabled_platforms", "queue_ids": "pending_queue_ids", "state": "publishing_state", "save": "save_published_platform", "queue_status": "set_queue_status", "publishers": "PUBLISHERS"}[name], value)
         for name, value in original_worker.items():
             setattr(worker, {"config": "load_config", "runtime": "apply_runtime", "schedule": "load_schedule", "save_schedule": "save_schedule", "generation_schedule": "load_generation_schedule", "episodes": "episodes", "video_for": "video_for", "names": "current_template_video_names", "state": "publishing_state", "queue_ids": "pending_queue_ids", "run_logged": "run_logged", "alert": "alert_low_stock", "maybe_generate": "maybe_generate", "notify": "notify"}[name], value)
         worker.time.sleep = original_sleep

@@ -52,6 +52,8 @@ def main() -> None:
         "inventory": worker.inventory,
         "run_logged": worker.run_logged,
         "save_schedule": worker.save_generation_schedule,
+        "active_template_version": worker.active_template_version,
+        "release_version": worker.release_version,
     }
 
     def run_logged(command: list[str], *_args: object) -> SimpleNamespace:
@@ -74,6 +76,12 @@ def main() -> None:
         assert commands[0][-1] == "mc-02"
         assert commands[1][-1] == "mc-03"
         assert schedules and schedules[0]
+        commands.clear()
+        worker.active_template_version = lambda: "old-release"
+        worker.release_version = lambda: "new-release"
+        worker.maybe_generate(config, stock)
+        assert not commands
+        assert schedules[-1]
     finally:
         for name, value in original.items():
             setattr(worker, {
@@ -83,6 +91,8 @@ def main() -> None:
                 "inventory": "inventory",
                 "run_logged": "run_logged",
                 "save_schedule": "save_generation_schedule",
+                "active_template_version": "active_template_version",
+                "release_version": "release_version",
             }[name], value)
         shutil.rmtree(fixture, ignore_errors=True)
 
@@ -97,12 +107,16 @@ def main() -> None:
         producer.render({"id": "mc-test", "answer": {"id": "stone"}})
         command, options = render_calls[0]
         assert "--concurrency=1" in command
+        props = next(argument for argument in command if argument.startswith("--props="))
+        assert props.startswith("--props=out/render-jobs/mc-test-stone/")
+        assert (ROOT / props.removeprefix("--props=")).is_file()
         assert options["timeout"] == 1800
     finally:
         producer.subprocess.run = original_render_run
         for key, value in original_render_env.items():
             if value is not None:
                 os.environ[key] = value
+        shutil.rmtree(ROOT / "out/render-jobs/mc-test-stone", ignore_errors=True)
 
     print("ok: automatic rendering selects missing episodes and continues after a failed render")
 

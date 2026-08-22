@@ -16,6 +16,7 @@ GENERATION_SCHEDULE_PATH = ROOT / "out/generation-schedule.json"
 STOCK_ALERT_PATH = ROOT / "out/stock-alert-state.json"
 
 import state_db
+from template_artifacts import validate_artifact
 from video_formats import FORMAT_DEFINITIONS, ROOT as FORMAT_ROOT, format_id_for, normalize_episode, video_path
 
 
@@ -135,6 +136,7 @@ def queue_episode(episode_id: str) -> None:
     video = video_path(episode, ROOT)
     if not video.exists():
         raise RuntimeError(f"Falta el video de {episode_id}")
+    validate_artifact(video, episode_id=episode_id, root=ROOT)
     ensure_state_db()
     state_db.upsert_queue_item(episode_id, db_path=state_db_path())
 
@@ -203,6 +205,8 @@ def reject_episode(episode_id: str) -> None:
 
     for video in (ROOT / "out/episodes").glob(f"{episode_id}-*.mp4"):
         video.unlink()
+    for artifact in (ROOT / "out/episodes").glob(f"{episode_id}-*.artifact.json"):
+        artifact.unlink()
     for thumbnail in (ROOT / "out/thumbnails").rglob(f"{episode_id}-*.jpg"):
         thumbnail.unlink()
     audio = ROOT / f"public/audio/quiz-copy/{episode_id}"
