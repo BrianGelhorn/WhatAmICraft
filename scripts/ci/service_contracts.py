@@ -12,6 +12,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import SimpleNamespace
 
+from template_artifacts import render_props_path, write_artifact
+
 
 TEST_ROOT = Path(__file__).resolve().parents[2] / "out" / "ci-service-contracts"
 
@@ -100,6 +102,19 @@ def publisher_contract() -> None:
         output.mkdir(parents=True)
         video = output / "mc-01-stone.mp4"
         video.write_bytes(b"publisher-fixture")
+        thumbnail = root / "out" / "thumbnails" / "item" / "default" / "mc-01-stone.vertical.jpg"
+        thumbnail.parent.mkdir(parents=True)
+        thumbnail.write_bytes(b"publisher-thumbnail")
+        props = render_props_path(video.stem, "video", root)
+        props.parent.mkdir(parents=True, exist_ok=True)
+        props.write_text(json.dumps({"config": {}}), encoding="utf-8")
+        write_artifact(
+            episode_id="mc-01",
+            video=video,
+            config={},
+            thumbnail=thumbnail,
+            root=root,
+        )
         episode = {
             "id": "mc-01",
             "target": {"id": "stone", "kind": "item", "display_name": "Stone"},
@@ -116,6 +131,7 @@ def publisher_contract() -> None:
 
         original = {
             "output": publisher.OUTPUT_DIR,
+            "root": publisher.ROOT,
             "lock": publisher.PUBLISH_LOCK,
             "episodes": publisher.episodes,
             "config": publisher.load_config,
@@ -129,6 +145,7 @@ def publisher_contract() -> None:
         }
         try:
             publisher.OUTPUT_DIR = output
+            publisher.ROOT = root
             publisher.PUBLISH_LOCK = root / "out" / "publishing.lock"
             publisher.episodes = lambda: [episode]
             publisher.load_config = lambda: config
@@ -191,7 +208,7 @@ def publisher_contract() -> None:
                     setattr(worker, name, value)
         finally:
             for name, value in original.items():
-                setattr(publisher, {"output": "OUTPUT_DIR", "lock": "PUBLISH_LOCK", "episodes": "episodes", "config": "load_config", "runtime": "apply_runtime", "platforms": "enabled_platforms", "queue_ids": "pending_queue_ids", "state": "publishing_state", "save": "save_published_platform", "queue_status": "set_queue_status", "publishers": "PUBLISHERS"}[name], value)
+                setattr(publisher, {"output": "OUTPUT_DIR", "root": "ROOT", "lock": "PUBLISH_LOCK", "episodes": "episodes", "config": "load_config", "runtime": "apply_runtime", "platforms": "enabled_platforms", "queue_ids": "pending_queue_ids", "state": "publishing_state", "save": "save_published_platform", "queue_status": "set_queue_status", "publishers": "PUBLISHERS"}[name], value)
     finally:
         shutil.rmtree(root, ignore_errors=True)
 
