@@ -1,0 +1,35 @@
+name: Deploy production
+
+on:
+  workflow_run:
+    workflows: ["Staging Smoke"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: whatamicraft-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy main to mini PC
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
+    environment: production
+    steps:
+      - name: Checkout verified main commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          submodules: recursive
+
+      - name: Deploy without copying runtime data or secrets
+        shell: bash
+        env:
+          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: bash scripts/deploy_main_to_production.sh

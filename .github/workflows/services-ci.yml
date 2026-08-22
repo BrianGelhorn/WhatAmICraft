@@ -86,9 +86,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bash -n scripts/linux/*.sh
+          for shell_script in scripts/linux/*.sh scripts/deploy_main_to_production.sh ops/install-production-launcher.sh; do
+            bash -n "$shell_script"
+          done
           python -m py_compile scripts/test_operational_contract.py
           PYTHONPATH=scripts python scripts/test_operational_contract.py
+          PYTHONPATH=scripts python scripts/test_production_deploy_contract.py
 
   publisher-worker:
     name: Publisher and worker services
