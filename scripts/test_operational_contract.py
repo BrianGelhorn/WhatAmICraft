@@ -33,6 +33,9 @@ def main() -> None:
     for service in ("dashboard:", "bot:", "publisher-worker:", "backup-rollback:", "media:"):
         section = compose.split(f"\n  {service}", 1)[1]
         assert "restart: unless-stopped" in section.split("\n  ", 1)[0] or "restart: unless-stopped" in section[:300]
+    assert "CLUES_API_URL: http://clues-api:8790" in compose
+    assert "CLUES_SOURCE_DIR: /app/data/new-clues-20260815" in compose
+    assert "MONITOR_CLUES_URL: http://clues-api:8790" in compose
     assert "backup-rollback:" in staging
     assert "BACKUP_ADMIN_TOKEN" in staging
     assert "dockerfile: Dockerfile.media" in compose
