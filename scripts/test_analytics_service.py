@@ -13,9 +13,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import analytics_service  # noqa: E402
 
 
-def call(base: str, path: str, method: str = "GET") -> tuple[int, dict]:
+def call(base: str, path: str, method: str = "GET", payload: dict | None = None) -> tuple[int, dict]:
+    body = json.dumps(payload).encode() if payload is not None else None
     try:
-        with urlopen(Request(f"{base}{path}", method=method), timeout=5) as response:
+        with urlopen(Request(f"{base}{path}", data=body, headers={"Content-Type": "application/json"} if body else {}, method=method), timeout=5) as response:
             return response.status, json.loads(response.read() or b"{}")
     except Exception as error:
         if hasattr(error, "code"):
@@ -35,6 +36,7 @@ def main() -> None:
     analytics_service.analytics.write_exports = lambda: expected  # type: ignore[assignment]
     analytics_service.analytics.sync_all = lambda: sync_calls.append("synced")  # type: ignore[assignment]
     analytics_service.state_db.load_flag = lambda *_args: {"youtube": {"synced": 1}}  # type: ignore[assignment]
+    analytics_service.state_db.set_analytics_recommendation_status = lambda recommendation_id, status: {"id": recommendation_id, "status": status}  # type: ignore[assignment]
     server = analytics_service.make_server("127.0.0.1", 0, service)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -51,6 +53,8 @@ def main() -> None:
                 break
             time.sleep(0.01)
         assert sync_calls == ["synced"] and service.sync_status()["status"] == "completed"
+        recommendation_status, recommendation = call(base, "/api/analytics/recommendation", "POST", {"id": "fixture", "status": "applied"})
+        assert recommendation_status == 200 and recommendation["recommendation"]["status"] == "applied"
         invalid_status, _ = call(base, "/api/analytics/unknown")
         assert invalid_status == 404
     finally:

@@ -1049,8 +1049,15 @@
         ? `<div class="analytics-callout bad"><strong>Alertas</strong><ul>${alerts.slice(0, 8).map(item => `<li>${escapeHtml(item.platform)}: ${escapeHtml(item.message)}${item.episodeId ? ` (${escapeHtml(item.episodeId)})` : ''}</li>`).join('')}</ul></div>`
         : '';
       $('analytics-recommendations').innerHTML = recommendations.length
-        ? `<div class="analytics-callout ok"><strong>Recomendaciones basadas en datos</strong><ul>${recommendations.slice(0, 8).map(item => `<li>${escapeHtml(item.action)} — ${escapeHtml(item.reason)}</li>`).join('')}</ul></div>`
+        ? `<div class="analytics-callout ok"><strong>Recomendaciones basadas en datos</strong><ul>${recommendations.slice(0, 8).map(item => { const id = item.id || ''; const status = item.status || 'proposed'; return `<li>${escapeHtml(item.action)} — ${escapeHtml(item.reason)} <span class="hint">[${escapeHtml(status)}]</span>${id ? ` <button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="applied" ${status === 'applied' ? 'disabled' : ''}>Aplicar</button><button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="dismissed" ${status === 'dismissed' ? 'disabled' : ''}>Descartar</button>` : ''}</li>`; }).join('')}</ul></div>`
         : '<p class="hint">Todavía no hay suficientes videos medidos por cohorte para recomendar cambios con confianza.</p>';
+      document.querySelectorAll('[data-recommendation-status]').forEach(button => {
+        button.onclick = async () => {
+          button.disabled = true;
+          try { await api('/api/analytics/recommendation', {id: button.dataset.recommendationId, status: button.dataset.recommendationStatus}); await refresh(); toast('Decisión guardada'); }
+          catch (error) { button.disabled = false; toast(error.message); }
+        };
+      });
     }
 
     function renderDiagnostics() {

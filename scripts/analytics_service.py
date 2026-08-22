@@ -110,7 +110,16 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"ok": False, "error": "No se pudo consultar analytics"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def do_POST(self) -> None:
-        if urlparse(self.path).path != "/api/analytics/sync":
+        path = urlparse(self.path).path
+        if path == "/api/analytics/recommendation":
+            try:
+                payload = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))) or b"{}")
+                recommendation = state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", "")))
+                self.send_json({"ok": True, "recommendation": recommendation})
+            except ValueError as error:
+                self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
+            return
+        if path != "/api/analytics/sync":
             self.send_json({"ok": False, "error": "Ruta no encontrada"}, HTTPStatus.NOT_FOUND)
             return
         try:

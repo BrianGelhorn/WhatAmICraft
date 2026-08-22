@@ -34,6 +34,7 @@ from review.storage import (  # noqa: E402
 )
 from analytics import build_snapshot, sync_all, write_exports  # noqa: E402
 from analytics_client import AnalyticsApiError, request_json as analytics_request, request_text as analytics_text  # noqa: E402
+import state_db  # noqa: E402
 from clues_client import CluesApiError, request_json as clues_request  # noqa: E402
 from monitor_client import MonitorApiError, request_json as monitor_request  # noqa: E402
 from publishing import PUBLISHERS  # noqa: E402
@@ -760,6 +761,15 @@ def start_analytics_sync() -> None:
     threading.Thread(target=run, daemon=True).start()
 
 
+def update_analytics_recommendation(payload: dict) -> dict:
+    if ANALYTICS_API_URL:
+        status, result = analytics_request("/api/analytics/recommendation", method="POST", payload=payload)
+        if status != HTTPStatus.OK:
+            raise RuntimeError(result.get("error", "El servicio de analytics rechazó la decisión"))
+        return result
+    return {"ok": True, "recommendation": state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", "")))}
+
+
 def analytics_scheduler() -> None:
     while True:
         start_analytics_sync()
@@ -945,6 +955,9 @@ class Handler(BaseHTTPRequestHandler):
                 disconnect_tiktok()
             elif path == "/api/analytics/sync":
                 start_analytics_sync()
+            elif path == "/api/analytics/recommendation":
+                self.send_json(update_analytics_recommendation(payload))
+                return
             elif path in {"/api/monitor/check", "/api/monitor/events"}:
                 if not MONITOR_API_URL:
                     raise RuntimeError("El servicio de monitoreo no está configurado")

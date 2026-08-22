@@ -302,7 +302,11 @@ def _build_recommendations(cohorts: list[dict], trends: list[dict]) -> list[dict
             "sampleConfidence": "medium",
             "liftPct": None,
         })
-    return recommendations
+    result = []
+    for recommendation in recommendations:
+        recommendation["id"] = f"{recommendation['platform']}:{recommendation['dimension']}:{recommendation['value']}"
+        result.append(state_db.save_analytics_recommendation(recommendation))
+    return result
 
 
 def _insight_values(response: dict) -> dict:

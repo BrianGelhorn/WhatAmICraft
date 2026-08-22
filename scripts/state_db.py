@@ -107,6 +107,13 @@ def init(db_path: Path | None = None) -> None:
                 key TEXT PRIMARY KEY,
                 value_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS analytics_recommendations (
+                recommendation_id TEXT PRIMARY KEY,
+                payload_json TEXT NOT NULL,
+                status TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS meta (
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL
@@ -505,6 +512,47 @@ def save_flag(key: str, value, db_path: Path | None = None) -> None:
             "INSERT OR REPLACE INTO flags (key, value_json) VALUES (?, ?)",
             (key, json.dumps(value, ensure_ascii=False)),
         )
+
+
+def save_analytics_recommendation(recommendation: dict, db_path: Path | None = None) -> dict:
+    recommendation_id = str(recommendation["id"])
+    now = datetime.now(timezone.utc).isoformat()
+    init(db_path)
+    with _connect(db_path) as db:
+        current = db.execute(
+            "SELECT status, created_at FROM analytics_recommendations WHERE recommendation_id = ?",
+            (recommendation_id,),
+        ).fetchone()
+        status = current["status"] if current else "proposed"
+        created_at = current["created_at"] if current else now
+        db.execute(
+            """
+            INSERT OR REPLACE INTO analytics_recommendations
+            (recommendation_id, payload_json, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (recommendation_id, json.dumps(recommendation, ensure_ascii=False), status, created_at, now),
+        )
+    return {**recommendation, "status": status, "createdAt": created_at, "updatedAt": now}
+
+
+def set_analytics_recommendation_status(recommendation_id: str, status: str, db_path: Path | None = None) -> dict:
+    if status not in {"proposed", "applied", "dismissed"}:
+        raise ValueError("Estado de recomendación inválido")
+    init(db_path)
+    now = datetime.now(timezone.utc).isoformat()
+    with _connect(db_path) as db:
+        row = db.execute(
+            "SELECT payload_json, created_at FROM analytics_recommendations WHERE recommendation_id = ?",
+            (recommendation_id,),
+        ).fetchone()
+        if not row:
+            raise ValueError("Recomendación no encontrada")
+        db.execute(
+            "UPDATE analytics_recommendations SET status = ?, updated_at = ? WHERE recommendation_id = ?",
+            (status, now, recommendation_id),
+        )
+    return {**json.loads(row["payload_json"]), "status": status, "createdAt": row["created_at"], "updatedAt": now}
 
 
 def export_legacy_json(
