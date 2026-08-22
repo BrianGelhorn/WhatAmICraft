@@ -26,9 +26,11 @@ def main() -> None:
 
     assert "scripts/backup_state.py --quiet" in start
     assert "docker compose up -d" in start
-    assert "backup-rollback media clues-api analytics-api monitor" in start
-    assert "ip link" in watchdog and "ifdown" in watchdog and "ifup" in watchdog and "systemctl" in watchdog
-    for service in ("dashboard:", "bot:", "publisher-worker:", "backup-rollback:", "media:", "clues-api:", "analytics-api:", "monitor:"):
+    assert "ip link" in watchdog and "getent ahostsv4" in watchdog and "curl --ipv4" in watchdog
+    assert "FAILS_BEFORE_RECOVERY:-6" in watchdog
+    assert "has_local_network" in watchdog and "systemctl restart networking.service" in watchdog
+    assert "ifdown" not in watchdog and "ifup" not in watchdog
+    for service in ("dashboard:", "bot:", "publisher-worker:", "backup-rollback:", "media:"):
         section = compose.split(f"\n  {service}", 1)[1]
         assert "restart: unless-stopped" in section.split("\n  ", 1)[0] or "restart: unless-stopped" in section[:300]
     assert "CLUES_API_URL: http://clues-api:8790" in compose
