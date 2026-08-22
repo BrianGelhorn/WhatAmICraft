@@ -45,9 +45,7 @@
     "iconScale": 1,
     "iconOffsetY": 0,
     "platforms": {
-      "vertical": "silhouette",
-      "square": "roulette",
-      "youtube": "silhouette"
+      "vertical": "silhouette"
     },
     "outputDir": "out/thumbnails"
   },

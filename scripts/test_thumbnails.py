@@ -12,7 +12,7 @@ def main() -> None:
     copy_bank = json.loads((ROOT / "data/quiz-copy-episodes.json").read_text(encoding="utf-8"))
     copied = copy_thumbnail_config(copy_bank["episodes"][0])
     validate_config(copied)
-    assert set(copied["thumbnail"]["platforms"]) == set(FORMATS)
+    assert set(copied["thumbnail"]["platforms"]) == {"vertical"} == set(FORMATS)
     assert copied["thumbnail"]["outputDir"] == "out/thumbnails"
     assert copied["hintCount"] == 3
     assert copied["answerType"] == "Item"

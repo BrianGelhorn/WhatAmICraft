@@ -598,6 +598,7 @@ def build_config(episode: dict, manifest: dict, music: dict, normalized: dict[st
     )
 
     result = deepcopy(episode)
+    result["thumbnail"]["platforms"] = {"vertical": result["thumbnail"]["platforms"]["vertical"]}
     result["fps"] = FPS
     result["durationInFrames"] = reveal_scene_from + timeline["revealDurationInFrames"]
     if music["fadeInFrames"] + music["fadeOutFrames"] >= result["durationInFrames"]:
