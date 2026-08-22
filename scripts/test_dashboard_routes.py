@@ -54,6 +54,13 @@ def cancellation_marks_job_complete() -> None:
     assert finished == [("cancelled", -15, "Cancelada por el usuario.", "generation")]
 
 
+def dashboard_job_controls_are_aligned() -> None:
+    markup = (ROOT / "dashboard/index.html").read_text(encoding="utf-8")
+    assert ".status { display:inline-flex; align-items:center; justify-content:center;" in markup
+    assert ".actions { display:flex; flex-wrap:wrap; align-items:center;" in markup
+    assert ".actions button { display:inline-flex; align-items:center; justify-content:center;" in markup
+
+
 @contextmanager
 def isolated_directory():
     root = ROOT / ".tmp" / f"dashboard-routes-{uuid.uuid4().hex}"
@@ -67,6 +74,7 @@ def isolated_directory():
 def main() -> None:
     cancellation_terminates_process()
     cancellation_marks_job_complete()
+    dashboard_job_controls_are_aligned()
     workflow = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     assert "python scripts/test_dashboard_routes.py" in workflow
     assert "node scripts/ci/dashboard_ui.mjs" in workflow
