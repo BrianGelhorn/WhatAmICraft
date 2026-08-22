@@ -4,6 +4,7 @@
 import json
 import os
 import shutil
+import subprocess
 import sys
 import threading
 import uuid
@@ -19,6 +20,12 @@ sys.path.insert(0, str(ROOT / "dashboard"))
 import app  # noqa: E402
 
 
+def cancellation_terminates_process() -> None:
+    process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    app._terminate_process(process)
+    assert process.poll() is not None
+
+
 @contextmanager
 def isolated_directory():
     root = ROOT / ".tmp" / f"dashboard-routes-{uuid.uuid4().hex}"
@@ -30,6 +37,7 @@ def isolated_directory():
 
 
 def main() -> None:
+    cancellation_terminates_process()
     workflow = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     assert "python scripts/test_dashboard_routes.py" in workflow
     assert "node scripts/ci/dashboard_ui.mjs" in workflow

@@ -550,6 +550,14 @@ def _terminate_process(process: subprocess.Popen | None, pid: int | None = None)
                 os.kill(target, signal.SIGTERM)
         except (ProcessLookupError, PermissionError):
             return
+    if process:
+        try:
+            process.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(target, signal.SIGKILL)
+            except (AttributeError, ProcessLookupError, PermissionError):
+                process.kill()
 
 
 def cancel_active_job(lane: str | None = None) -> None:
