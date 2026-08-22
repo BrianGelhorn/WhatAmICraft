@@ -178,6 +178,87 @@ def _build_quality(items: list[dict]) -> list[dict]:
     return quality
 
 
+def _build_trends(series: list[dict]) -> list[dict]:
+    trends = []
+    for platform in PLATFORMS:
+        points = [point for point in series if point["platform"] == platform]
+        if len(points) < 2:
+            trends.append({"platform": platform, "trend": "unknown", "viewsPerHour": None, "viewsSincePrevious": None})
+            continue
+        previous, latest = points[-2], points[-1]
+        hours = (datetime.fromisoformat(latest["capturedAt"]) - datetime.fromisoformat(previous["capturedAt"])).total_seconds() / 3600
+        delta = latest["views"] - previous["views"]
+        trends.append({
+            "platform": platform,
+            "trend": "up" if delta > 0 else "down" if delta < 0 else "flat",
+            "viewsPerHour": round(delta / hours, 2) if hours > 0 else None,
+            "viewsSincePrevious": delta,
+            "latestViews": latest["views"],
+            "capturedAt": latest["capturedAt"],
+        })
+    return trends
+
+
+def _build_alerts(items: list[dict], quality: list[dict], trends: list[dict], statuses: dict) -> list[dict]:
+    alerts = []
+    now = datetime.now(timezone.utc)
+    for platform, status in statuses.items():
+        if status.get("error"):
+            alerts.append({"severity": "high", "platform": platform, "type": "sync", "message": status["error"]})
+        synced_at = status.get("syncedAt")
+        if status.get("configured") and synced_at:
+            age_hours = (now - datetime.fromisoformat(synced_at)).total_seconds() / 3600
+            if age_hours > 24:
+                alerts.append({"severity": "medium", "platform": platform, "type": "stale", "message": f"La última sincronización tiene {round(age_hours)} h."})
+    for row in quality:
+        for warning in row["warnings"]:
+            if row["videos"]:
+                alerts.append({"severity": "medium", "platform": row["platform"], "type": "coverage", "message": warning})
+    for item in items:
+        if item.get("viewsSincePrevious") is not None and item["viewsSincePrevious"] < 0:
+            alerts.append({"severity": "medium", "platform": item["platform"], "type": "anomaly", "episodeId": item["episodeId"], "message": "Las vistas bajaron desde la captura anterior; revisar corrección de la plataforma."})
+        if item.get("views", 0) >= 100 and item.get("engagementRateByViews") is not None and item["engagementRateByViews"] < 1:
+            alerts.append({"severity": "low", "platform": item["platform"], "type": "engagement", "episodeId": item["episodeId"], "message": "Alcance aceptable, pero interacción inferior al 1%."})
+    return alerts
+
+
+def _build_recommendations(cohorts: list[dict], trends: list[dict]) -> list[dict]:
+    recommendations = []
+    for dimension in ("formatLabel", "targetKind", "templateVersion", "publishHourUtc"):
+        platforms = sorted({cohort["platform"] for cohort in cohorts if cohort["dimension"] == dimension})
+        for platform in platforms:
+            candidates = [
+                cohort for cohort in cohorts
+                if cohort["dimension"] == dimension and cohort["platform"] == platform
+                and cohort["measuredVideos"] >= 2 and cohort["value"] != "unknown"
+            ]
+            if not candidates:
+                continue
+            best = max(candidates, key=lambda cohort: (cohort["lifetimeViewsPerHour"] or 0, cohort["viewsPerVideo"] or 0))
+            evidence = best["lifetimeViewsPerHour"] or best["viewsPerVideo"]
+            unit = "vistas/h" if best["lifetimeViewsPerHour"] is not None else "vistas/video"
+            action = {
+                "formatLabel": f"Repetir el formato {best['value']}",
+                "targetKind": f"Priorizar targets de tipo {best['value']}",
+                "templateVersion": f"Mantener la plantilla {best['value']} mientras siga superando al resto",
+                "publishHourUtc": f"Probar más publicaciones cerca de las {best['value']}",
+            }[dimension]
+            recommendations.append({
+                "priority": "high", "platform": platform, "dimension": dimension,
+                "value": best["value"], "action": action,
+                "reason": f"{round(evidence, 2)} {unit} con {best['measuredVideos']} videos medidos.",
+            })
+    rising = [trend for trend in trends if trend.get("trend") == "up" and trend.get("viewsPerHour")]
+    if rising:
+        best = max(rising, key=lambda trend: trend["viewsPerHour"])
+        recommendations.append({
+            "priority": "medium", "platform": best["platform"], "dimension": "trend",
+            "value": best["platform"], "action": f"Mantener la cadencia en {best['platform']} y medir el próximo lote.",
+            "reason": f"La última ventana creció a {best['viewsPerHour']} vistas/h.",
+        })
+    return recommendations
+
+
 def _insight_values(response: dict) -> dict:
     result = {}
     for metric in response.get("data", []):
@@ -474,6 +555,11 @@ def build_snapshot() -> dict:
         })
     total_views = sum(item["views"] or 0 for item in items)
     total_engagements = sum(item["engagements"] for item in items)
+    series = _build_series(video_metric_snapshots())
+    quality = _build_quality(items)
+    trends = _build_trends(series)
+    alerts = _build_alerts(items, quality, trends, statuses)
+    cohorts = _build_cohorts(items)
     observations = []
     measured = [item for item in items if item["views"] is not None]
     if measured:
@@ -502,9 +588,12 @@ def build_snapshot() -> dict:
             "engagementRateByViews": round(total_engagements / total_views * 100, 2) if total_views else None,
         },
         "platforms": platform_summaries,
-        "series": _build_series(video_metric_snapshots()),
-        "cohorts": _build_cohorts(items),
-        "quality": _build_quality(items),
+        "series": series,
+        "cohorts": cohorts,
+        "quality": quality,
+        "trends": trends,
+        "alerts": alerts,
+        "recommendations": _build_recommendations(cohorts, trends),
         "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),
         "observations": observations,
         "definitions": {
@@ -516,6 +605,7 @@ def build_snapshot() -> dict:
             "A view is defined differently by each platform; compare direction and relative performance, not absolute equivalence.",
             "TikTok Display API does not expose retention or average watch time.",
             "Unavailable metrics are null, never estimated as zero.",
+            "Recommendations require at least two measured videos per cohort and do not replace external trend research.",
         ],
         "suggestedGptTask": "Analyze platform health, winners, weak points and concrete next experiments. Separate facts from hypotheses and cite episode IDs.",
     }

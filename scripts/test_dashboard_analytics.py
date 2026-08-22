@@ -43,6 +43,9 @@ assert snapshot["cohorts"][0]["dimension"] == "formatLabel"
 assert snapshot["cohorts"][0]["viewsPerVideo"] == 100
 quality = {item["platform"]: item for item in snapshot["quality"]}
 assert quality["tiktok"]["coveragePercent"] == 100.0
+assert snapshot["trends"][1]["trend"] == "up"
+assert snapshot["alerts"] == []
+assert snapshot["recommendations"][0]["dimension"] == "trend"
 assert "raw" not in snapshot["videos"][0]
 assert [len(batch) for batch in analytics._chunks(list(range(41)), 20)] == [20, 20, 1]
 

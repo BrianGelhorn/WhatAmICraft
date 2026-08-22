@@ -84,6 +84,8 @@
     .analytics-controls .field { min-width:150px; }
     .analytics-chart { min-height:240px; border:1px solid var(--line); border-radius:10px; padding:10px; background:#101713; }
     .analytics-chart svg { display:block; width:100%; height:auto; }
+    .analytics-callouts { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+    .analytics-callout { border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:#101713; }
     .analytics-cohorts { margin-top:14px; }
     .analytics-platform { border:1px solid var(--line); border-radius:10px; padding:11px; background:#101713; }
     .analytics-platform strong,.analytics-platform span { display:block; }
@@ -421,6 +423,8 @@
         <label class="field">Plataforma<select id="analytics-platform"><option value="all">Todas</option><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="facebook">Facebook Reels</option></select></label>
       </div>
       <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
+      <div class="analytics-callouts" id="analytics-alerts" aria-live="polite"></div>
+      <div class="analytics-callouts" id="analytics-recommendations" aria-live="polite"></div>
       <div class="analytics-controls analytics-cohorts" aria-label="Comparación de cohortes">
         <label class="field">Comparar por<select id="analytics-cohort-dimension"><option value="formatLabel">Formato</option><option value="targetKind">Tipo de target</option><option value="templateVersion">Versión de plantilla</option><option value="publishHourUtc">Hora de publicación</option></select></label>
       </div>
@@ -973,6 +977,7 @@
       renderAnalyticsChart(analytics);
       renderAnalyticsCohorts(analytics);
       renderAnalyticsQuality(analytics);
+      renderAnalyticsCallouts(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
       $('analytics-rows').innerHTML = (analytics.videos || []).map(item => `
@@ -1035,6 +1040,17 @@
         const status = warnings.length ? `<span class="bad">${escapeHtml(warnings.join(' · '))}</span>` : '<span class="ok">Datos utilizables</span>';
         return `<tr><td><strong>${escapeHtml(item.platform)}</strong></td><td>${number(item.measuredVideos)}/${number(item.videos)}</td><td>${metric(item.reachPerView)}</td><td>${metric(item.averageWatchSeconds, ' s')}</td><td>${metric(item.completionRate, '%')}</td><td>${metric(item.coveragePercent, '%')}</td><td>${status}</td></tr>`;
       }).join('');
+    }
+
+    function renderAnalyticsCallouts(analytics) {
+      const alerts = analytics.alerts || [];
+      const recommendations = analytics.recommendations || [];
+      $('analytics-alerts').innerHTML = alerts.length
+        ? `<div class="analytics-callout bad"><strong>Alertas</strong><ul>${alerts.slice(0, 8).map(item => `<li>${escapeHtml(item.platform)}: ${escapeHtml(item.message)}${item.episodeId ? ` (${escapeHtml(item.episodeId)})` : ''}</li>`).join('')}</ul></div>`
+        : '';
+      $('analytics-recommendations').innerHTML = recommendations.length
+        ? `<div class="analytics-callout ok"><strong>Recomendaciones basadas en datos</strong><ul>${recommendations.slice(0, 8).map(item => `<li>${escapeHtml(item.action)} — ${escapeHtml(item.reason)}</li>`).join('')}</ul></div>`
+        : '<p class="hint">Todavía no hay suficientes videos medidos por cohorte para recomendar cambios con confianza.</p>';
     }
 
     function renderDiagnostics() {
