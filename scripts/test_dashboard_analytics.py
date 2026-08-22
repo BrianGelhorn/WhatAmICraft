@@ -82,7 +82,7 @@ try:
     analytics.urllib.request.urlopen = lambda *_args, **_kwargs: FakeTrendResponse()
     analytics.state_db.save_flag = lambda key, value: saved_trend_status.append((key, value))
     live_status = analytics.sync_trend_signals()
-    assert live_status["synced"] == 1 and saved_trend_status[0][0] == "analytics_trend_signals"
+    assert live_status["synced"] == 1 and [item[0] for item in saved_trend_status] == ["analytics_trend_signals", "analytics_trend_sync_status"]
 finally:
     analytics.urllib.request.urlopen = old_urlopen
     analytics.state_db.save_flag = old_save_flag

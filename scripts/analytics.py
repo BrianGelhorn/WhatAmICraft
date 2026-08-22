@@ -105,7 +105,9 @@ def sync_trend_signals() -> dict:
     url = os.getenv("ANALYTICS_TRENDS_URL", "").strip()
     synced_at = datetime.now(timezone.utc).isoformat()
     if not url:
-        return {"configured": False, "synced": 0, "error": "Fuente de tendencias no configurada", "syncedAt": synced_at}
+        result = {"configured": False, "synced": 0, "error": "Fuente de tendencias no configurada", "syncedAt": synced_at}
+        state_db.save_flag("analytics_trend_sync_status", result)
+        return result
     headers = {"Accept": "application/json"}
     token = os.getenv("ANALYTICS_TRENDS_TOKEN", "").strip()
     if token:
@@ -115,9 +117,11 @@ def sync_trend_signals() -> dict:
         with urllib.request.urlopen(request, timeout=20) as response:
             payload = json.loads(response.read() or b"{}")
         signals = import_trend_signals(payload)
-        return {"configured": True, "synced": len(signals), "error": None, "syncedAt": synced_at}
+        result = {"configured": True, "synced": len(signals), "error": None, "syncedAt": synced_at}
     except (OSError, ValueError, json.JSONDecodeError) as error:
-        return {"configured": True, "synced": 0, "error": _safe_error(error), "syncedAt": synced_at}
+        result = {"configured": True, "synced": 0, "error": _safe_error(error), "syncedAt": synced_at}
+    state_db.save_flag("analytics_trend_sync_status", result)
+    return result
 
 
 def _active_trend_signals() -> list[dict]:
@@ -846,6 +850,6 @@ def sync_all() -> dict:
             statuses[platform] = {"configured": True, "synced": count, "error": None, "syncedAt": synced_at}
         except Exception as error:
             statuses[platform] = {"configured": True, "synced": 0, "error": _safe_error(error), "syncedAt": synced_at}
-    state_db.save_flag("analytics_trend_sync_status", sync_trend_signals())
+    sync_trend_signals()
     state_db.save_flag("analytics_sync_status", statuses)
     return {"status": statuses, "analytics": write_exports()}
