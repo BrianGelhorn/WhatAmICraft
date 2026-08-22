@@ -200,10 +200,18 @@ def main() -> None:
 
         error_log = fixture / "logs/generator.log"
         error_log.parent.mkdir(parents=True, exist_ok=True)
+        assert bot.classify_error("Remotion render failed at frame 114", "logs/generator.log") == "Render / Remotion"
+        alert = bot.error_alert("ERROR render synthetic failure\n" + ("traceback noise\n" * 40), "logs/generator.log", "Tarea: fixture")
+        assert "⚠️ ALERTA · Render / Remotion" in alert
+        assert "Detalle: ERROR render synthetic failure" in alert
+        assert len(alert) < 1000
         bot.monitor_errors()
         error_log.write_text("ERROR render synthetic failure\n", encoding="utf-8")
         bot.monitor_errors()
-        assert "ERROR DETECTADO" in telegram_messages(telegram_server)[-1]["text"]
+        alert_message = telegram_messages(telegram_server)[-1]["text"]
+        assert "⚠️ ALERTA · Render / Remotion" in alert_message
+        assert "Detalle: ERROR render synthetic failure" in alert_message
+        assert "generator.log" in alert_message
 
         bot.handle_callback({"id": "cb-unknown", "message": {"chat": {"id": 42}}, "data": "unknown:value"})
         assert "Error:" in telegram_messages(telegram_server)[-1]["text"]

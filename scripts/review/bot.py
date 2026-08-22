@@ -27,6 +27,17 @@ ERROR_RE = re.compile(
     r"faltan assets|browser crashed|exit\s*[:=]\s*(?!0)\d+)",
     re.IGNORECASE,
 )
+ERROR_TYPES = (
+    ("Render / Remotion", re.compile(r"remotion|render(?:ed|ing)?|browser crashed|compositor", re.IGNORECASE)),
+    ("Publicación / credenciales", re.compile(r"youtube|instagram|tiktok|facebook|publish|publicar|oauth|token|401|403", re.IGNORECASE)),
+    ("Audio / voces", re.compile(r"audio|voice|voz|eleven|tts|ffprobe|music|música", re.IGNORECASE)),
+    ("Red / API", re.compile(r"timeout|connection|network|http|api|429|502|503|conexión|red", re.IGNORECASE)),
+    ("Archivos / permisos", re.compile(r"permission|denied|not found|no existe|missing|asset|archivo|zip", re.IGNORECASE)),
+    ("Dashboard / tarea", re.compile(r"dashboard|job|cancel|tarea|worker|scheduler", re.IGNORECASE)),
+)
+SECRET_RE = re.compile(
+    r"(?i)(access[_ -]?token|refresh[_ -]?token|client[_ -]?secret|authorization|password)\s*[:=]\s*[^\s,]+"
+)
 MONITORED_LOGS = (
     ROOT / "out/logs/generator.log",
     ROOT / "out/logs/publisher.log",
@@ -438,6 +449,36 @@ def log_tail(path: Path, limit: int = 3000) -> str:
         return f"No se pudo leer el log: {error}"
 
 
+def classify_error(text: str, source: str = "") -> str:
+    haystack = f"{source}\n{text}"
+    for label, pattern in ERROR_TYPES:
+        if pattern.search(haystack):
+            return label
+    return "Error no clasificado"
+
+
+def fundamental_error(text: str) -> str:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    candidates = [line for line in lines if ERROR_RE.search(line) or line.lower().startswith(("caused by", "error", "fatal"))]
+    useful = [
+        line for line in candidates
+        if not line.lower().startswith(("traceback", "file ", "during handling", "the above exception"))
+    ]
+    detail = useful[-1] if useful else (candidates[-1] if candidates else (lines[-1] if lines else "Sin detalle disponible"))
+    detail = SECRET_RE.sub(r"\1=<redacted>", detail)
+    return detail[:420]
+
+
+def error_alert(text: str, source: str, context: str = "") -> str:
+    label = classify_error(text, source)
+    detail = fundamental_error(text)
+    lines = [f"⚠️ ALERTA · {label}"]
+    if context:
+        lines.append(context)
+    lines.extend([f"Detalle: {detail}", f"Log: {source or 'sin archivo'}"])
+    return "\n".join(lines)
+
+
 def notify_generation_done(job: dict, state: dict) -> None:
     label = job.get("label") or "generación"
     episode_match = re.search(r"\bmc-\d+\b", label)
@@ -491,7 +532,7 @@ def monitor_errors() -> None:
         if matches:
             tell(
                 os.environ["TELEGRAM_REVIEW_CHAT_ID"],
-                f"⚠️ ERROR DETECTADO\nArchivo: {path.relative_to(ROOT)}\n\n" + "\n".join(matches[-20:]),
+                error_alert("\n".join(matches), str(path.relative_to(ROOT))),
             )
     last_jobs = state.setdefault("lastJobs", {})
     for lane, job in jobs.items():
@@ -500,7 +541,11 @@ def monitor_errors() -> None:
             if job.get("status") == "failed":
                 job_log = str(job.get("log") or "").replace("/app/", str(ROOT) + "/")
                 path = Path(job_log) if job_log else ROOT / "out/logs/generator.log"
-                message = f"❌ Tarea fallida: {job.get('label') or 'sin nombre'}\n\n{log_tail(path)}"
+                message = error_alert(
+                    log_tail(path, 3000),
+                    str(path.relative_to(ROOT)) if path.is_absolute() and path.is_relative_to(ROOT) else str(path),
+                    f"Tarea: {job.get('label') or 'sin nombre'}",
+                )
             elif job.get("status") == "cancelled":
                 message = f"⏹ Tarea cancelada: {job.get('label') or 'sin nombre'}"
             else:
