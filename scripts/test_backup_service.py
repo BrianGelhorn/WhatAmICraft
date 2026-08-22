@@ -37,6 +37,8 @@ def main() -> None:
         (root / "data").mkdir(parents=True)
         (root / "out" / "logs").mkdir(parents=True)
         (root / "data" / "state.json").write_text('{"status":"before"}\n', encoding="utf-8")
+        (root / "data" / "publishing-secrets.json").touch()
+        (root / ".env").touch()
         (root / "out" / "queue.json").write_text('{"pending":["mc-01"]}\n', encoding="utf-8")
         backup_dir = root / "backups" / "ops"
         service = backup_service.BackupService(root, backup_dir, keep=1, interval_seconds=60, admin_token="test-token")
@@ -55,6 +57,9 @@ def main() -> None:
             assert status == 201 and created["backup"]["action"] == "manual"
             backup_name = created["backup"]["backup"]
             assert (backup_dir / backup_name).is_file()
+            with zipfile.ZipFile(backup_dir / backup_name) as archive:
+                assert "data/publishing-secrets.json" not in archive.namelist()
+                assert ".env" not in archive.namelist()
             assert service.keep == 2
 
             (root / "data" / "state.json").write_text('{"status":"corrupted"}\n', encoding="utf-8")

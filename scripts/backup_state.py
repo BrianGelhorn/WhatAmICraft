@@ -9,6 +9,7 @@ from pathlib import PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP_DIR = ROOT / "backups/ops"
 DEFAULT_KEEP = 10
+EXCLUDED_BACKUP_NAMES = {".env", ".env.local", "publishing-secrets.json"}
 
 
 def wanted_files(root: Path = ROOT) -> list[Path]:
@@ -29,7 +30,9 @@ def wanted_files(root: Path = ROOT) -> list[Path]:
     ]
     files: list[Path] = []
     for pattern in patterns:
-        files.extend(path for path in root.glob(pattern) if path.is_file())
+        files.extend(
+            path for path in root.glob(pattern) if path.is_file() and path.name not in EXCLUDED_BACKUP_NAMES
+        )
     return sorted(set(files))
 
 
