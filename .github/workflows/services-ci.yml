@@ -23,7 +23,7 @@ concurrency:
 jobs:
   dashboard:
     name: Dashboard service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -55,7 +55,7 @@ jobs:
 
   bot:
     name: Telegram bot service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -74,7 +74,7 @@ jobs:
 
   operational-contract:
     name: Operational startup and recovery contract
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -91,11 +91,12 @@ jobs:
           done
           python -m py_compile scripts/test_operational_contract.py
           PYTHONPATH=scripts python scripts/test_operational_contract.py
+          PYTHONPATH=scripts python scripts/test_ci_runner_contract.py
           PYTHONPATH=scripts python scripts/test_production_deploy_contract.py
 
   publisher-worker:
     name: Publisher and worker services
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -115,7 +116,7 @@ jobs:
 
   producer:
     name: Producer and generation contracts
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -147,7 +148,7 @@ jobs:
 
   clues-api:
     name: Clues API service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -165,7 +166,7 @@ jobs:
 
   analytics-api:
     name: Analytics API service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -183,7 +184,7 @@ jobs:
 
   monitor:
     name: Monitoring service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -200,7 +201,7 @@ jobs:
 
   backup-rollback:
     name: Backup and rollback service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -217,7 +218,7 @@ jobs:
 
   media:
     name: Media service
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
       - name: Media behavior contract
@@ -273,7 +274,7 @@ jobs:
   dashboard-media-integration:
     name: Dashboard/media integration
     needs: [dashboard, bot, publisher-worker, producer, clues-api, analytics-api, monitor, backup-rollback, media, operational-contract]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:

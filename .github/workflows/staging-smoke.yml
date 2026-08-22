@@ -20,7 +20,7 @@ permissions:
 jobs:
   staging:
     name: Isolated staging verification
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]
     steps:
       - uses: actions/checkout@v7
         with:
