@@ -26,6 +26,41 @@ def cancellation_terminates_process() -> None:
     assert process.poll() is not None
 
 
+def cancellation_marks_job_complete() -> None:
+    original = {
+        "read_job": app.read_job,
+        "terminate": app._terminate_process,
+        "append": app.append_job_line,
+        "finish": app.finish_job,
+        "active": app.ACTIVE_PROCESSES,
+        "requested": app.CANCEL_REQUESTED,
+    }
+    finished: list[tuple[str, int, str | None, str]] = []
+    try:
+        app.read_job = lambda _lane=None: {"status": "running", "pid": 123}
+        app._terminate_process = lambda _process, _pid=None: None
+        app.append_job_line = lambda *_args: None
+        app.finish_job = lambda status, code, error=None, lane="main": finished.append((status, code, error, lane))
+        app.ACTIVE_PROCESSES = {}
+        app.CANCEL_REQUESTED = {}
+        app.cancel_active_job("generation")
+    finally:
+        app.read_job = original["read_job"]
+        app._terminate_process = original["terminate"]
+        app.append_job_line = original["append"]
+        app.finish_job = original["finish"]
+        app.ACTIVE_PROCESSES = original["active"]
+        app.CANCEL_REQUESTED = original["requested"]
+    assert finished == [("cancelled", -15, "Cancelada por el usuario.", "generation")]
+
+
+def dashboard_job_controls_are_aligned() -> None:
+    markup = (ROOT / "dashboard/index.html").read_text(encoding="utf-8")
+    assert ".status { display:inline-flex; align-items:center; justify-content:center;" in markup
+    assert ".actions { display:flex; flex-wrap:wrap; align-items:center;" in markup
+    assert ".actions button { display:inline-flex; align-items:center; justify-content:center;" in markup
+
+
 @contextmanager
 def isolated_directory():
     root = ROOT / ".tmp" / f"dashboard-routes-{uuid.uuid4().hex}"
@@ -38,6 +73,8 @@ def isolated_directory():
 
 def main() -> None:
     cancellation_terminates_process()
+    cancellation_marks_job_complete()
+    dashboard_job_controls_are_aligned()
     workflow = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     assert "python scripts/test_dashboard_routes.py" in workflow
     assert "node scripts/ci/dashboard_ui.mjs" in workflow
