@@ -777,10 +777,11 @@ def render(episode: dict) -> None:
             "render",
             "QuizCapasCopy",
             str(output),
-            f"--concurrency={os.getenv('REMOTION_CONCURRENCY', '100%')}",
+            f"--concurrency={os.getenv('REMOTION_CONCURRENCY', '1')}",
         ],
         cwd=ROOT,
         check=True,
+        timeout=int(os.getenv("REMOTION_RENDER_TIMEOUT_SECONDS", "1800")),
     )
 
 
