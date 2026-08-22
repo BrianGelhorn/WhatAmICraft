@@ -66,8 +66,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile scripts/review/bot.py scripts/review/telegram.py
+          python -m py_compile scripts/review/bot.py scripts/review/telegram.py scripts/test_telegram_alerts.py
           PYTHONPATH=scripts python scripts/test_telegram_bot.py
+          PYTHONPATH=scripts python scripts/test_telegram_alerts.py
           PYTHONPATH=scripts python scripts/ci/service_contracts.py --bot
           PYTHONPATH=scripts python scripts/ci/process_smoke.py
 

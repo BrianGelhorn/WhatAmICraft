@@ -29,11 +29,11 @@ ERROR_RE = re.compile(
 )
 ERROR_TYPES = (
     ("Render / Remotion", re.compile(r"remotion|render(?:ed|ing)?|browser crashed|compositor", re.IGNORECASE)),
+    ("Archivos / permisos", re.compile(r"permission|denied|not found|no existe|missing|asset|archivo|zip", re.IGNORECASE)),
     ("Publicación / credenciales", re.compile(r"youtube|instagram|tiktok|facebook|publish|publicar|oauth|token|401|403", re.IGNORECASE)),
     ("Audio / voces", re.compile(r"audio|voice|voz|eleven|tts|ffprobe|music|música", re.IGNORECASE)),
     ("Red / API", re.compile(r"timeout|connection|network|http|api|429|502|503|conexión|red", re.IGNORECASE)),
-    ("Archivos / permisos", re.compile(r"permission|denied|not found|no existe|missing|asset|archivo|zip", re.IGNORECASE)),
-    ("Dashboard / tarea", re.compile(r"dashboard|job|cancel|tarea|worker|scheduler", re.IGNORECASE)),
+    ("Dashboard / tarea", re.compile(r"dashboard|job|cancel|tarea|scheduler", re.IGNORECASE)),
 )
 SECRET_RE = re.compile(
     r"(?i)(access[_ -]?token|refresh[_ -]?token|client[_ -]?secret|authorization|password)\s*[:=]\s*[^\s,]+"
@@ -450,9 +450,11 @@ def log_tail(path: Path, limit: int = 3000) -> str:
 
 
 def classify_error(text: str, source: str = "") -> str:
-    haystack = f"{source}\n{text}"
     for label, pattern in ERROR_TYPES:
-        if pattern.search(haystack):
+        if pattern.search(text):
+            return label
+    for label, pattern in ERROR_TYPES:
+        if pattern.search(source):
             return label
     return "Error no clasificado"
 
