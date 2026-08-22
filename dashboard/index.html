@@ -84,6 +84,7 @@
     .analytics-controls .field { min-width:150px; }
     .analytics-chart { min-height:240px; border:1px solid var(--line); border-radius:10px; padding:10px; background:#101713; }
     .analytics-chart svg { display:block; width:100%; height:auto; }
+    .analytics-cohorts { margin-top:14px; }
     .analytics-platform { border:1px solid var(--line); border-radius:10px; padding:11px; background:#101713; }
     .analytics-platform strong,.analytics-platform span { display:block; }
     .analytics-platform span { margin-top:4px; color:var(--muted); font-size:12px; }
@@ -420,6 +421,12 @@
         <label class="field">Plataforma<select id="analytics-platform"><option value="all">Todas</option><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="facebook">Facebook Reels</option></select></label>
       </div>
       <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
+      <div class="analytics-controls analytics-cohorts" aria-label="Comparación de cohortes">
+        <label class="field">Comparar por<select id="analytics-cohort-dimension"><option value="formatLabel">Formato</option><option value="targetKind">Tipo de target</option><option value="templateVersion">Versión de plantilla</option><option value="publishHourUtc">Hora de publicación</option></select></label>
+      </div>
+      <div class="table-wrap" id="analytics-cohorts-wrap" hidden>
+        <table><thead><tr><th>Plataforma</th><th>Cohorte</th><th>Videos</th><th>Vistas/video</th><th>Vistas/h</th><th>Engagement</th><th>Retención</th></tr></thead><tbody id="analytics-cohorts-rows"></tbody></table>
+      </div>
       <section class="stats" aria-label="Resumen de estadísticas">
         <div class="stat"><span>Videos medidos</span><strong id="analytics-videos">0</strong></div>
         <div class="stat"><span>Vistas</span><strong id="analytics-views">0</strong></div>
@@ -960,6 +967,7 @@
           <span>${item.syncedAt ? `Actualizado ${new Date(item.syncedAt).toLocaleString()}` : 'Todavía sin sincronizar'}</span>
         </div>`).join('');
       renderAnalyticsChart(analytics);
+      renderAnalyticsCohorts(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
       $('analytics-rows').innerHTML = (analytics.videos || []).map(item => `
@@ -1000,6 +1008,16 @@
       const first = new Date(points[0].capturedAt).toLocaleDateString();
       const last = new Date(points.at(-1).capturedAt).toLocaleDateString();
       $('analytics-chart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de vistas"><line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="var(--line-strong)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="var(--line-strong)"/><path d="${path}" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}<text x="${left}" y="${height-10}" fill="var(--muted)">${escapeHtml(first)}</text><text x="${width-right}" y="${height-10}" text-anchor="end" fill="var(--muted)">${escapeHtml(last)}</text><text x="${left-8}" y="${top+4}" text-anchor="end" fill="var(--muted)">${number(max)}</text><text x="${left-8}" y="${height-bottom+4}" text-anchor="end" fill="var(--muted)">0</text></svg>`;
+    }
+
+    function renderAnalyticsCohorts(analytics) {
+      const number = value => Number(value || 0).toLocaleString('es-AR');
+      const metric = (value, suffix = '') => value == null ? '—' : `${Number(value).toLocaleString('es-AR')}${suffix}`;
+      const dimension = $('analytics-cohort-dimension').value;
+      const rows = (analytics.cohorts || []).filter(item => item.dimension === dimension).slice(0, 40);
+      $('analytics-cohorts-wrap').hidden = !rows.length;
+      $('analytics-cohorts-rows').innerHTML = rows.map(item => `
+        <tr><td><strong>${escapeHtml(item.platform)}</strong></td><td>${escapeHtml(item.value)}</td><td>${number(item.videos)} <span class="hint">(${number(item.measuredVideos)} medidos)</span></td><td>${metric(item.viewsPerVideo)}</td><td>${metric(item.lifetimeViewsPerHour)}</td><td>${metric(item.engagementRateByViews, '%')}</td><td>${metric(item.completionRate, '%')}</td></tr>`).join('');
     }
 
     function renderDiagnostics() {
@@ -1176,6 +1194,7 @@
     };
     $('analytics-window').onchange = () => renderAnalyticsChart(state.analytics || {});
     $('analytics-platform').onchange = () => renderAnalyticsChart(state.analytics || {});
+    $('analytics-cohort-dimension').onchange = () => renderAnalyticsCohorts(state.analytics || {});
     $('publish-now').onclick = async () => { try { await api('/api/publish-now',{}); toast('Publicación iniciada'); refresh(); } catch(e){ toast(e.message); } };
     $('manual-publish').onclick = async event => {
       const platform = event.target.dataset.publishPlatform; if (!platform || !selectedId) return;

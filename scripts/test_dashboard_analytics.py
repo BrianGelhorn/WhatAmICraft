@@ -18,6 +18,7 @@ analytics.all_episodes = lambda: [{
 analytics.publishing_state = lambda: {"videos": {"mc-99": {"platforms": {"tiktok": {
     "publishedAt": (now - timedelta(hours=2)).isoformat(),
 }}}}}
+analytics.video_path = lambda episode: Path("missing.mp4")
 analytics.video_metrics = lambda: [{
     "episodeId": "mc-99", "platform": "tiktok", "videoId": "123", "title": "Pilot",
     "shareUrl": "https://example.test", "createTime": 0, "views": 100, "likes": 10,
@@ -38,6 +39,8 @@ assert snapshot["videos"][0]["viewsPerHourSincePrevious"] == 20
 assert snapshot["videos"][0]["averageWatchSeconds"] is None
 assert [point["views"] for point in snapshot["series"]] == [80, 100]
 assert [point["engagements"] for point in snapshot["series"]] == [10, 13]
+assert snapshot["cohorts"][0]["dimension"] == "formatLabel"
+assert snapshot["cohorts"][0]["viewsPerVideo"] == 100
 assert "raw" not in snapshot["videos"][0]
 assert [len(batch) for batch in analytics._chunks(list(range(41)), 20)] == [20, 20, 1]
 

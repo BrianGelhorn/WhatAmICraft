@@ -69,6 +69,7 @@ const state = {
     summary: {videos: 1, views: 100, engagements: 12, engagementRateByViews: 12},
     platforms: [{platform: 'youtube', videos: 1, views: 100, engagements: 12, error: null, syncedAt: '2026-08-21T12:00:00Z'}],
     series: [{platform: 'youtube', capturedAt: '2026-08-21T12:00:00Z', views: 100, engagements: 12}],
+    cohorts: [{dimension: 'formatLabel', platform: 'youtube', value: 'Quiz definitivo', videos: 1, measuredVideos: 1, viewsPerVideo: 100, lifetimeViewsPerHour: 10, engagementRateByViews: 12, completionRate: 70}],
     videos: [{platform: 'youtube', episodeId: 'mc-04', target: 'Golden Apple', formatLabel: 'Quiz definitivo', views: 100, reach: 90, viewsPerHourSincePrevious: 10, engagementRateByViews: 12, likes: 8, comments: 2, shares: 1, saves: 1, averageWatchSeconds: 18, completionRate: 70}],
     observations: ['Fixture observation'],
   },
@@ -284,9 +285,12 @@ try {
 
   await click('[data-view="analytics"]');
   assert.equal(await evaluate(() => Boolean(document.querySelector('#analytics-chart svg'))), true);
-  await setValue('#analytics-platform', 'youtube');
-  await setValue('#analytics-window', 'all');
+  await setValue('#analytics-platform', 'youtube', 'change');
+  await setValue('#analytics-window', 'all', 'change');
   assert.equal(await evaluate(() => Boolean(document.querySelector('#analytics-chart svg'))), true);
+  assert.equal(await evaluate(() => document.querySelectorAll('#analytics-cohorts-rows tr').length), 1);
+  await setValue('#analytics-cohort-dimension', 'targetKind', 'change');
+  assert.equal(await evaluate(() => document.querySelector('#analytics-cohorts-wrap').hidden), true);
   await clickRequest('#sync-analytics', '/api/analytics/sync');
   assert.deepEqual(await evaluate(() => [...document.querySelectorAll('a[href^="/api/analytics/export"]')].map((link) => link.getAttribute('href'))), ['/api/analytics/export.json', '/api/analytics/export.md']);
 

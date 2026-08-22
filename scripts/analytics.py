@@ -10,7 +10,8 @@ from publishing.settings import apply_runtime, credential_status, load_config, s
 from publishing.tiktok import _access_token as tiktok_access_token
 from publishing.youtube import _access_token as youtube_access_token
 from review.storage import publishing_state, save_published_platform, save_video_metrics, video_metric_snapshots, video_metrics
-from video_formats import all_episodes, format_id_for, format_label
+from template_artifacts import read_artifact
+from video_formats import FORMAT_DEFINITIONS, all_episodes, format_id_for, format_label, video_path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = ROOT / "out/analytics"
@@ -73,6 +74,60 @@ def _build_series(snapshots: list[dict]) -> list[dict]:
     for point in buckets.values():
         point["engagementRateByViews"] = round(point["engagements"] / point["views"] * 100, 2) if point["views"] else None
     return sorted(buckets.values(), key=lambda point: (point["capturedAt"], point["platform"]))
+
+
+def _creative_metadata(episode: dict | None, published_at: str | None) -> dict:
+    if not episode:
+        return {"targetKind": "unknown", "templateVersion": "unknown", "durationSeconds": None, "publishHourUtc": None}
+    format_id = format_id_for(episode)
+    artifact = read_artifact(video_path(episode))
+    publish_hour = None
+    if published_at:
+        publish_hour = datetime.fromisoformat(published_at).astimezone(timezone.utc).hour
+    return {
+        "targetKind": episode.get("target", {}).get("kind", "unknown").replace("_", " ").title(),
+        "templateVersion": artifact.get("templateVersion", "unknown") if artifact else "unknown",
+        "durationSeconds": FORMAT_DEFINITIONS.get(format_id, {}).get("durationSeconds"),
+        "publishHourUtc": publish_hour,
+    }
+
+
+def _build_cohorts(items: list[dict]) -> list[dict]:
+    dimensions = ("formatLabel", "targetKind", "templateVersion", "publishHourUtc")
+    groups = {}
+    for item in items:
+        for dimension in dimensions:
+            value = item.get(dimension)
+            if value is None:
+                value = "unknown"
+            value = f"{value:02d}:00 UTC" if dimension == "publishHourUtc" and isinstance(value, int) else str(value)
+            key = (dimension, item["platform"], value)
+            group = groups.setdefault(key, {
+                "dimension": dimension, "platform": item["platform"], "value": value,
+                "videos": 0, "measuredVideos": 0, "views": 0, "engagements": 0,
+                "lifetimeViewsPerHour": [], "engagementRateByViews": [],
+                "averageWatchSeconds": [], "completionRate": [],
+            })
+            group["videos"] += 1
+            if item.get("views") is not None:
+                group["measuredVideos"] += 1
+                group["views"] += item["views"]
+            group["engagements"] += item.get("engagements", 0)
+            for field in ("lifetimeViewsPerHour", "engagementRateByViews", "averageWatchSeconds", "completionRate"):
+                if item.get(field) is not None:
+                    group[field].append(item[field])
+    result = []
+    for group in groups.values():
+        measured = group.pop("measuredVideos")
+        views = group["views"]
+        for field in ("lifetimeViewsPerHour", "engagementRateByViews", "averageWatchSeconds", "completionRate"):
+            values = group[field]
+            group[field] = round(sum(values) / len(values), 2) if values else None
+        group["viewsPerVideo"] = round(views / measured, 2) if measured else None
+        group["engagementRateByViews"] = round(group["engagements"] / views * 100, 2) if views else None
+        group["measuredVideos"] = measured
+        result.append(group)
+    return sorted(result, key=lambda group: (group["dimension"], group["platform"], -(group["viewsPerVideo"] or 0)))
 
 
 def _insight_values(response: dict) -> dict:
@@ -356,6 +411,7 @@ def build_snapshot() -> dict:
             "viewsSincePrevious": visible["views"] - previous["views"] if visible["views"] is not None and previous else None,
             "viewsPerHourSincePrevious": round((visible["views"] - previous["views"]) / delta_hours, 2) if visible["views"] is not None and previous and delta_hours and delta_hours > 0 else None,
         }
+        item.update(_creative_metadata(episode, published_at))
         items.append(item)
     platform_summaries = []
     statuses = state_db.load_flag("analytics_sync_status", {})
@@ -399,6 +455,7 @@ def build_snapshot() -> dict:
         },
         "platforms": platform_summaries,
         "series": _build_series(video_metric_snapshots()),
+        "cohorts": _build_cohorts(items),
         "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),
         "observations": observations,
         "definitions": {
