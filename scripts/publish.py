@@ -179,6 +179,10 @@ def run(args: argparse.Namespace) -> int:
                 record["platforms"][platform] = {
                     **result,
                     "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "publishedTitle": platform_item.title,
+                    "publishedCaption": platform_item.caption,
+                    "publishedHashtags": list(platform_item.hashtags),
+                    "templateVersion": artifact.get("templateVersion"),
                 }
                 save_published_platform(episode["id"], fingerprint, platform, record["platforms"][platform])
                 print(f"  {platform}: listo")

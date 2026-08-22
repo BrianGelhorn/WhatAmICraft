@@ -90,9 +90,16 @@ def _build_series(snapshots: list[dict]) -> list[dict]:
     return sorted(buckets.values(), key=lambda point: (point["capturedAt"], point["platform"]))
 
 
-def _creative_metadata(episode: dict | None, published_at: str | None) -> dict:
+def _creative_metadata(episode: dict | None, published_at: str | None, published_payload: dict | None = None) -> dict:
+    published_payload = published_payload or {}
     if not episode:
-        return {"targetKind": "unknown", "templateVersion": "unknown", "musicSource": "unknown", "durationSeconds": None, "publishHourUtc": None}
+        return {
+            "targetKind": "unknown", "templateVersion": "unknown", "musicSource": "unknown",
+            "durationSeconds": None, "publishHourUtc": None,
+            "publishedTitle": published_payload.get("publishedTitle"),
+            "publishedCaption": published_payload.get("publishedCaption"),
+            "publishedHashtags": published_payload.get("publishedHashtags", []),
+        }
     format_id = format_id_for(episode)
     artifact = read_artifact(video_path(episode))
     music_source = "unknown"
@@ -111,6 +118,9 @@ def _creative_metadata(episode: dict | None, published_at: str | None) -> dict:
         "musicSource": music_source,
         "durationSeconds": FORMAT_DEFINITIONS.get(format_id, {}).get("durationSeconds"),
         "publishHourUtc": publish_hour,
+        "publishedTitle": published_payload.get("publishedTitle"),
+        "publishedCaption": published_payload.get("publishedCaption"),
+        "publishedHashtags": published_payload.get("publishedHashtags", []),
     }
 
 
@@ -557,7 +567,7 @@ def build_snapshot() -> dict:
             "viewsSincePrevious": visible["views"] - previous["views"] if visible["views"] is not None and previous else None,
             "viewsPerHourSincePrevious": round((visible["views"] - previous["views"]) / delta_hours, 2) if visible["views"] is not None and previous and delta_hours and delta_hours > 0 else None,
         }
-        item.update(_creative_metadata(episode, published_at))
+        item.update(_creative_metadata(episode, published_at, platform_payload))
         items.append(item)
     platform_summaries = []
     statuses = state_db.load_flag("analytics_sync_status", {})

@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import publish  # noqa: E402
 import publish_worker as worker  # noqa: E402
-from template_artifacts import render_props_path, write_artifact  # noqa: E402
+from template_artifacts import release_version, render_props_path, write_artifact  # noqa: E402
 
 
 def check_generation_lane_guard() -> None:
@@ -176,7 +176,12 @@ def main() -> None:
 
         assert commands and "--queue" in commands[0] and "--limit" in commands[0]
         assert provider_calls == [("Guess Item", "Can you guess it?\n\n#minecraft #shorts", b"automatic-publish-video")]
-        assert state["videos"]["mc-01"]["platforms"]["fake"]["id"] == "fake-post-01"
+        published = state["videos"]["mc-01"]["platforms"]["fake"]
+        assert published["id"] == "fake-post-01"
+        assert published["publishedTitle"] == "Guess Item"
+        assert published["publishedCaption"] == "Can you guess it?"
+        assert published["publishedHashtags"] == ["minecraft", "shorts"]
+        assert published["templateVersion"] == release_version(fixture)
         assert queue == {"ids": [], "status": "completed", "error": None}
         assert saved_schedules and saved_schedules[0]
 

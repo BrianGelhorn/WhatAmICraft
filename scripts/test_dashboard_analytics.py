@@ -53,9 +53,15 @@ props_path.write_text('{"config":{"music":{"sourceName":"Fixture track @ 12s"}}}
 old_read_artifact = analytics.read_artifact
 analytics.read_artifact = lambda _video: {"templateVersion": "fixture-template", "configPath": "out/test-analytics-props.json"}
 try:
-    metadata = analytics._creative_metadata({"format": "clues", "target": {"kind": "food"}}, now.isoformat())
+    metadata = analytics._creative_metadata(
+        {"format": "clues", "target": {"kind": "food"}},
+        now.isoformat(),
+        {"publishedTitle": "Guess Food", "publishedCaption": "Can you guess it?", "publishedHashtags": ["shorts"]},
+    )
     assert metadata["musicSource"] == "Fixture track @ 12s"
     assert metadata["templateVersion"] == "fixture-template"
+    assert metadata["publishedTitle"] == "Guess Food"
+    assert metadata["publishedHashtags"] == ["shorts"]
 finally:
     analytics.read_artifact = old_read_artifact
     props_path.unlink(missing_ok=True)
