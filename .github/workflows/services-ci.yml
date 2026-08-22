@@ -105,8 +105,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile scripts/publish.py scripts/publish_worker.py scripts/publishing/*.py
+          python -m py_compile scripts/publish.py scripts/publish_worker.py scripts/publishing/*.py scripts/test_youtube_publishing.py
           PYTHONPATH=scripts python scripts/test_publishing.py
+          PYTHONPATH=scripts python scripts/test_youtube_publishing.py
           PYTHONPATH=scripts python scripts/test_automatic_publishing.py
           PYTHONPATH=scripts python scripts/test_priorities.py
           PYTHONPATH=scripts python scripts/ci/service_contracts.py --publisher
