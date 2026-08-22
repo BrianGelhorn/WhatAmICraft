@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Ensure every GitHub Actions job uses the mini PC self-hosted runner."""
+"""Keep production deployment on the mini PC and CI on GitHub-hosted runners."""
 
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = "runs-on: [self-hosted, linux, x64]"
+SELF_HOSTED = "runs-on: [self-hosted, linux, x64]"
+GITHUB_HOSTED = "runs-on: ubuntu-latest"
+DEPLOY_WORKFLOW = "deploy-production.yml"
 
 
 def main() -> None:
@@ -13,17 +15,17 @@ def main() -> None:
     runner_lines = []
     for workflow in workflows:
         content = workflow.read_text(encoding="utf-8")
-        assert "actions/setup-python" not in content, workflow.name
-        runner_lines.extend(
-            f"{workflow.name}:{line.strip()}"
-            for line in workflow.read_text(encoding="utf-8").splitlines()
-            if line.strip().startswith("runs-on:")
-        )
+        lines = [line.strip() for line in content.splitlines() if line.strip().startswith("runs-on:")]
+        assert lines, workflow.name
+        expected = SELF_HOSTED if workflow.name == DEPLOY_WORKFLOW else GITHUB_HOSTED
+        assert all(line == expected for line in lines), f"{workflow.name}: {lines}"
+        runner_lines.extend(f"{workflow.name}:{line}" for line in lines)
     assert workflows and runner_lines
-    assert all(line.endswith(EXPECTED) for line in runner_lines), runner_lines
+    assert any(line == f"{DEPLOY_WORKFLOW}:{SELF_HOSTED}" for line in runner_lines)
+    assert any(line.endswith(f":{GITHUB_HOSTED}") for line in runner_lines)
     action = (ROOT / ".github/actions/runner-python/action.yml").read_text(encoding="utf-8")
     assert "python3 --version" in action and "sys.version_info >= (3, 12)" in action
-    print(f"ok: {len(runner_lines)} CI/CD jobs use the mini PC self-hosted runner")
+    print(f"ok: {len(runner_lines)} CI/CD jobs use the intended runner")
 
 
 if __name__ == "__main__":

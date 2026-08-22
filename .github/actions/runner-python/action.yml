@@ -1,5 +1,5 @@
 name: Runner Python
-description: Use the installed Python runtime on the self-hosted Linux runner.
+description: Use the installed Python runtime on the Linux runner.
 runs:
   using: composite
   steps:
