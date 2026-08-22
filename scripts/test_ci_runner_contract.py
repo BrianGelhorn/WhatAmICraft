@@ -17,8 +17,10 @@ def main() -> None:
         content = workflow.read_text(encoding="utf-8")
         lines = [line.strip() for line in content.splitlines() if line.strip().startswith("runs-on:")]
         assert lines, workflow.name
-        expected = SELF_HOSTED if workflow.name == DEPLOY_WORKFLOW else GITHUB_HOSTED
-        assert all(line == expected for line in lines), f"{workflow.name}: {lines}"
+        if workflow.name == DEPLOY_WORKFLOW:
+            assert set(lines) == {GITHUB_HOSTED, SELF_HOSTED}, f"{workflow.name}: {lines}"
+        else:
+            assert all(line == GITHUB_HOSTED for line in lines), f"{workflow.name}: {lines}"
         runner_lines.extend(f"{workflow.name}:{line}" for line in lines)
     assert workflows and runner_lines
     assert any(line == f"{DEPLOY_WORKFLOW}:{SELF_HOSTED}" for line in runner_lines)

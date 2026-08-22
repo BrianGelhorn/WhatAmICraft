@@ -8,18 +8,46 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: whatamicraft-production
-  cancel-in-progress: false
-
 jobs:
-  deploy:
-    name: Deploy main to mini PC
+  gate:
+    name: Verify latest main commit
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      current: ${{ steps.current.outputs.current }}
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 1
+          submodules: false
+
+      - name: Reject stale deployment
+        id: current
+        shell: bash
+        env:
+          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          current_sha="$(git rev-parse HEAD)"
+          if [ "$current_sha" != "$DEPLOY_SHA" ]; then
+            echo "Skipping stale deployment $DEPLOY_SHA; main is $current_sha"
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "current=true" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy main to mini PC
+    needs: gate
+    if: needs.gate.outputs.current == 'true'
     runs-on: [self-hosted, linux, x64]
+    concurrency:
+      group: whatamicraft-production
+      cancel-in-progress: false
     environment: production
     steps:
       - name: Checkout verified main commit
