@@ -52,7 +52,7 @@ After a successful merge to `main`, `Staging Smoke` runs first. The `Deploy prod
 
 One-time mini PC setup:
 
-1. In GitHub, open `Settings > Actions > Runners > New self-hosted runner`, choose Linux x64, and run GitHub's displayed setup commands on the mini PC. Do not paste the runner token into the repository or chat. Add the label `whatamicraft-mini-pc`.
+1. In GitHub, open `Settings > Actions > Runners > New self-hosted runner`, choose Linux x64, and run GitHub's displayed setup commands on the mini PC. Do not paste the runner token into the repository or chat. The workflows use the standard `self-hosted`, `linux`, and `x64` labels.
 2. From the deployed repository, run `sudo sh ops/install-production-launcher.sh` once so the root-owned launcher recognizes optional services added to `main`.
 3. Keep the runner service enabled. It needs no Docker group membership; it only needs the existing exact sudo permission for the launcher.
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED = "runs-on: [self-hosted, linux, x64, whatamicraft-mini-pc]"
+EXPECTED = "runs-on: [self-hosted, linux, x64]"
 
 
 def main() -> None:
