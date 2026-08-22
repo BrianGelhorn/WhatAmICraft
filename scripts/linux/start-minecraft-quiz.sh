@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-/home/brian/MinecraftQuizGuesser}"
-SERVICES="${SERVICES:-dashboard bot publisher-worker media}"
+SERVICES="${SERVICES:-dashboard bot publisher-worker backup-rollback media clues-api analytics-api monitor}"
 WAIT_SECONDS="${WAIT_SECONDS:-180}"
 LOG_DIR="${APP_DIR}/out/logs"
 LOG_FILE="${LOG_DIR}/minecraft-quiz-service.log"

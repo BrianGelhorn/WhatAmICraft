@@ -69,6 +69,9 @@ services:
     environment:
       <<: *publishing-environment
       DASHBOARD_PORT: 8787
+      CLUES_API_URL: http://clues-api:8790
+      ANALYTICS_API_URL: http://analytics-api:8791
+      MONITOR_API_URL: http://monitor:8792
       ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
       ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
       REMOTION_CONCURRENCY: ${REMOTION_CONCURRENCY:-1}
@@ -86,6 +89,34 @@ services:
       - ./backups:/app/backups
       - ${VIDEO_STORAGE_PATH:-./out/episodes}:/app/out/episodes
       - ./public/audio:/app/public/audio
+    depends_on:
+      - clues-api
+      - analytics-api
+
+  clues-api:
+    image: minecraft-quiz-guesser:local
+    build: .
+    entrypoint: ["python3", "scripts/clues_api.py"]
+    restart: unless-stopped
+    environment:
+      CLUES_PORT: 8790
+      CLUES_SOURCE_DIR: /app/data/new-clues-20260815
+      CLUES_UPLOAD_DIR: /app/data/clues/inbox
+      CLUES_USED_TARGETS_PATH: /app/data/used-targets.json
+    volumes:
+      - ./data:/app/data
+
+  analytics-api:
+    image: minecraft-quiz-guesser:local
+    build: .
+    entrypoint: ["python3", "scripts/analytics_service.py"]
+    restart: unless-stopped
+    environment:
+      ANALYTICS_PORT: 8791
+    volumes:
+      - ./data:/app/data
+      - ./out:/app/out
+      - ./backups:/app/backups
 
   publisher:
     image: minecraft-quiz-guesser:local
@@ -147,6 +178,29 @@ services:
     volumes:
       - ${VIDEO_STORAGE_PATH:-./out/episodes}:/mnt/out/episodes:ro
       - ./out/thumbnails:/mnt/out/thumbnails:ro
+
+  monitor:
+    image: minecraft-quiz-guesser:local
+    build: .
+    entrypoint: ["python3", "scripts/monitor_service.py"]
+    restart: unless-stopped
+    environment:
+      MONITOR_PORT: 8792
+      MONITOR_DASHBOARD_URL: http://dashboard:8787
+      MONITOR_CLUES_URL: http://clues-api:8790
+      MONITOR_ANALYTICS_URL: http://analytics-api:8791
+      MONITOR_BACKUP_URL: http://backup-rollback:8793
+      MONITOR_MEDIA_URL: http://media
+      MONITOR_EVENTS_PATH: /app/out/monitor/events.jsonl
+      MONITOR_INTERVAL_SECONDS: ${MONITOR_INTERVAL_SECONDS:-60}
+    volumes:
+      - ./out:/app/out
+    depends_on:
+      - dashboard
+      - clues-api
+      - analytics-api
+      - backup-rollback
+      - media
 
   tunnel:
     # ponytail: quick tunnel URL changes on recreation; use a named tunnel for a stable production domain.

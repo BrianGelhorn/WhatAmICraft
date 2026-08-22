@@ -467,7 +467,7 @@
             "generate": true,
             "text": "One renewable rod can be converted into several units of me.",
             "publicSrc": "audio/quiz-copy/mc-03/clue-3.mp3",
-        "seedSrc": "audio/episodes/mc-03/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-03/clue-3.mp3",
             "durationMs": 3437,
             "volume": 1,
             "speed": 1.02,
@@ -4460,6 +4460,5616 @@
           "speed": 1.02,
           "fromOffsetFrames": 0,
           "answerStartMs": 2240,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-47",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "amethyst_block",
+        "displayName": "Amethyst Block",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/AMETHYST_BLOCK.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/AMETHYST_BLOCK.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the geode building block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the geode building block family.",
+            "publicSrc": "audio/quiz-copy/mc-47/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-47/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I naturally generate inside an amethyst geode.",
+          "voice": {
+            "generate": true,
+            "text": "I naturally generate inside an amethyst geode.",
+            "publicSrc": "audio/quiz-copy/mc-47/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-47/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be crafted from four matching mineral pieces.",
+          "voice": {
+            "generate": true,
+            "text": "I can be crafted from four matching mineral pieces.",
+            "publicSrc": "audio/quiz-copy/mc-47/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-47/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "AMETHYST BLOCK!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/AMETHYST_BLOCK.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Amethyst Block!",
+          "publicSrc": "audio/quiz-copy/mc-47/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-47/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-48",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "amethyst_shard",
+        "displayName": "Amethyst Shard",
+        "guessType": "Mineral",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/AMETHYST_SHARD.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "MINERAL",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/AMETHYST_SHARD.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the crystal item family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the crystal item family.",
+            "publicSrc": "audio/quiz-copy/mc-48/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-48/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I am a crystal-shaped mineral item.",
+          "voice": {
+            "generate": true,
+            "text": "I am a crystal-shaped mineral item.",
+            "publicSrc": "audio/quiz-copy/mc-48/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-48/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be used to craft a decorative block from four matching pieces.",
+          "voice": {
+            "generate": true,
+            "text": "I can be used to craft a decorative block from four matching pieces.",
+            "publicSrc": "audio/quiz-copy/mc-48/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-48/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "AMETHYST SHARD!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/AMETHYST_SHARD.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Amethyst Shard!",
+          "publicSrc": "audio/quiz-copy/mc-48/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-48/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-49",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "anvil",
+        "displayName": "Anvil",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/ANVIL.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/ANVIL.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the metalworking utility family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the metalworking utility family.",
+            "publicSrc": "audio/quiz-copy/mc-49/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-49/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can combine two inputs into one modified result.",
+          "voice": {
+            "generate": true,
+            "text": "I can combine two inputs into one modified result.",
+            "publicSrc": "audio/quiz-copy/mc-49/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-49/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "Repeated use can damage my block state until I break.",
+          "voice": {
+            "generate": true,
+            "text": "Repeated use can damage my block state until I break.",
+            "publicSrc": "audio/quiz-copy/mc-49/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-49/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "ANVIL!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/ANVIL.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Anvil!",
+          "publicSrc": "audio/quiz-copy/mc-49/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-49/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-50",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "bamboo",
+        "displayName": "Bamboo",
+        "guessType": "Plant",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/BAMBOO.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "PLANT",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/BAMBOO.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the segmented stalk plant family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the segmented stalk plant family.",
+            "publicSrc": "audio/quiz-copy/mc-50/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-50/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be planted on sand beside a water source.",
+          "voice": {
+            "generate": true,
+            "text": "I can be planted on sand beside a water source.",
+            "publicSrc": "audio/quiz-copy/mc-50/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-50/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I grow upward in separate visible sections.",
+          "voice": {
+            "generate": true,
+            "text": "I grow upward in separate visible sections.",
+            "publicSrc": "audio/quiz-copy/mc-50/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-50/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "BAMBOO!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/BAMBOO.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Bamboo!",
+          "publicSrc": "audio/quiz-copy/mc-50/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-50/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-51",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "barrel",
+        "displayName": "Barrel",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/BARREL.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/BARREL.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the storage block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the storage block family.",
+            "publicSrc": "audio/quiz-copy/mc-51/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-51/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I occupy one block while providing storage.",
+          "voice": {
+            "generate": true,
+            "text": "I occupy one block while providing storage.",
+            "publicSrc": "audio/quiz-copy/mc-51/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-51/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be opened even when a solid block is directly above me.",
+          "voice": {
+            "generate": true,
+            "text": "I can be opened even when a solid block is directly above me.",
+            "publicSrc": "audio/quiz-copy/mc-51/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-51/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "BARREL!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/BARREL.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Barrel!",
+          "publicSrc": "audio/quiz-copy/mc-51/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-51/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-52",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "cactus",
+        "displayName": "Cactus",
+        "guessType": "Plant",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/CACTUS.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "PLANT",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/CACTUS.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the desert plant block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the desert plant block family.",
+            "publicSrc": "audio/quiz-copy/mc-52/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-52/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can grow without farmland in a natural overworld biome.",
+          "voice": {
+            "generate": true,
+            "text": "I can grow without farmland in a natural overworld biome.",
+            "publicSrc": "audio/quiz-copy/mc-52/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-52/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "Touching me can hurt an entity.",
+          "voice": {
+            "generate": true,
+            "text": "Touching me can hurt an entity.",
+            "publicSrc": "audio/quiz-copy/mc-52/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-52/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "CACTUS!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/CACTUS.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Cactus!",
+          "publicSrc": "audio/quiz-copy/mc-52/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-52/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-53",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "calcite",
+        "displayName": "Calcite",
+        "guessType": "Mineral",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/CALCITE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "MINERAL",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/CALCITE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the pale geode stone family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the pale geode stone family.",
+            "publicSrc": "audio/quiz-copy/mc-53/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-53/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can appear as part of a naturally generated geode or underground layer.",
+          "voice": {
+            "generate": true,
+            "text": "I can appear as part of a naturally generated geode or underground layer.",
+            "publicSrc": "audio/quiz-copy/mc-53/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-53/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I form a pale decorative stone used for building.",
+          "voice": {
+            "generate": true,
+            "text": "I form a pale decorative stone used for building.",
+            "publicSrc": "audio/quiz-copy/mc-53/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-53/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "CALCITE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/CALCITE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Calcite!",
+          "publicSrc": "audio/quiz-copy/mc-53/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-53/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-54",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "chorus_flower",
+        "displayName": "Chorus Flower",
+        "guessType": "Plant",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/CHORUS_FLOWER.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "PLANT",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/CHORUS_FLOWER.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the branching plant family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the branching plant family.",
+            "publicSrc": "audio/quiz-copy/mc-54/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-54/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I need a particular supporting block beneath me to grow.",
+          "voice": {
+            "generate": true,
+            "text": "I need a particular supporting block beneath me to grow.",
+            "publicSrc": "audio/quiz-copy/mc-54/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-54/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be harvested and replanted to continue a growth cycle.",
+          "voice": {
+            "generate": true,
+            "text": "I can be harvested and replanted to continue a growth cycle.",
+            "publicSrc": "audio/quiz-copy/mc-54/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-54/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "CHORUS FLOWER!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/CHORUS_FLOWER.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Chorus Flower!",
+          "publicSrc": "audio/quiz-copy/mc-54/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-54/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-55",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "crying_obsidian",
+        "displayName": "Crying Obsidian",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/CRYING_OBSIDIAN.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/CRYING_OBSIDIAN.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the building block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the building block family.",
+            "publicSrc": "audio/quiz-copy/mc-55/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-55/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I have very high blast resistance.",
+          "voice": {
+            "generate": true,
+            "text": "I have very high blast resistance.",
+            "publicSrc": "audio/quiz-copy/mc-55/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-55/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be used in the recipe for a return-point device.",
+          "voice": {
+            "generate": true,
+            "text": "I can be used in the recipe for a return-point device.",
+            "publicSrc": "audio/quiz-copy/mc-55/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-55/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "CRYING OBSIDIAN!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/CRYING_OBSIDIAN.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Crying Obsidian!",
+          "publicSrc": "audio/quiz-copy/mc-55/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-55/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-56",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "dragon_egg",
+        "displayName": "Dragon Egg",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/DRAGON_EGG.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/DRAGON_EGG.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the rare structure block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the rare structure block family.",
+            "publicSrc": "audio/quiz-copy/mc-56/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-56/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I am a rare decorative object associated with the defeat of a major creature.",
+          "voice": {
+            "generate": true,
+            "text": "I am a rare decorative object associated with the defeat of a major creature.",
+            "publicSrc": "audio/quiz-copy/mc-56/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-56/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I appear after a boss victory.",
+          "voice": {
+            "generate": true,
+            "text": "I appear after a boss victory.",
+            "publicSrc": "audio/quiz-copy/mc-56/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-56/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "DRAGON EGG!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/DRAGON_EGG.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Dragon Egg!",
+          "publicSrc": "audio/quiz-copy/mc-56/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-56/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-57",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "end_portal_frame",
+        "displayName": "End Portal Frame",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/END_PORTAL_FRAME.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/END_PORTAL_FRAME.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the structure block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the structure block family.",
+            "publicSrc": "audio/quiz-copy/mc-57/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-57/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I belong to a structure that connects to another dimension.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to a structure that connects to another dimension.",
+            "publicSrc": "audio/quiz-copy/mc-57/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-57/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I cannot be obtained by ordinary survival mining.",
+          "voice": {
+            "generate": true,
+            "text": "I cannot be obtained by ordinary survival mining.",
+            "publicSrc": "audio/quiz-copy/mc-57/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-57/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "END PORTAL FRAME!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/END_PORTAL_FRAME.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the End Portal Frame!",
+          "publicSrc": "audio/quiz-copy/mc-57/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-57/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-58",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "ender_chest",
+        "displayName": "Ender Chest",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/ENDER_CHEST.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/ENDER_CHEST.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the shared storage block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the shared storage block family.",
+            "publicSrc": "audio/quiz-copy/mc-58/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-58/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I provide access to a portable inventory system.",
+          "voice": {
+            "generate": true,
+            "text": "I provide access to a portable inventory system.",
+            "publicSrc": "audio/quiz-copy/mc-58/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-58/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "My recipe surrounds a rare central component with dark stone.",
+          "voice": {
+            "generate": true,
+            "text": "My recipe surrounds a rare central component with dark stone.",
+            "publicSrc": "audio/quiz-copy/mc-58/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-58/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "ENDER CHEST!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/ENDER_CHEST.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Ender Chest!",
+          "publicSrc": "audio/quiz-copy/mc-58/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-58/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-59",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "fletching_table",
+        "displayName": "Fletching Table",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/FLETCHING_TABLE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/FLETCHING_TABLE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the arrow utility family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the arrow utility family.",
+            "publicSrc": "audio/quiz-copy/mc-59/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-59/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I use wooden planks in my recipe.",
+          "voice": {
+            "generate": true,
+            "text": "I use wooden planks in my recipe.",
+            "publicSrc": "audio/quiz-copy/mc-59/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-59/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I require four wooden planks in my recipe.",
+          "voice": {
+            "generate": true,
+            "text": "I require four wooden planks in my recipe.",
+            "publicSrc": "audio/quiz-copy/mc-59/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-59/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "FLETCHING TABLE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/FLETCHING_TABLE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Fletching Table!",
+          "publicSrc": "audio/quiz-copy/mc-59/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-59/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-60",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "glow_berries",
+        "displayName": "Glow Berries",
+        "guessType": "Food",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/GLOW_BERRIES.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "FOOD",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/GLOW_BERRIES.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the cave plant family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the cave plant family.",
+            "publicSrc": "audio/quiz-copy/mc-60/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-60/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be eaten directly from a growing plant.",
+          "voice": {
+            "generate": true,
+            "text": "I can be eaten directly from a growing plant.",
+            "publicSrc": "audio/quiz-copy/mc-60/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-60/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I grow from a hanging vine in a cave environment.",
+          "voice": {
+            "generate": true,
+            "text": "I grow from a hanging vine in a cave environment.",
+            "publicSrc": "audio/quiz-copy/mc-60/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-60/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "GLOW BERRIES!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/GLOW_BERRIES.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Glow Berries!",
+          "publicSrc": "audio/quiz-copy/mc-60/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-60/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-61",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "grindstone",
+        "displayName": "Grindstone",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/GRINDSTONE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/GRINDSTONE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the sharpening utility family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the sharpening utility family.",
+            "publicSrc": "audio/quiz-copy/mc-61/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-61/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I have two input slots for equipment or enchantments.",
+          "voice": {
+            "generate": true,
+            "text": "I have two input slots for equipment or enchantments.",
+            "publicSrc": "audio/quiz-copy/mc-61/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-61/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can remove an unwanted enchantment while returning some experience.",
+          "voice": {
+            "generate": true,
+            "text": "I can remove an unwanted enchantment while returning some experience.",
+            "publicSrc": "audio/quiz-copy/mc-61/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-61/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "GRINDSTONE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/GRINDSTONE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Grindstone!",
+          "publicSrc": "audio/quiz-copy/mc-61/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-61/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-62",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "heavy_core",
+        "displayName": "Heavy Core",
+        "guessType": "Item",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/HEAVY_CORE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "ITEM",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/HEAVY_CORE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the trial chamber item family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the trial chamber item family.",
+            "publicSrc": "audio/quiz-copy/mc-62/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-62/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be found as a reward connected to a trial chamber challenge.",
+          "voice": {
+            "generate": true,
+            "text": "I can be found as a reward connected to a trial chamber challenge.",
+            "publicSrc": "audio/quiz-copy/mc-62/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-62/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I combine with another rare component to make a heavy striking weapon.",
+          "voice": {
+            "generate": true,
+            "text": "I combine with another rare component to make a heavy striking weapon.",
+            "publicSrc": "audio/quiz-copy/mc-62/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-62/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "HEAVY CORE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/HEAVY_CORE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Heavy Core!",
+          "publicSrc": "audio/quiz-copy/mc-62/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-62/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-63",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "kelp",
+        "displayName": "Kelp",
+        "guessType": "Plant",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/KELP.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "PLANT",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/KELP.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the aquatic plant family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the aquatic plant family.",
+            "publicSrc": "audio/quiz-copy/mc-63/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-63/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I grow underwater.",
+          "voice": {
+            "generate": true,
+            "text": "I grow underwater.",
+            "publicSrc": "audio/quiz-copy/mc-63/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-63/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "Removing a lower section can bring down the growth above it.",
+          "voice": {
+            "generate": true,
+            "text": "Removing a lower section can bring down the growth above it.",
+            "publicSrc": "audio/quiz-copy/mc-63/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-63/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "KELP!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/KELP.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Kelp!",
+          "publicSrc": "audio/quiz-copy/mc-63/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-63/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-64",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "lodestone",
+        "displayName": "Lodestone",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/LODESTONE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/LODESTONE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the navigation utility block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the navigation utility block family.",
+            "publicSrc": "audio/quiz-copy/mc-64/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-64/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be used to bind a navigation tool to a location.",
+          "voice": {
+            "generate": true,
+            "text": "I can be used to bind a navigation tool to a location.",
+            "publicSrc": "audio/quiz-copy/mc-64/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-64/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "My recipe includes a durable metallic block.",
+          "voice": {
+            "generate": true,
+            "text": "My recipe includes a durable metallic block.",
+            "publicSrc": "audio/quiz-copy/mc-64/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-64/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "LODESTONE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/LODESTONE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Lodestone!",
+          "publicSrc": "audio/quiz-copy/mc-64/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-64/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-65",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "loom",
+        "displayName": "Loom",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/LOOM.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/LOOM.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the banner utility family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the banner utility family.",
+            "publicSrc": "audio/quiz-copy/mc-65/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-65/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I use wooden components and a flat material in my recipe.",
+          "voice": {
+            "generate": true,
+            "text": "I use wooden components and a flat material in my recipe.",
+            "publicSrc": "audio/quiz-copy/mc-65/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-65/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I combine a pattern with a banner and a dye.",
+          "voice": {
+            "generate": true,
+            "text": "I combine a pattern with a banner and a dye.",
+            "publicSrc": "audio/quiz-copy/mc-65/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-65/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "LOOM!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/LOOM.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Loom!",
+          "publicSrc": "audio/quiz-copy/mc-65/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-65/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-66",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "nether_wart",
+        "displayName": "Nether Wart",
+        "guessType": "Plant",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/NETHER_WART.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "PLANT",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/NETHER_WART.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the fungal crop plant family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the fungal crop plant family.",
+            "publicSrc": "audio/quiz-copy/mc-66/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-66/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I grow only when planted on a particular substrate.",
+          "voice": {
+            "generate": true,
+            "text": "I grow only when planted on a particular substrate.",
+            "publicSrc": "audio/quiz-copy/mc-66/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-66/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be replanted after harvest to continue a crop cycle.",
+          "voice": {
+            "generate": true,
+            "text": "I can be replanted after harvest to continue a crop cycle.",
+            "publicSrc": "audio/quiz-copy/mc-66/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-66/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "NETHER WART!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/NETHER_WART.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Nether Wart!",
+          "publicSrc": "audio/quiz-copy/mc-66/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-66/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-67",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "prismarine",
+        "displayName": "Prismarine",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/PRISMARINE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/PRISMARINE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the ocean monument block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the ocean monument block family.",
+            "publicSrc": "audio/quiz-copy/mc-67/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-67/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I belong to a family of related decorative ocean stones.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to a family of related decorative ocean stones.",
+            "publicSrc": "audio/quiz-copy/mc-67/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-67/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be crafted into a building block with a repeating masonry pattern.",
+          "voice": {
+            "generate": true,
+            "text": "I can be crafted into a building block with a repeating masonry pattern.",
+            "publicSrc": "audio/quiz-copy/mc-67/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-67/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "PRISMARINE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/PRISMARINE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Prismarine!",
+          "publicSrc": "audio/quiz-copy/mc-67/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-67/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-68",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "sculk",
+        "displayName": "Sculk",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SCULK.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SCULK.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the experience-reactive block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the experience-reactive block family.",
+            "publicSrc": "audio/quiz-copy/mc-68/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-68/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be found covering parts of the Deep Dark floor.",
+          "voice": {
+            "generate": true,
+            "text": "I can be found covering parts of the Deep Dark floor.",
+            "publicSrc": "audio/quiz-copy/mc-68/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-68/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can spread when experience is released nearby.",
+          "voice": {
+            "generate": true,
+            "text": "I can spread when experience is released nearby.",
+            "publicSrc": "audio/quiz-copy/mc-68/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-68/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SCULK!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SCULK.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Sculk!",
+          "publicSrc": "audio/quiz-copy/mc-68/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-68/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-69",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "sculk_catalyst",
+        "displayName": "Sculk Catalyst",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SCULK_CATALYST.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SCULK_CATALYST.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the mob-event catalyst family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the mob-event catalyst family.",
+            "publicSrc": "audio/quiz-copy/mc-69/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-69/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can appear as a special block in the Deep Dark.",
+          "voice": {
+            "generate": true,
+            "text": "I can appear as a special block in the Deep Dark.",
+            "publicSrc": "audio/quiz-copy/mc-69/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-69/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I react to nearby mob deaths through a pulse event.",
+          "voice": {
+            "generate": true,
+            "text": "I react to nearby mob deaths through a pulse event.",
+            "publicSrc": "audio/quiz-copy/mc-69/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-69/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SCULK CATALYST!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SCULK_CATALYST.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Sculk Catalyst!",
+          "publicSrc": "audio/quiz-copy/mc-69/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-69/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-70",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "sculk_shrieker",
+        "displayName": "Sculk Shrieker",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SCULK_SHRIEKER.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SCULK_SHRIEKER.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the warning block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the warning block family.",
+            "publicSrc": "audio/quiz-copy/mc-70/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-70/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be encountered among the warning mechanisms of the Deep Dark.",
+          "voice": {
+            "generate": true,
+            "text": "I can be encountered among the warning mechanisms of the Deep Dark.",
+            "publicSrc": "audio/quiz-copy/mc-70/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-70/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can produce a warning effect after repeated activation.",
+          "voice": {
+            "generate": true,
+            "text": "I can produce a warning effect after repeated activation.",
+            "publicSrc": "audio/quiz-copy/mc-70/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-70/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SCULK SHRIEKER!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SCULK_SHRIEKER.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Sculk Shrieker!",
+          "publicSrc": "audio/quiz-copy/mc-70/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-70/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-71",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "sea_lantern",
+        "displayName": "Sea Lantern",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SEA_LANTERN.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SEA_LANTERN.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the aquatic light block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the aquatic light block family.",
+            "publicSrc": "audio/quiz-copy/mc-71/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-71/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be found in an ocean monument.",
+          "voice": {
+            "generate": true,
+            "text": "I can be found in an ocean monument.",
+            "publicSrc": "audio/quiz-copy/mc-71/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-71/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I remain functional when placed underwater.",
+          "voice": {
+            "generate": true,
+            "text": "I remain functional when placed underwater.",
+            "publicSrc": "audio/quiz-copy/mc-71/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-71/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SEA LANTERN!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SEA_LANTERN.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Sea Lantern!",
+          "publicSrc": "audio/quiz-copy/mc-71/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-71/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-72",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "shulker_box",
+        "displayName": "Shulker Box",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SHULKER_BOX.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SHULKER_BOX.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the portable block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the portable block family.",
+            "publicSrc": "audio/quiz-copy/mc-72/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-72/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be dyed into several colors.",
+          "voice": {
+            "generate": true,
+            "text": "I can be dyed into several colors.",
+            "publicSrc": "audio/quiz-copy/mc-72/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-72/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "My inventory remains available after I break the block.",
+          "voice": {
+            "generate": true,
+            "text": "My inventory remains available after I break the block.",
+            "publicSrc": "audio/quiz-copy/mc-72/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-72/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SHULKER BOX!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SHULKER_BOX.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Shulker Box!",
+          "publicSrc": "audio/quiz-copy/mc-72/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-72/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-73",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "soul_lantern",
+        "displayName": "Soul Lantern",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SOUL_LANTERN.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SOUL_LANTERN.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the colored light block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the colored light block family.",
+            "publicSrc": "audio/quiz-copy/mc-73/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-73/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I can be placed on the floor or hung from a ceiling.",
+          "voice": {
+            "generate": true,
+            "text": "I can be placed on the floor or hung from a ceiling.",
+            "publicSrc": "audio/quiz-copy/mc-73/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-73/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "My light has a blue-green color.",
+          "voice": {
+            "generate": true,
+            "text": "My light has a blue-green color.",
+            "publicSrc": "audio/quiz-copy/mc-73/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-73/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SOUL LANTERN!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SOUL_LANTERN.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Soul Lantern!",
+          "publicSrc": "audio/quiz-copy/mc-73/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-73/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-74",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "sponge",
+        "displayName": "Sponge",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SPONGE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SPONGE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the water utility block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the water utility block family.",
+            "publicSrc": "audio/quiz-copy/mc-74/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-74/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I exist in a wet and dry form.",
+          "voice": {
+            "generate": true,
+            "text": "I exist in a wet and dry form.",
+            "publicSrc": "audio/quiz-copy/mc-74/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-74/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "Heat can turn me into a dry building material.",
+          "voice": {
+            "generate": true,
+            "text": "Heat can turn me into a dry building material.",
+            "publicSrc": "audio/quiz-copy/mc-74/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-74/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SPONGE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SPONGE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Sponge!",
+          "publicSrc": "audio/quiz-copy/mc-74/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-74/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-75",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "sugar_cane",
+        "displayName": "Sugar Cane",
+        "guessType": "Plant",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/SUGAR_CANE.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "PLANT",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/SUGAR_CANE.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the water-edge crop plant family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the water-edge crop plant family.",
+            "publicSrc": "audio/quiz-copy/mc-75/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-75/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "A sand block can support my growth beside water.",
+          "voice": {
+            "generate": true,
+            "text": "A sand block can support my growth beside water.",
+            "publicSrc": "audio/quiz-copy/mc-75/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-75/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I grow upward as a segmented column.",
+          "voice": {
+            "generate": true,
+            "text": "I grow upward as a segmented column.",
+            "publicSrc": "audio/quiz-copy/mc-75/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-75/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "SUGAR CANE!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/SUGAR_CANE.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Sugar Cane!",
+          "publicSrc": "audio/quiz-copy/mc-75/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-75/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
+          "syncOffsetFrames": 5
+        }
+      },
+      "timeline": {
+        "contentStartFrame": 180,
+        "reelStopFrame": 34,
+        "hookTitleFromFrame": 42,
+        "handoffFromFrame": 80,
+        "categoryFromFrame": 34,
+        "hintDurationInFrames": 155,
+        "revealDurationInFrames": 210,
+        "answerStartFrame": 72,
+        "countdownStepInFrames": 24
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3"
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "folder": "public/audio/music",
+          "targetLufs": -16,
+          "truePeakDb": -1.5,
+          "loudnessRange": 11,
+          "volume": 0.16,
+          "duckedVolume": 0.07,
+          "fadeInFrames": 24,
+          "fadeOutFrames": 36,
+          "duckFadeFrames": 6
+        },
+        "roulette": {
+          "publicSrc": "audio/sfx/roulette-ticks-unified.wav",
+          "from": 0,
+          "durationInFrames": 36,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "countdownClick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1,
+          "targetPeakDb": -8
+        },
+        "revealBell": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.85,
+          "targetPeakDb": -4.5
+        },
+        "genericVoices": [
+          {
+            "id": "hook",
+            "generate": false,
+            "text": "Can you guess it?",
+            "publicSrc": "audio/voice/quiz-copy/hook.mp3",
+            "from": 48,
+            "durationInFrames": 28,
+            "volume": 1
+          },
+          {
+            "id": "handoff",
+            "generate": false,
+            "text": "Three hints. One chance.",
+            "publicSrc": "audio/voice/quiz-copy/handoff.mp3",
+            "from": 80,
+            "durationInFrames": 54,
+            "volume": 1,
+            "playbackRate": 1.12,
+            "fadeOutFrames": 11
+          }
+        ]
+      }
+    },
+    {
+      "id": "mc-76",
+      "uniqueAnswer": true,
+      "needsReview": false,
+      "answer": {
+        "id": "tuff_bricks",
+        "displayName": "Tuff Bricks",
+        "guessType": "Block",
+        "edition": "java",
+        "version": "1.21.5"
+      },
+      "background": "images/template-layers/background.png",
+      "hook": {
+        "eyebrow": "MINECRAFT MYSTERY",
+        "title": "CAN YOU GUESS IT?",
+        "handoff": "3 HINTS · ONE CHANCE",
+        "categoryPrefix": "CATEGORY",
+        "selectedIcon": "mc-assets/item-assets/TUFF_BRICKS.png",
+        "rouletteIcons": [
+          "mc-assets/item-assets/DIAMOND.png",
+          "mc-assets/item-assets/ENDER_PEARL.png",
+          "mc-assets/item-assets/GOLDEN_APPLE.png",
+          "mc-assets/item-assets/TOTEM_OF_UNDYING.png",
+          "mc-assets/item-assets/NETHERITE_SWORD.png",
+          "mc-assets/item-assets/EMERALD.png",
+          "mc-assets/item-assets/TNT.png"
+        ]
+      },
+      "hintUi": {
+        "label": "HINT {current} / {total}",
+        "cta": "LOCK IN YOUR GUESS"
+      },
+      "thumbnail": {
+        "eyebrow": "MINECRAFT QUIZ",
+        "headlineTop": "GUESS",
+        "headlineBottom": "BLOCK",
+        "difficulty": "MEDIUM",
+        "subline": "3 HINTS · 1 CHANCE",
+        "mysteryLabel": "WHAT AM I?",
+        "hintLabel": "HINT {number}",
+        "background": "images/template-layers/background.png",
+        "icon": "mc-assets/item-assets/TUFF_BRICKS.png",
+        "accent": "#FFD34F",
+        "secondaryAccent": "#7EC850",
+        "iconScale": 1,
+        "iconOffsetY": 0,
+        "platforms": {
+          "vertical": "silhouette"
+        },
+        "outputDir": "out/thumbnails"
+      },
+      "clues": [
+        {
+          "text": "I belong to the masonry block family.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to the masonry block family.",
+            "publicSrc": "audio/quiz-copy/mc-76/clue-1.mp3",
+            "seedSrc": "audio/episodes/mc-76/clue-1.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I am a decorative masonry block formed from a stone material.",
+          "voice": {
+            "generate": true,
+            "text": "I am a decorative masonry block formed from a stone material.",
+            "publicSrc": "audio/quiz-copy/mc-76/clue-2.mp3",
+            "seedSrc": "audio/episodes/mc-76/clue-2.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        },
+        {
+          "text": "I belong to a brick variant family with stairs, slabs, and walls.",
+          "voice": {
+            "generate": true,
+            "text": "I belong to a brick variant family with stairs, slabs, and walls.",
+            "publicSrc": "audio/quiz-copy/mc-76/clue-3.mp3",
+            "seedSrc": "audio/episodes/mc-76/clue-3.mp3",
+            "durationMs": 0,
+            "volume": 1,
+            "speed": 1.02,
+            "fromOffsetFrames": 0
+          }
+        }
+      ],
+      "reveal": {
+        "prompt": "FINAL ANSWER?",
+        "answerLabel": "THE ANSWER IS",
+        "answerText": "TUFF BRICKS!",
+        "cta": "HOW MANY HINTS DID YOU NEED?",
+        "icon": "mc-assets/item-assets/TUFF_BRICKS.png",
+        "countdownFrom": 3,
+        "voice": {
+          "generate": true,
+          "text": "Did you guess it? It is... the Tuff Bricks!",
+          "publicSrc": "audio/quiz-copy/mc-76/reveal.mp3",
+          "seedSrc": "audio/episodes/mc-76/reveal.mp3",
+          "durationMs": 0,
+          "volume": 1,
+          "speed": 1.02,
+          "fromOffsetFrames": 0,
+          "answerStartMs": 0,
           "syncOffsetFrames": 5
         }
       },
