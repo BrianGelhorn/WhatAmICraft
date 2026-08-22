@@ -4,6 +4,7 @@ import json
 import sys
 import time
 from contextlib import contextmanager
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from publishing import PUBLISHERS
 from publishing.common import PublishRequest, sha256
 from publishing.settings import apply_runtime, enabled_platforms, load_config
 from review.storage import pending_queue_ids, publishing_state, save_published_platform, set_queue_status
+from thumbnails import copy_thumbnail_config, render_thumbnails
 from video_formats import ready_episodes, thumbnail_path, video_stem
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,6 +37,16 @@ def video_for(episode: dict) -> Path:
 def thumbnail_for(episode: dict) -> Path | None:
     path = thumbnail_path(episode, "vertical")
     return path if path.exists() else None
+
+
+def ensure_thumbnail(episode: dict) -> Path:
+    path = thumbnail_for(episode)
+    if path is None:
+        render_thumbnails(copy_thumbnail_config(episode), video_stem(episode))
+        path = thumbnail_for(episode)
+    if path is None:
+        raise RuntimeError(f"No se pudo generar la miniatura vertical de {episode['id']}")
+    return path
 
 
 def publish_request(episode: dict, config: dict) -> PublishRequest:
@@ -152,7 +164,8 @@ def run(args: argparse.Namespace) -> int:
                 print(f"  {platform}: ya publicado")
                 continue
             try:
-                result = PUBLISHERS[platform](item)
+                platform_item = replace(item, thumbnail=ensure_thumbnail(episode)) if platform == "youtube" else item
+                result = PUBLISHERS[platform](platform_item)
                 record["platforms"][platform] = {
                     **result,
                     "publishedAt": datetime.now(timezone.utc).isoformat(),

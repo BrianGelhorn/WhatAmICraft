@@ -8,8 +8,6 @@ ROOT = Path(__file__).resolve().parents[1]
 GENERATED_PATH = ROOT / "src/generated/thumbnail-config.json"
 FORMATS = {
     "vertical": "ThumbnailVertical",
-    "square": "ThumbnailSquare",
-    "youtube": "ThumbnailYoutube",
 }
 VARIANTS = {"silhouette", "pixelated", "roulette"}
 DEFAULT_DESIGN_VARIANT = "default"
@@ -48,8 +46,10 @@ def _write_json(path: Path, value: dict) -> None:
 
 def copy_thumbnail_config(episode: dict) -> dict:
     answer_type = episode["answer"]["guessType"]
+    thumbnail = deepcopy(episode["thumbnail"])
+    thumbnail["platforms"] = {"vertical": thumbnail["platforms"]["vertical"]}
     return {
-        "thumbnail": deepcopy(episode["thumbnail"]),
+        "thumbnail": thumbnail,
         "answerType": answer_type,
         "categoryIcon": category_icon_path(answer_type),
         "rouletteIcons": deepcopy(episode["hook"]["rouletteIcons"]),

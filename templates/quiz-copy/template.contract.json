@@ -252,18 +252,6 @@
         "width": 1080,
         "height": 1920,
         "variant": "silhouette"
-      },
-      "square": {
-        "compositionId": "ThumbnailSquare",
-        "width": 1080,
-        "height": 1080,
-        "variant": "roulette"
-      },
-      "youtube": {
-        "compositionId": "ThumbnailYoutube",
-        "width": 1280,
-        "height": 720,
-        "variant": "silhouette"
       }
     },
     "outputDir": "out/thumbnails"

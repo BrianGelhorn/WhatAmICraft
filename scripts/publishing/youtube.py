@@ -3,6 +3,8 @@ import os
 
 from .common import PublishRequest, json_request, request, secret
 
+MAX_THUMBNAIL_BYTES = 2 * 1024 * 1024
+
 
 def _access_token() -> str:
     token, _ = json_request(
@@ -56,19 +58,26 @@ def publish(item: PublishRequest) -> dict:
     result = json.loads(body)
     video_id = result["id"]
     payload = {"id": video_id, "url": f"https://www.youtube.com/shorts/{video_id}"}
-    if item.thumbnail and item.thumbnail.exists():
-        try:
-            request(
-                f"https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId={video_id}",
-                method="POST",
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Content-Type": "image/jpeg",
-                    "Content-Length": str(item.thumbnail.stat().st_size),
-                },
-                data=item.thumbnail.read_bytes(),
-            )
-            payload["thumbnail"] = item.thumbnail.name
-        except Exception as error:
-            raise RuntimeError(f"YouTube miniatura: {error}") from error
+    if not item.thumbnail or not item.thumbnail.is_file():
+        raise RuntimeError("YouTube no recibió una miniatura vertical")
+    thumbnail_size = item.thumbnail.stat().st_size
+    if thumbnail_size > MAX_THUMBNAIL_BYTES:
+        raise RuntimeError(f"YouTube miniatura supera 2 MB: {item.thumbnail.name}")
+    try:
+        _, _, thumbnail_body = request(
+            f"https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId={video_id}",
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "image/jpeg",
+                "Content-Length": str(thumbnail_size),
+            },
+            data=item.thumbnail.read_bytes(),
+        )
+        thumbnail_result = json.loads(thumbnail_body or b"{}")
+        if not thumbnail_result.get("items"):
+            raise RuntimeError("YouTube no confirmó la miniatura")
+        payload["thumbnail"] = item.thumbnail.name
+    except Exception as error:
+        raise RuntimeError(f"YouTube miniatura: {error}") from error
     return payload
