@@ -16,7 +16,12 @@ def main() -> None:
     assert "workflow_run:" in workflow and 'workflows: ["Staging Smoke"]' in workflow
     assert "conclusion == 'success'" in workflow and "head_branch == 'main'" in workflow
     assert "workflow_run.event == 'push'" in workflow
+    assert "runs-on: ubuntu-latest" in workflow and "ref: main" in workflow
+    assert "Reject stale deployment" in workflow
+    assert "current_sha" in workflow and "current=false" in workflow
+    assert "needs: gate" in workflow
     assert "head_sha" in workflow and "runs-on: [self-hosted, linux, x64]" in workflow
+    assert "group: whatamicraft-production" in workflow and "cancel-in-progress: false" in workflow
     assert "push:" in staging and "- main" in staging
     for required in (
         "archive --format=tar",
