@@ -302,6 +302,7 @@ try {
   assert.match(await evaluate(() => document.querySelector('#analytics-trend-signal-list').textContent), /Fixture trend/);
   await setValue('#analytics-trend-signals', '[{"platform":"youtube","kind":"topic","value":"New fixture trend","source":"fixture"}]');
   await clickRequest('#import-analytics-trends', '/api/analytics/trends');
+  await clickRequest('#sync-analytics-trends', '/api/analytics/trends/sync');
   await clickRequest('#sync-analytics', '/api/analytics/sync');
   assert.deepEqual(await evaluate(() => [...document.querySelectorAll('a[href^="/api/analytics/export"]')].map((link) => link.getAttribute('href'))), ['/api/analytics/export.json', '/api/analytics/export.md']);
 

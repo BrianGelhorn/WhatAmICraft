@@ -1,6 +1,7 @@
 import json
 import os
 import urllib.parse
+import urllib.request
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -40,7 +41,8 @@ def _epoch(value: str | None) -> int:
 
 def _safe_error(error: Exception) -> str:
     message = str(error)
-    for secret in stored_secrets().values():
+    secrets = [*stored_secrets().values(), os.getenv("ANALYTICS_TRENDS_TOKEN", "")]
+    for secret in secrets:
         if secret and len(secret) > 6:
             message = message.replace(str(secret), "***")
     lower = message.lower()
@@ -97,6 +99,25 @@ def import_trend_signals(payload: object) -> list[dict]:
     signals = validate_trend_signals(payload)
     state_db.save_flag("analytics_trend_signals", signals)
     return signals
+
+
+def sync_trend_signals() -> dict:
+    url = os.getenv("ANALYTICS_TRENDS_URL", "").strip()
+    synced_at = datetime.now(timezone.utc).isoformat()
+    if not url:
+        return {"configured": False, "synced": 0, "error": "Fuente de tendencias no configurada", "syncedAt": synced_at}
+    headers = {"Accept": "application/json"}
+    token = os.getenv("ANALYTICS_TRENDS_TOKEN", "").strip()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read() or b"{}")
+        signals = import_trend_signals(payload)
+        return {"configured": True, "synced": len(signals), "error": None, "syncedAt": synced_at}
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        return {"configured": True, "synced": 0, "error": _safe_error(error), "syncedAt": synced_at}
 
 
 def _active_trend_signals() -> list[dict]:
@@ -732,6 +753,7 @@ def build_snapshot() -> dict:
         "quality": quality,
         "trends": trends,
         "trendSignals": _active_trend_signals(),
+        "trendSync": state_db.load_flag("analytics_trend_sync_status", {"configured": False, "synced": 0, "error": None}),
         "experiments": _build_experiments(items),
         "alerts": alerts,
         "recommendations": _build_recommendations(cohorts, trends),
@@ -824,5 +846,6 @@ def sync_all() -> dict:
             statuses[platform] = {"configured": True, "synced": count, "error": None, "syncedAt": synced_at}
         except Exception as error:
             statuses[platform] = {"configured": True, "synced": 0, "error": _safe_error(error), "syncedAt": synced_at}
+    state_db.save_flag("analytics_trend_sync_status", sync_trend_signals())
     state_db.save_flag("analytics_sync_status", statuses)
     return {"status": statuses, "analytics": write_exports()}

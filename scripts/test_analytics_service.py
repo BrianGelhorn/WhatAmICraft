@@ -39,6 +39,7 @@ def main() -> None:
     analytics_service.state_db.set_analytics_recommendation_status = lambda recommendation_id, status: {"id": recommendation_id, "status": status}  # type: ignore[assignment]
     analytics_service.state_db.create_analytics_experiment = lambda recommendation_id, minimum_videos: {"id": "exp:" + recommendation_id, "minimumVideos": minimum_videos}  # type: ignore[assignment]
     analytics_service.analytics.import_trend_signals = lambda payload: payload.get("signals", [])  # type: ignore[assignment]
+    analytics_service.analytics.sync_trend_signals = lambda: {"configured": True, "synced": 2, "error": None}  # type: ignore[assignment]
     server = analytics_service.make_server("127.0.0.1", 0, service)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -61,6 +62,8 @@ def main() -> None:
         assert started_status == 200 and started["experiment"]["minimumVideos"] == 4
         trend_status, trends = call(base, "/api/analytics/trends", "POST", {"signals": []})
         assert trend_status == 200 and trends["signals"] == []
+        trend_sync_status, trend_sync = call(base, "/api/analytics/trends/sync", "POST", {})
+        assert trend_sync_status == 200 and trend_sync["sync"]["synced"] == 2
         invalid_status, _ = call(base, "/api/analytics/unknown")
         assert invalid_status == 404
     finally:

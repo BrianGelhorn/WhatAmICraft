@@ -431,6 +431,8 @@
         <p class="hint">Importá JSON de una fuente o análisis externo. Se usa como contexto, nunca publica solo.</p>
         <textarea id="analytics-trend-signals" rows="3" placeholder='[{"platform":"youtube","kind":"topic","value":"Minecraft 1.22","source":"manual","score":80,"expiresAt":"2026-09-01T00:00:00Z"}]'></textarea>
         <button class="button-link" id="import-analytics-trends">Importar señales</button>
+        <button class="button-link" id="sync-analytics-trends">Actualizar fuente en vivo</button>
+        <span class="hint" id="analytics-trend-sync-status"></span>
         <ul class="analysis-list" id="analytics-trend-signal-list"></ul>
       </div>
       <div class="analytics-controls analytics-cohorts" aria-label="Comparación de cohortes">
@@ -1079,6 +1081,8 @@
 
     function renderAnalyticsSignals(analytics) {
       const signals = analytics.trendSignals || [];
+      const sync = analytics.trendSync || {};
+      $('analytics-trend-sync-status').textContent = sync.error || (sync.configured ? `Última actualización: ${sync.synced || 0} señales` : 'Fuente en vivo no configurada');
       $('analytics-trend-signal-list').innerHTML = signals.length
         ? signals.map(item => `<li><strong>${escapeHtml(item.platform)} · ${escapeHtml(item.kind)}:</strong> ${escapeHtml(item.value)} <span class="hint">(${escapeHtml(item.source)})</span></li>`).join('')
         : '<li class="hint">No hay señales vigentes.</li>';
@@ -1264,6 +1268,10 @@
         await refresh();
         toast('Señales importadas');
       } catch (error) { toast(error.message || 'JSON inválido'); }
+    };
+    $('sync-analytics-trends').onclick = async () => {
+      try { await api('/api/analytics/trends/sync', {}); await refresh(); toast('Fuente de tendencias actualizada'); }
+      catch (error) { toast(error.message); }
     };
     $('analytics-window').onchange = () => renderAnalyticsChart(state.analytics || {});
     $('analytics-platform').onchange = () => renderAnalyticsChart(state.analytics || {});

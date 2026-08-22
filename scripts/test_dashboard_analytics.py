@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -61,6 +62,34 @@ except ValueError:
     pass
 else:
     raise AssertionError("invalid trend signal accepted")
+
+class FakeTrendResponse:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def read(self):
+        return b'{"signals":[{"platform":"youtube","kind":"topic","value":"Live Minecraft","source":"fixture"}]}'
+
+old_trends_url = os.environ.get("ANALYTICS_TRENDS_URL")
+old_urlopen = analytics.urllib.request.urlopen
+old_save_flag = analytics.state_db.save_flag
+saved_trend_status = []
+try:
+    os.environ["ANALYTICS_TRENDS_URL"] = "https://trends.example.test/feed"
+    analytics.urllib.request.urlopen = lambda *_args, **_kwargs: FakeTrendResponse()
+    analytics.state_db.save_flag = lambda key, value: saved_trend_status.append((key, value))
+    live_status = analytics.sync_trend_signals()
+    assert live_status["synced"] == 1 and saved_trend_status[0][0] == "analytics_trend_signals"
+finally:
+    analytics.urllib.request.urlopen = old_urlopen
+    analytics.state_db.save_flag = old_save_flag
+    if old_trends_url is None:
+        os.environ.pop("ANALYTICS_TRENDS_URL", None)
+    else:
+        os.environ["ANALYTICS_TRENDS_URL"] = old_trends_url
 
 experiment_db = ROOT / "out/test-analytics-experiments.sqlite3"
 for suffix in ("", "-wal", "-shm"):

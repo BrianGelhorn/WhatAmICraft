@@ -373,6 +373,7 @@ def analytics_snapshot() -> dict:
             "quality": [],
             "trends": [],
             "trendSignals": [],
+            "trendSync": {"configured": False, "synced": 0, "error": None},
             "experiments": [],
             "alerts": [],
             "recommendations": [],
@@ -784,6 +785,15 @@ def import_analytics_trends(payload: object) -> dict:
     return {"ok": True, "signals": analytics.import_trend_signals(payload)}
 
 
+def sync_analytics_trends() -> dict:
+    if ANALYTICS_API_URL:
+        status, result = analytics_request("/api/analytics/trends/sync", method="POST", payload={})
+        if status != HTTPStatus.OK:
+            raise RuntimeError(result.get("error", "El servicio de analytics rechazó la sincronización de tendencias"))
+        return result
+    return {"ok": True, "sync": analytics.sync_trend_signals()}
+
+
 def analytics_scheduler() -> None:
     while True:
         start_analytics_sync()
@@ -974,6 +984,9 @@ class Handler(BaseHTTPRequestHandler):
                 return
             elif path == "/api/analytics/trends":
                 self.send_json(import_analytics_trends(payload))
+                return
+            elif path == "/api/analytics/trends/sync":
+                self.send_json(sync_analytics_trends())
                 return
             elif path in {"/api/monitor/check", "/api/monitor/events"}:
                 if not MONITOR_API_URL:

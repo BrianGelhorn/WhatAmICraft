@@ -62,6 +62,8 @@ services:
     restart: unless-stopped
     environment:
       ANALYTICS_PORT: 8791
+      ANALYTICS_TRENDS_URL: ${ANALYTICS_TRENDS_URL:-}
+      ANALYTICS_TRENDS_TOKEN: ${ANALYTICS_TRENDS_TOKEN:-}
     volumes:
       - ./staging/runtime/pre-main/data:/app/data
       - ./staging/runtime/pre-main/out:/app/out
