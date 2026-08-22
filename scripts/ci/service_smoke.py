@@ -200,9 +200,10 @@ def main() -> None:
     expected_body = b"whatamicraft-ci-video"
     require_video(f"{dashboard}/videos/{fixture}", expected_body)
     require_video(f"{media}/{fixture}", expected_body)
+    require_video(f"{media}/videos/{fixture}", expected_body)
 
     range_status, range_headers, range_body = get(
-        f"{media}/{fixture}",
+        f"{media}/videos/{fixture}",
         expected={206},
         headers={"Range": "bytes=0-4"},
     )

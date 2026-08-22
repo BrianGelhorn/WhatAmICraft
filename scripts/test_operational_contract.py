@@ -43,6 +43,8 @@ def main() -> None:
     assert "COPY nginx.media.conf /etc/nginx/conf.d/default.conf" in media_dockerfile
     nginx_media = (ROOT / "nginx.media.conf").read_text(encoding="utf-8")
     assert "root /mnt/out/episodes;" in nginx_media
+    assert "location /videos/" in nginx_media
+    assert "alias /mnt/out/episodes/;" in nginx_media
     assert "alias /mnt/out/thumbnails/;" in nginx_media
     assert "${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data" in staging
     assert "${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out" in staging
