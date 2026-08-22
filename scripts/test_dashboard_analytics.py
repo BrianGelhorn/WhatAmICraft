@@ -32,7 +32,7 @@ analytics.video_metric_snapshots = lambda: [
     {"episodeId": "mc-99", "platform": "tiktok", "views": 90, "likes": 9, "comments": 2, "shares": 1, "capturedAt": now.isoformat()},
     {"episodeId": "mc-99", "platform": "tiktok", "views": 80, "likes": 8, "comments": 1, "shares": 1, "capturedAt": (now - timedelta(hours=1)).isoformat()},
 ]
-analytics.state_db.load_flag = lambda *args: {"tiktok": {"configured": True, "synced": 1, "error": None}}
+analytics.state_db.load_flag = lambda key, default: {"tiktok": {"configured": True, "synced": 1, "error": None}} if key == "analytics_sync_status" else default
 
 snapshot = analytics.build_snapshot()
 assert snapshot["summary"] == {"videos": 1, "views": 100, "engagements": 13, "engagementRateByViews": 13.0}
@@ -51,6 +51,16 @@ assert snapshot["cohorts"]
 assert snapshot["cohorts"][0]["sampleConfidence"] == "low"
 assert snapshot["cohorts"][0]["baselineViewsPerVideo"] is not None
 assert snapshot["cohorts"][0]["sampleWarning"]
+assert snapshot["trendSignals"] == []
+
+signals = analytics.validate_trend_signals({"signals": [{"platform": "youtube", "kind": "topic", "value": "Minecraft", "source": "fixture"}]})
+assert signals[0]["platform"] == "youtube"
+try:
+    analytics.validate_trend_signals({"signals": [{"platform": "other", "kind": "topic", "value": "bad", "source": "fixture"}]})
+except ValueError:
+    pass
+else:
+    raise AssertionError("invalid trend signal accepted")
 
 props_path = ROOT / "out/test-analytics-props.json"
 props_path.write_text('{"config":{"music":{"sourceName":"Fixture track @ 12s"}}}', encoding="utf-8")

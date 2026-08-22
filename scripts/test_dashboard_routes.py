@@ -129,6 +129,7 @@ def main() -> None:
         app.disconnect_tiktok = lambda: called("disconnect")
         app.start_analytics_sync = lambda: called("analytics")
         app.update_analytics_recommendation = lambda value: called("recommendation", value) or {"ok": True}
+        app.import_analytics_trends = lambda value: called("trends", value) or {"ok": True}
         app.start_publish_job = lambda: called("publish-next")
         app.start_platform_publish = lambda episode, platform: called("publish-platform", (episode, platform))
         app.start_backup_job = lambda: called("backup")
@@ -193,6 +194,7 @@ def main() -> None:
             request("/api/tiktok/disconnect", {})
             request("/api/analytics/sync", {})
             request("/api/analytics/recommendation", {"id": "youtube:trend:youtube", "status": "applied"})
+            request("/api/analytics/trends", {"signals": []})
             request("/api/monitor/check", {})
             request("/api/monitor/events", {"limit": 2})
             request("/api/publish-now", {})
@@ -215,6 +217,7 @@ def main() -> None:
             assert {
                 "cancel", "generate", "config", "secrets", "disconnect", "analytics", "publish-next",
                 "recommendation",
+                "trends",
                 "publish-platform", "backup", "snapshot", "music-import", "music-delete", "music-starts",
                 "approve", "unqueue", "reject", "hints", "clear-hints",
             } <= names

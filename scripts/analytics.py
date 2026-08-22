@@ -22,6 +22,7 @@ QUALITY_FIELDS = {
     "instagram": ("views", "reach", "likes", "comments", "shares", "saves", "averageWatchSeconds"),
     "facebook": ("views", "likes", "comments", "completionRate"),
 }
+TREND_SIGNAL_KINDS = {"audio", "hashtag", "topic", "format"}
 
 
 def _chunks(items: list, size: int):
@@ -52,6 +53,59 @@ def _safe_error(error: Exception) -> str:
     if "urlopen error" in lower or "connection" in lower or "conexión" in lower:
         return "No se pudo contactar a la plataforma"
     return message[:240]
+
+
+def validate_trend_signals(payload: object) -> list[dict]:
+    values = payload.get("signals") if isinstance(payload, dict) else payload
+    if not isinstance(values, list) or len(values) > 100:
+        raise ValueError("Las señales deben ser una lista de hasta 100 elementos")
+    normalized = []
+    for item in values:
+        if not isinstance(item, dict):
+            raise ValueError("Cada señal debe ser un objeto")
+        platform = str(item.get("platform", "")).lower()
+        kind = str(item.get("kind", "")).lower()
+        value = str(item.get("value", "")).strip()
+        source = str(item.get("source", "")).strip()
+        if platform not in PLATFORMS or kind not in TREND_SIGNAL_KINDS or not value or len(value) > 120 or not source or len(source) > 120:
+            raise ValueError("Señal inválida: plataforma, tipo, valor y fuente son obligatorios")
+        captured_at = str(item.get("capturedAt") or datetime.now(timezone.utc).isoformat())
+        expires_at = item.get("expiresAt")
+        try:
+            datetime.fromisoformat(captured_at.replace("Z", "+00:00"))
+            if expires_at:
+                datetime.fromisoformat(str(expires_at).replace("Z", "+00:00"))
+        except ValueError as error:
+            raise ValueError("Las fechas de las señales deben estar en ISO-8601") from error
+        score = item.get("score")
+        if score is not None:
+            try:
+                score = round(float(score), 2)
+            except (TypeError, ValueError) as error:
+                raise ValueError("El score de una señal debe ser numérico") from error
+            if score < 0:
+                raise ValueError("El score de una señal no puede ser negativo")
+        normalized.append({
+            "platform": platform, "kind": kind, "value": value, "source": source,
+            "score": score, "capturedAt": captured_at, "expiresAt": str(expires_at) if expires_at else None,
+            "notes": str(item.get("notes", ""))[:240],
+        })
+    return normalized
+
+
+def import_trend_signals(payload: object) -> list[dict]:
+    signals = validate_trend_signals(payload)
+    state_db.save_flag("analytics_trend_signals", signals)
+    return signals
+
+
+def _active_trend_signals() -> list[dict]:
+    values = state_db.load_flag("analytics_trend_signals", [])
+    now = datetime.now(timezone.utc)
+    return [
+        item for item in values
+        if not item.get("expiresAt") or datetime.fromisoformat(item["expiresAt"].replace("Z", "+00:00")) > now
+    ]
 
 
 def _published(platform: str, state: dict) -> list[tuple[str, dict, dict]]:
@@ -642,6 +696,7 @@ def build_snapshot() -> dict:
         "cohorts": cohorts,
         "quality": quality,
         "trends": trends,
+        "trendSignals": _active_trend_signals(),
         "alerts": alerts,
         "recommendations": _build_recommendations(cohorts, trends),
         "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),

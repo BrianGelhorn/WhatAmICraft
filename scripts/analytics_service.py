@@ -111,6 +111,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = urlparse(self.path).path
+        if path == "/api/analytics/trends":
+            try:
+                payload = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))) or b"{}")
+                self.send_json({"ok": True, "signals": analytics.import_trend_signals(payload)})
+            except ValueError as error:
+                self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
+            return
         if path == "/api/analytics/recommendation":
             try:
                 payload = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))) or b"{}")

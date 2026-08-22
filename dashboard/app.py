@@ -372,6 +372,7 @@ def analytics_snapshot() -> dict:
             "cohorts": [],
             "quality": [],
             "trends": [],
+            "trendSignals": [],
             "alerts": [],
             "recommendations": [],
             "videos": [],
@@ -770,6 +771,15 @@ def update_analytics_recommendation(payload: dict) -> dict:
     return {"ok": True, "recommendation": state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", "")))}
 
 
+def import_analytics_trends(payload: object) -> dict:
+    if ANALYTICS_API_URL:
+        status, result = analytics_request("/api/analytics/trends", method="POST", payload=payload if isinstance(payload, dict) else {"signals": payload})
+        if status != HTTPStatus.OK:
+            raise RuntimeError(result.get("error", "El servicio de analytics rechazó las señales"))
+        return result
+    return {"ok": True, "signals": analytics.import_trend_signals(payload)}
+
+
 def analytics_scheduler() -> None:
     while True:
         start_analytics_sync()
@@ -957,6 +967,9 @@ class Handler(BaseHTTPRequestHandler):
                 start_analytics_sync()
             elif path == "/api/analytics/recommendation":
                 self.send_json(update_analytics_recommendation(payload))
+                return
+            elif path == "/api/analytics/trends":
+                self.send_json(import_analytics_trends(payload))
                 return
             elif path in {"/api/monitor/check", "/api/monitor/events"}:
                 if not MONITOR_API_URL:

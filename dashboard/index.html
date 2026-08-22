@@ -425,6 +425,13 @@
       <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
       <div class="analytics-callouts" id="analytics-alerts" aria-live="polite"></div>
       <div class="analytics-callouts" id="analytics-recommendations" aria-live="polite"></div>
+      <div class="analytics-callout" aria-label="Señales externas de tendencia">
+        <strong>Señales externas</strong>
+        <p class="hint">Importá JSON de una fuente o análisis externo. Se usa como contexto, nunca publica solo.</p>
+        <textarea id="analytics-trend-signals" rows="3" placeholder='[{"platform":"youtube","kind":"topic","value":"Minecraft 1.22","source":"manual","score":80,"expiresAt":"2026-09-01T00:00:00Z"}]'></textarea>
+        <button class="button-link" id="import-analytics-trends">Importar señales</button>
+        <ul class="analysis-list" id="analytics-trend-signal-list"></ul>
+      </div>
       <div class="analytics-controls analytics-cohorts" aria-label="Comparación de cohortes">
         <label class="field">Comparar por<select id="analytics-cohort-dimension"><option value="formatLabel">Formato</option><option value="targetKind">Tipo de target</option><option value="templateVersion">Versión de plantilla</option><option value="musicSource">Música</option><option value="publishHourUtc">Hora de publicación</option></select></label>
       </div>
@@ -978,6 +985,7 @@
       renderAnalyticsCohorts(analytics);
       renderAnalyticsQuality(analytics);
       renderAnalyticsCallouts(analytics);
+      renderAnalyticsSignals(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
       $('analytics-rows').innerHTML = (analytics.videos || []).map(item => `
@@ -1058,6 +1066,13 @@
           catch (error) { button.disabled = false; toast(error.message); }
         };
       });
+    }
+
+    function renderAnalyticsSignals(analytics) {
+      const signals = analytics.trendSignals || [];
+      $('analytics-trend-signal-list').innerHTML = signals.length
+        ? signals.map(item => `<li><strong>${escapeHtml(item.platform)} · ${escapeHtml(item.kind)}:</strong> ${escapeHtml(item.value)} <span class="hint">(${escapeHtml(item.source)})</span></li>`).join('')
+        : '<li class="hint">No hay señales vigentes.</li>';
     }
 
     function renderDiagnostics() {
@@ -1231,6 +1246,15 @@
       try { await api('/api/analytics/sync',{}); await refresh(); toast('Actualización iniciada; el panel se refresca solo'); }
       catch(e) { toast(e.message); }
       finally { $('sync-analytics').disabled = false; }
+    };
+    $('import-analytics-trends').onclick = async () => {
+      try {
+        const parsed = JSON.parse($('analytics-trend-signals').value);
+        await api('/api/analytics/trends', {signals: Array.isArray(parsed) ? parsed : parsed.signals});
+        $('analytics-trend-signals').value = '';
+        await refresh();
+        toast('Señales importadas');
+      } catch (error) { toast(error.message || 'JSON inválido'); }
     };
     $('analytics-window').onchange = () => renderAnalyticsChart(state.analytics || {});
     $('analytics-platform').onchange = () => renderAnalyticsChart(state.analytics || {});
