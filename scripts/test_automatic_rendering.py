@@ -3,12 +3,14 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
 import publish_worker as worker
+import produce_quiz_copy as producer
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -83,6 +85,24 @@ def main() -> None:
                 "save_schedule": "save_generation_schedule",
             }[name], value)
         shutil.rmtree(fixture, ignore_errors=True)
+
+    render_calls: list[tuple[list[str], dict]] = []
+    original_render_run = producer.subprocess.run
+    original_render_env = {
+        key: os.environ.pop(key, None)
+        for key in ("REMOTION_CONCURRENCY", "REMOTION_RENDER_TIMEOUT_SECONDS")
+    }
+    try:
+        producer.subprocess.run = lambda command, **kwargs: render_calls.append((command, kwargs))  # type: ignore[assignment]
+        producer.render({"id": "mc-test", "answer": {"id": "stone"}})
+        command, options = render_calls[0]
+        assert "--concurrency=1" in command
+        assert options["timeout"] == 1800
+    finally:
+        producer.subprocess.run = original_render_run
+        for key, value in original_render_env.items():
+            if value is not None:
+                os.environ[key] = value
 
     print("ok: automatic rendering selects missing episodes and continues after a failed render")
 
