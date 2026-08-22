@@ -43,6 +43,10 @@ for optional in clues-api analytics-api monitor; do
   fi
 done
 
+if [ -f "$app_dir/scripts/linux/install-wifi-watchdog.sh" ]; then
+  /usr/bin/bash "$app_dir/scripts/linux/install-wifi-watchdog.sh" >/dev/null
+fi
+
 exec /usr/bin/docker compose \
   --ansi never \
   --project-directory "$app_dir" \
