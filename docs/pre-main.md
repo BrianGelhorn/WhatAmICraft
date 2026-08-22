@@ -14,6 +14,12 @@ producción. Escucha solamente en localhost:
 No inicia Telegram, publisher-worker ni ningún proveedor externo. Las pruebas
 de publicación siguen usando fakes en CI.
 
+La fuente de tendencias en vivo es opcional. Configurá `ANALYTICS_TRENDS_URL`
+y, si corresponde, `ANALYTICS_TRENDS_TOKEN` en el entorno que levanta Compose.
+El endpoint debe responder con `{"signals":[...]}` usando `platform`, `kind`,
+`value`, `source` y fechas ISO opcionales. El dashboard valida, vence y guarda
+las señales; nunca publica automáticamente por recibir una tendencia.
+
 Desde PowerShell:
 
 ```powershell
