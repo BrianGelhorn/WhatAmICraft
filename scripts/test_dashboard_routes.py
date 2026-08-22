@@ -33,6 +33,8 @@ def main() -> None:
     workflow = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     assert "python scripts/test_dashboard_routes.py" in workflow
     assert "node scripts/ci/dashboard_ui.mjs" in workflow
+    assert "npx remotion browser ensure" in workflow
+    assert "command -v google-chrome" not in workflow
     calls: list[tuple[str, object]] = []
     state = {"revision": 0}
     schedule = {"publishing": None, "generation": None}

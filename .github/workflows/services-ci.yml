@@ -35,7 +35,9 @@ jobs:
           node-version: 20
           cache: npm
       - name: Install locked dashboard browser runtime
-        run: npm ci
+        run: |
+          npm ci
+          npx remotion browser ensure
       - name: Dashboard HTTP behavior
         shell: bash
         run: |
@@ -49,9 +51,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          test -n "$browser"
-          DASHBOARD_BROWSER_EXECUTABLE="$browser" node scripts/ci/dashboard_ui.mjs
+          node scripts/ci/dashboard_ui.mjs
 
   bot:
     name: Telegram bot service
