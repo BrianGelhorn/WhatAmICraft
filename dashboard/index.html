@@ -425,6 +425,7 @@
       <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
       <div class="analytics-callouts" id="analytics-alerts" aria-live="polite"></div>
       <div class="analytics-callouts" id="analytics-recommendations" aria-live="polite"></div>
+      <div class="analytics-callouts" id="analytics-experiments" aria-live="polite"></div>
       <div class="analytics-callout" aria-label="Señales externas de tendencia">
         <strong>Señales externas</strong>
         <p class="hint">Importá JSON de una fuente o análisis externo. Se usa como contexto, nunca publica solo.</p>
@@ -985,6 +986,7 @@
       renderAnalyticsCohorts(analytics);
       renderAnalyticsQuality(analytics);
       renderAnalyticsCallouts(analytics);
+      renderAnalyticsExperiments(analytics);
       renderAnalyticsSignals(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
@@ -1057,15 +1059,22 @@
         ? `<div class="analytics-callout bad"><strong>Alertas</strong><ul>${alerts.slice(0, 8).map(item => `<li>${escapeHtml(item.platform)}: ${escapeHtml(item.message)}${item.episodeId ? ` (${escapeHtml(item.episodeId)})` : ''}</li>`).join('')}</ul></div>`
         : '';
       $('analytics-recommendations').innerHTML = recommendations.length
-        ? `<div class="analytics-callout ok"><strong>Recomendaciones basadas en datos</strong><ul>${recommendations.slice(0, 8).map(item => { const id = item.id || ''; const status = item.status || 'proposed'; return `<li>${escapeHtml(item.action)} — ${escapeHtml(item.reason)} <span class="hint">[${escapeHtml(status)}]</span>${id ? ` <button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="applied" ${status === 'applied' ? 'disabled' : ''}>Aplicar</button><button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="dismissed" ${status === 'dismissed' ? 'disabled' : ''}>Descartar</button>` : ''}</li>`; }).join('')}</ul></div>`
+        ? `<div class="analytics-callout ok"><strong>Recomendaciones basadas en datos</strong><ul>${recommendations.slice(0, 8).map(item => { const id = item.id || ''; const status = item.status || 'proposed'; const canExperiment = item.dimension !== 'trend'; return `<li>${escapeHtml(item.action)} — ${escapeHtml(item.reason)} <span class="hint">[${escapeHtml(status)}]</span>${id ? ` <button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="applied" data-start-experiment="${canExperiment}" ${status === 'applied' ? 'disabled' : ''}>${canExperiment ? 'Iniciar experimento' : 'Marcar aplicada'}</button><button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="dismissed" ${status === 'dismissed' ? 'disabled' : ''}>Descartar</button>` : ''}</li>`; }).join('')}</ul></div>`
         : '<p class="hint">Todavía no hay suficientes videos medidos por cohorte para recomendar cambios con confianza.</p>';
       document.querySelectorAll('[data-recommendation-status]').forEach(button => {
         button.onclick = async () => {
           button.disabled = true;
-          try { await api('/api/analytics/recommendation', {id: button.dataset.recommendationId, status: button.dataset.recommendationStatus}); await refresh(); toast('Decisión guardada'); }
+          try { await api('/api/analytics/recommendation', {id: button.dataset.recommendationId, status: button.dataset.recommendationStatus, startExperiment: button.dataset.startExperiment === 'true'}); await refresh(); toast(button.dataset.startExperiment === 'true' ? 'Experimento iniciado' : 'Decisión guardada'); }
           catch (error) { button.disabled = false; toast(error.message); }
         };
       });
+    }
+
+    function renderAnalyticsExperiments(analytics) {
+      const experiments = analytics.experiments || [];
+      $('analytics-experiments').innerHTML = experiments.length
+        ? `<div class="analytics-callout"><strong>Experimentos</strong><ul>${experiments.slice(0, 8).map(item => `<li>${escapeHtml(item.platform)} · ${escapeHtml(item.dimension)}=${escapeHtml(item.variantValue)}: control ${item.control.measuredVideos}/${item.minimumVideos}, variante ${item.variant.measuredVideos}/${item.minimumVideos}, lift ${item.liftPct == null ? '—' : escapeHtml(item.liftPct + '%')} <span class="hint">[${escapeHtml(item.sampleStatus)}]</span></li>`).join('')}</ul></div>`
+        : '';
     }
 
     function renderAnalyticsSignals(analytics) {

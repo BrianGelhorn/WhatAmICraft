@@ -62,6 +62,32 @@ except ValueError:
 else:
     raise AssertionError("invalid trend signal accepted")
 
+experiment_db = ROOT / "out/test-analytics-experiments.sqlite3"
+for suffix in ("", "-wal", "-shm"):
+    experiment_db.with_name(experiment_db.name + suffix).unlink(missing_ok=True)
+recommendation = state_db.save_analytics_recommendation({
+    "id": "fixture:formatLabel:Quiz", "platform": "youtube", "dimension": "formatLabel", "value": "Quiz",
+    "action": "Probar Quiz", "reason": "fixture", "priority": "high",
+}, experiment_db)
+experiment = state_db.create_analytics_experiment(recommendation["id"], 2, experiment_db)
+assert experiment["status"] == "running" and experiment["variantValue"] == "Quiz"
+assert state_db.set_analytics_experiment_status(experiment["id"], "completed", experiment_db)["status"] == "completed"
+old_experiments = analytics.state_db.analytics_experiments
+analytics.state_db.analytics_experiments = lambda: [experiment]
+try:
+    experiment_rows = analytics._build_experiments([
+        {"platform": "youtube", "formatLabel": "Quiz", "views": 120, "engagements": 12},
+        {"platform": "youtube", "formatLabel": "Quiz", "views": 100, "engagements": 10},
+        {"platform": "youtube", "formatLabel": "Other", "views": 80, "engagements": 8},
+        {"platform": "youtube", "formatLabel": "Other", "views": 70, "engagements": 7},
+    ])
+    assert experiment_rows[0]["sampleStatus"] == "ready"
+    assert experiment_rows[0]["liftPct"] > 0
+finally:
+    analytics.state_db.analytics_experiments = old_experiments
+for suffix in ("", "-wal", "-shm"):
+    experiment_db.with_name(experiment_db.name + suffix).unlink(missing_ok=True)
+
 props_path = ROOT / "out/test-analytics-props.json"
 props_path.write_text('{"config":{"music":{"sourceName":"Fixture track @ 12s"}}}', encoding="utf-8")
 old_read_artifact = analytics.read_artifact

@@ -121,8 +121,11 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/analytics/recommendation":
             try:
                 payload = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))) or b"{}")
+                experiment = None
+                if payload.get("status") == "applied" and payload.get("startExperiment"):
+                    experiment = state_db.create_analytics_experiment(str(payload.get("id", "")), int(payload.get("minimumVideos", 3)))
                 recommendation = state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", "")))
-                self.send_json({"ok": True, "recommendation": recommendation})
+                self.send_json({"ok": True, "recommendation": recommendation, "experiment": experiment})
             except ValueError as error:
                 self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
             return

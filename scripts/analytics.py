@@ -363,6 +363,41 @@ def _build_recommendations(cohorts: list[dict], trends: list[dict]) -> list[dict
     return result
 
 
+def _experiment_value(item: dict, dimension: str) -> str:
+    value = item.get(dimension)
+    return f"{value:02d}:00 UTC" if dimension == "publishHourUtc" and isinstance(value, int) else str(value or "unknown")
+
+
+def _experiment_group(items: list[dict]) -> dict:
+    views = [item["views"] for item in items if item.get("views") is not None]
+    engagements = sum(item.get("engagements", 0) for item in items)
+    total_views = sum(views)
+    return {
+        "videos": len(items), "measuredVideos": len(views), "views": total_views,
+        "viewsPerVideo": round(total_views / len(views), 2) if views else None,
+        "engagementRateByViews": round(engagements / total_views * 100, 2) if total_views else None,
+    }
+
+
+def _build_experiments(items: list[dict]) -> list[dict]:
+    experiments = []
+    for experiment in state_db.analytics_experiments():
+        candidates = [item for item in items if item["platform"] == experiment["platform"] and item.get("views") is not None]
+        variant = [item for item in candidates if _experiment_value(item, experiment["dimension"]) == experiment["variantValue"]]
+        control = [item for item in candidates if _experiment_value(item, experiment["dimension"]) != experiment["variantValue"]]
+        variant_result, control_result = _experiment_group(variant), _experiment_group(control)
+        lift = round((variant_result["viewsPerVideo"] / control_result["viewsPerVideo"] - 1) * 100, 2) if variant_result["viewsPerVideo"] and control_result["viewsPerVideo"] else None
+        experiments.append({
+            **experiment,
+            "assignmentMode": "observational",
+            "control": control_result,
+            "variant": variant_result,
+            "liftPct": lift,
+            "sampleStatus": "ready" if variant_result["measuredVideos"] >= experiment["minimumVideos"] and control_result["measuredVideos"] >= experiment["minimumVideos"] else "waiting",
+        })
+    return experiments
+
+
 def _insight_values(response: dict) -> dict:
     result = {}
     for metric in response.get("data", []):
@@ -697,6 +732,7 @@ def build_snapshot() -> dict:
         "quality": quality,
         "trends": trends,
         "trendSignals": _active_trend_signals(),
+        "experiments": _build_experiments(items),
         "alerts": alerts,
         "recommendations": _build_recommendations(cohorts, trends),
         "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),
@@ -711,6 +747,7 @@ def build_snapshot() -> dict:
             "TikTok Display API does not expose retention or average watch time.",
             "Unavailable metrics are null, never estimated as zero.",
             "Recommendations require at least two measured videos per cohort and do not replace external trend research.",
+            "Experiments compare observed variant and baseline cohorts; they are not randomized unless the content plan assigns both groups deliberately.",
         ],
         "suggestedGptTask": "Analyze platform health, trends, cohort winners, data quality, alerts and concrete next experiments. Separate facts from hypotheses and cite episode IDs.",
     }

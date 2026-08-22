@@ -37,6 +37,7 @@ def main() -> None:
     analytics_service.analytics.sync_all = lambda: sync_calls.append("synced")  # type: ignore[assignment]
     analytics_service.state_db.load_flag = lambda *_args: {"youtube": {"synced": 1}}  # type: ignore[assignment]
     analytics_service.state_db.set_analytics_recommendation_status = lambda recommendation_id, status: {"id": recommendation_id, "status": status}  # type: ignore[assignment]
+    analytics_service.state_db.create_analytics_experiment = lambda recommendation_id, minimum_videos: {"id": "exp:" + recommendation_id, "minimumVideos": minimum_videos}  # type: ignore[assignment]
     analytics_service.analytics.import_trend_signals = lambda payload: payload.get("signals", [])  # type: ignore[assignment]
     server = analytics_service.make_server("127.0.0.1", 0, service)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -56,6 +57,8 @@ def main() -> None:
         assert sync_calls == ["synced"] and service.sync_status()["status"] == "completed"
         recommendation_status, recommendation = call(base, "/api/analytics/recommendation", "POST", {"id": "fixture", "status": "applied"})
         assert recommendation_status == 200 and recommendation["recommendation"]["status"] == "applied"
+        started_status, started = call(base, "/api/analytics/recommendation", "POST", {"id": "fixture", "status": "applied", "startExperiment": True, "minimumVideos": 4})
+        assert started_status == 200 and started["experiment"]["minimumVideos"] == 4
         trend_status, trends = call(base, "/api/analytics/trends", "POST", {"signals": []})
         assert trend_status == 200 and trends["signals"] == []
         invalid_status, _ = call(base, "/api/analytics/unknown")

@@ -373,6 +373,7 @@ def analytics_snapshot() -> dict:
             "quality": [],
             "trends": [],
             "trendSignals": [],
+            "experiments": [],
             "alerts": [],
             "recommendations": [],
             "videos": [],
@@ -768,7 +769,10 @@ def update_analytics_recommendation(payload: dict) -> dict:
         if status != HTTPStatus.OK:
             raise RuntimeError(result.get("error", "El servicio de analytics rechazó la decisión"))
         return result
-    return {"ok": True, "recommendation": state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", "")))}
+    experiment = None
+    if payload.get("status") == "applied" and payload.get("startExperiment"):
+        experiment = state_db.create_analytics_experiment(str(payload.get("id", "")), int(payload.get("minimumVideos", 3)))
+    return {"ok": True, "recommendation": state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", ""))), "experiment": experiment}
 
 
 def import_analytics_trends(payload: object) -> dict:
