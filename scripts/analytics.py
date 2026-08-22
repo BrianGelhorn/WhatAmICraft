@@ -126,6 +126,14 @@ def _creative_metadata(episode: dict | None, published_at: str | None, published
 
 def _build_cohorts(items: list[dict]) -> list[dict]:
     dimensions = ("formatLabel", "targetKind", "templateVersion", "musicSource", "publishHourUtc")
+    baselines = {}
+    for platform in PLATFORMS:
+        measured = [item for item in items if item["platform"] == platform and item.get("views") is not None]
+        hours = [item["lifetimeViewsPerHour"] for item in measured if item.get("lifetimeViewsPerHour") is not None]
+        baselines[platform] = {
+            "viewsPerVideo": round(sum(item["views"] for item in measured) / len(measured), 2) if measured else None,
+            "viewsPerHour": round(sum(hours) / len(hours), 2) if hours else None,
+        }
     groups = {}
     for item in items:
         for dimension in dimensions:
@@ -158,6 +166,13 @@ def _build_cohorts(items: list[dict]) -> list[dict]:
         group["viewsPerVideo"] = round(views / measured, 2) if measured else None
         group["engagementRateByViews"] = round(group["engagements"] / views * 100, 2) if views else None
         group["measuredVideos"] = measured
+        baseline = baselines[group["platform"]]
+        group["baselineViewsPerVideo"] = baseline["viewsPerVideo"]
+        group["viewsPerVideoLiftPct"] = round((group["viewsPerVideo"] / baseline["viewsPerVideo"] - 1) * 100, 2) if group["viewsPerVideo"] is not None and baseline["viewsPerVideo"] else None
+        group["baselineViewsPerHour"] = baseline["viewsPerHour"]
+        group["viewsPerHourLiftPct"] = round((group["lifetimeViewsPerHour"] / baseline["viewsPerHour"] - 1) * 100, 2) if group["lifetimeViewsPerHour"] is not None and baseline["viewsPerHour"] else None
+        group["sampleConfidence"] = "high" if measured >= 8 else "medium" if measured >= 3 else "low"
+        group["sampleWarning"] = None if measured >= 3 else "Muestra pequeña: usar como hipótesis, no como conclusión."
         result.append(group)
     return sorted(result, key=lambda group: (group["dimension"], group["platform"], -(group["viewsPerVideo"] or 0)))
 
@@ -273,7 +288,9 @@ def _build_recommendations(cohorts: list[dict], trends: list[dict]) -> list[dict
             recommendations.append({
                 "priority": "high", "platform": platform, "dimension": dimension,
                 "value": best["value"], "action": action,
-                "reason": f"{round(evidence, 2)} {unit} con {best['measuredVideos']} videos medidos.",
+                "reason": f"{round(evidence, 2)} {unit} con {best['measuredVideos']} videos medidos; confianza {best['sampleConfidence']}.",
+                "sampleConfidence": best["sampleConfidence"],
+                "liftPct": best["viewsPerHourLiftPct"] if best["lifetimeViewsPerHour"] is not None else best["viewsPerVideoLiftPct"],
             })
     rising = [trend for trend in trends if trend.get("trend") == "up" and trend.get("viewsPerHour")]
     if rising:
@@ -282,6 +299,8 @@ def _build_recommendations(cohorts: list[dict], trends: list[dict]) -> list[dict
             "priority": "medium", "platform": best["platform"], "dimension": "trend",
             "value": best["platform"], "action": f"Mantener la cadencia en {best['platform']} y medir el próximo lote.",
             "reason": f"La última ventana creció a {best['viewsPerHour']} vistas/h.",
+            "sampleConfidence": "medium",
+            "liftPct": None,
         })
     return recommendations
 
@@ -674,7 +693,7 @@ def write_exports(snapshot: dict | None = None) -> dict:
     )
     lines.extend(["", "## Cohorts", ""])
     lines.extend(
-        f"- {row['platform']} · {row['dimension']}={row['value']}: {row['viewsPerVideo'] or 'N/A'} views/video, {row['measuredVideos']} measured"
+        f"- {row['platform']} · {row['dimension']}={row['value']}: {row['viewsPerVideo'] or 'N/A'} views/video, lift {row['viewsPerVideoLiftPct'] if row['viewsPerVideoLiftPct'] is not None else 'N/A'}%, {row['measuredVideos']} measured, confidence {row['sampleConfidence']}"
         for row in snapshot["cohorts"]
     )
     lines.extend(["", "## Videos", "", "| Platform | Episode | Views | Engagement rate | Views/hour |", "|---|---|---:|---:|---:|"])

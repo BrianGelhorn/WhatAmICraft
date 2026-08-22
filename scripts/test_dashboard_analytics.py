@@ -47,6 +47,10 @@ assert quality["tiktok"]["coveragePercent"] == 100.0
 assert snapshot["trends"][1]["trend"] == "up"
 assert snapshot["alerts"] == []
 assert snapshot["recommendations"][0]["dimension"] == "trend"
+assert snapshot["cohorts"]
+assert snapshot["cohorts"][0]["sampleConfidence"] == "low"
+assert snapshot["cohorts"][0]["baselineViewsPerVideo"] is not None
+assert snapshot["cohorts"][0]["sampleWarning"]
 
 props_path = ROOT / "out/test-analytics-props.json"
 props_path.write_text('{"config":{"music":{"sourceName":"Fixture track @ 12s"}}}', encoding="utf-8")
