@@ -32,6 +32,7 @@ def main() -> None:
     assert "ssh " not in script and "scp " not in script
     assert "--env-file" not in script
     assert "whatamicraft-up" in launcher and "config --services" in launcher
+    assert "install-wifi-watchdog.sh" in launcher
     print("ok: production deploy waits for staging, preserves runtime state, and uses the root launcher")
 
 
