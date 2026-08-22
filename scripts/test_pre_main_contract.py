@@ -15,7 +15,7 @@ def main() -> None:
 
     assert "staging/runtime/pre-main" in compose
     assert '"127.0.0.1:8878:8787"' in compose
-    assert '"127.0.0.1:8088:80"' in compose
+    assert '"127.0.0.1:8098:80"' in compose
     assert "publishing-secrets.json" not in compose
     for credential in (
         "YOUTUBE_REFRESH_TOKEN",

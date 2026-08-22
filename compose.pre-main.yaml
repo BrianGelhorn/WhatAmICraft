@@ -107,7 +107,7 @@ services:
       dockerfile: Dockerfile.media
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8088:80"
+      - "127.0.0.1:8098:80"
     volumes:
       - ./staging/runtime/pre-main/out/episodes:/mnt/out/episodes:ro
       - ./staging/runtime/pre-main/out/thumbnails:/mnt/out/thumbnails:ro

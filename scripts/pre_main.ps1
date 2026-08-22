@@ -52,6 +52,6 @@ Invoke-Compose config --quiet
 Invoke-Compose up -d --build dashboard clues-api analytics-api backup-rollback monitor media
 
 Write-Host "pre-main activo: http://127.0.0.1:8878"
-Write-Host "media local:    http://127.0.0.1:8088"
+Write-Host "media local:    http://127.0.0.1:8098"
 Write-Host "para logs:      .\scripts\pre_main.ps1 -Logs"
 Write-Host "para detener:   .\scripts\pre_main.ps1 -Down"

@@ -9,7 +9,7 @@ El stack usa `staging/runtime/pre-main/`, no `data/`, `out/` ni `backups/` de
 producción. Escucha solamente en localhost:
 
 - Dashboard: http://127.0.0.1:8878
-- Media: http://127.0.0.1:8088
+- Media: http://127.0.0.1:8098
 
 No inicia Telegram, publisher-worker ni ningún proveedor externo. Las pruebas
 de publicación siguen usando fakes en CI.
