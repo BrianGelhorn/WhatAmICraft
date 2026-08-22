@@ -20,6 +20,8 @@ def main() -> None:
     imported = {episode["answer"]["id"]: episode for episode in bank["episodes"]}
     assert source_ids <= imported.keys()
     assert all(imported[target]["clues"][0]["voice"]["generate"] for target in source_ids)
+    dashboard_targets = {episode["target"]["id"] for episode in app.all_episodes()}
+    assert source_ids <= dashboard_targets
 
     captured = {}
     app.start_command = lambda label, command, *args, **kwargs: captured.update(label=label, command=command)
