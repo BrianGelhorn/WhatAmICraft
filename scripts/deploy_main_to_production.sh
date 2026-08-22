@@ -16,7 +16,8 @@ trap cleanup EXIT
 [ "$GITHUB_WORKSPACE" != "$app_dir" ] || { echo "Runner workspace must not be production" >&2; exit 1; }
 command -v rsync >/dev/null || { echo "rsync is required on the runner" >&2; exit 1; }
 
-python3 "$app_dir/scripts/backup_state.py" --quiet
+python3 "$GITHUB_WORKSPACE/scripts/backup_state.py" --quiet \
+  --root "$app_dir" --backup-dir "$app_dir/backups/ops"
 git -C "$GITHUB_WORKSPACE" archive --format=tar "$DEPLOY_SHA" | tar -xf - -C "$release_dir"
 
 [ -f "$release_dir/data/quiz-copy-episodes.json" ] || {

@@ -23,9 +23,10 @@ def main() -> None:
     assert "head_sha" in workflow and "runs-on: [self-hosted, linux, x64]" in workflow
     assert "group: whatamicraft-production" in workflow and "cancel-in-progress: false" in workflow
     assert "push:" in staging and "- main" in staging
+    assert '"$GITHUB_WORKSPACE/scripts/backup_state.py" --quiet' in script
+    assert '--root "$app_dir" --backup-dir "$app_dir/backups/ops"' in script
     for required in (
         "archive --format=tar",
-        "backup_state.py\" --quiet",
         "rsync -a --delete",
         "--exclude=/out/",
         "--exclude=/.secrets/",
