@@ -607,7 +607,7 @@ def build_snapshot() -> dict:
             "Unavailable metrics are null, never estimated as zero.",
             "Recommendations require at least two measured videos per cohort and do not replace external trend research.",
         ],
-        "suggestedGptTask": "Analyze platform health, winners, weak points and concrete next experiments. Separate facts from hypotheses and cite episode IDs.",
+        "suggestedGptTask": "Analyze platform health, trends, cohort winners, data quality, alerts and concrete next experiments. Separate facts from hypotheses and cite episode IDs.",
     }
 
 
@@ -625,6 +625,31 @@ def write_exports(snapshot: dict | None = None) -> dict:
     lines.extend(f"- {row['platform']}: {row['videos']} videos, {row['views']} views" + (f" — {row['error']}" if row.get("error") else "") for row in snapshot["platforms"])
     lines.extend(["", "## Observations", ""])
     lines.extend(f"- {item}" for item in snapshot["observations"] or ["Not enough data yet."])
+    lines.extend(["", "## Trends", ""])
+    lines.extend(
+        f"- {row['platform']}: {row['trend']}" + (f", {row['viewsPerHour']} views/hour" if row.get("viewsPerHour") is not None else "")
+        for row in snapshot["trends"]
+    )
+    lines.extend(["", "## Recommendations", ""])
+    lines.extend(
+        f"- {row['platform']}: {row['action']} — {row['reason']}"
+        for row in snapshot["recommendations"] or [{"platform": "all", "action": "Insufficient data", "reason": "Measure at least two videos per cohort."}]
+    )
+    lines.extend(["", "## Alerts", ""])
+    lines.extend(
+        f"- {row['severity']} · {row['platform']}: {row['message']}"
+        for row in snapshot["alerts"] or [{"severity": "ok", "platform": "all", "message": "No active alerts."}]
+    )
+    lines.extend(["", "## Data quality", ""])
+    lines.extend(
+        f"- {row['platform']}: {row['coveragePercent']}% coverage, {row['measuredVideos']}/{row['videos']} videos measured"
+        for row in snapshot["quality"]
+    )
+    lines.extend(["", "## Cohorts", ""])
+    lines.extend(
+        f"- {row['platform']} · {row['dimension']}={row['value']}: {row['viewsPerVideo'] or 'N/A'} views/video, {row['measuredVideos']} measured"
+        for row in snapshot["cohorts"]
+    )
     lines.extend(["", "## Videos", "", "| Platform | Episode | Views | Engagement rate | Views/hour |", "|---|---|---:|---:|---:|"])
     lines.extend(
         f"| {row['platform']} | {row['episodeId']} | {row['views'] if row['views'] is not None else 'N/A'} | "

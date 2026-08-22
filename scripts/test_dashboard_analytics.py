@@ -46,6 +46,21 @@ assert quality["tiktok"]["coveragePercent"] == 100.0
 assert snapshot["trends"][1]["trend"] == "up"
 assert snapshot["alerts"] == []
 assert snapshot["recommendations"][0]["dimension"] == "trend"
+
+export_root = ROOT / "out/test-analytics-export"
+export_root.mkdir(parents=True, exist_ok=True)
+old_export_dir = analytics.EXPORT_DIR
+analytics.EXPORT_DIR = export_root
+try:
+    analytics.write_exports(snapshot)
+    export = (export_root / "gpt-analytics.md").read_text(encoding="utf-8")
+    assert "## Recommendations" in export
+    assert "## Data quality" in export
+finally:
+    analytics.EXPORT_DIR = old_export_dir
+    for path in export_root.glob("*"):
+        path.unlink(missing_ok=True)
+    export_root.rmdir()
 assert "raw" not in snapshot["videos"][0]
 assert [len(batch) for batch in analytics._chunks(list(range(41)), 20)] == [20, 20, 1]
 
