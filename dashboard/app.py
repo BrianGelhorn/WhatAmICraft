@@ -799,6 +799,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+        elif path == "/health":
+            self.send_json({"ok": True, "service": "dashboard"})
         elif path == "/api/state":
             self.send_json(dashboard_state())
         elif path == "/api/clues":

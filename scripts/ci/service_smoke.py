@@ -113,6 +113,13 @@ def main() -> None:
     if status != 200 or not headers.get("content-type", "").startswith("text/html"):
         raise RuntimeError("dashboard root is not serving HTML")
 
+    _, dashboard_health_headers, dashboard_health_body = get(f"{dashboard}/health")
+    if not dashboard_health_headers.get("content-type", "").startswith("application/json"):
+        raise RuntimeError("dashboard health is not JSON")
+    dashboard_health = json.loads(dashboard_health_body)
+    if dashboard_health.get("service") != "dashboard":
+        raise RuntimeError("dashboard health returned the wrong service")
+
     _, state_headers, state_body = get(f"{dashboard}/api/state")
     if not state_headers.get("content-type", "").startswith("application/json"):
         raise RuntimeError("dashboard state is not JSON")

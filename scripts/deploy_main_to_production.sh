@@ -50,7 +50,7 @@ sudo -n /usr/local/sbin/whatamicraft-up
 
 for attempt in $(seq 1 60); do
   if curl --fail --silent --show-error --max-time 10 \
-    http://127.0.0.1:8787/api/state >/dev/null; then
+    http://127.0.0.1:8787/health >/dev/null; then
     echo "Production deployed: $DEPLOY_SHA"
     exit 0
   fi
