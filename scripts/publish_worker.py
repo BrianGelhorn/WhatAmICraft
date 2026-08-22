@@ -29,7 +29,7 @@ from video_formats import (
     ready_episodes,
     video_path,
 )
-from job_status import append_job_line, begin_job, finish_job
+from job_status import append_job_line, begin_job, finish_job, read_job
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
@@ -280,10 +280,16 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
     schedule = load_generation_schedule()
     if not generation["enabled"] or not is_due({"schedule": generation}, schedule):
         return
+    if read_job("generation")["status"] == "running":
+        save_generation_schedule(next_run_iso(5))
+        log(LOG_DIR / "generator.log", "skip: generation already in progress")
+        return
     if publishing_active():
+        save_generation_schedule(next_run_iso(5))
         log(LOG_DIR / "generator.log", "skip: publishing in progress")
         return
     if not generation_window_open(config, load_schedule()):
+        save_generation_schedule(next_run_iso(5))
         log(LOG_DIR / "generator.log", "skip: publish window guard")
         return
 
@@ -292,6 +298,7 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
     retry_minutes = generation["intervalMinutes"]
     format_id = choose_generation_format(config, stock)
     if approved < generation["lowStockThreshold"] and total_buffer < generation["targetStock"] and format_id:
+        save_generation_schedule(next_run_iso(retry_minutes))
         missing_ids = stock["formats"].get(format_id, {}).get("missing", [])
         for episode_id in missing_ids:
             log(

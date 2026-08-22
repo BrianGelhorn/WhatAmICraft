@@ -116,6 +116,8 @@ def main() -> None:
 
         try:
             assert request("/")[1] == b"<main>dashboard fixture</main>"
+            health = json.loads(request("/health")[1])
+            assert health == {"ok": True, "service": "dashboard"}
             assert json.loads(request("/api/state")[1]) == {"ok": True, "revision": 0}
             assert json.loads(request("/api/diagnostics")[1])["ok"] is True
 

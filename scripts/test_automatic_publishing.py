@@ -17,7 +17,45 @@ import publish  # noqa: E402
 import publish_worker as worker  # noqa: E402
 
 
+def check_generation_lane_guard() -> None:
+    fixture = ROOT / "out/test-generation-schedule"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    config = {
+        "schedule": {"enabled": False},
+        "generation": {
+            "enabled": True,
+            "intervalMinutes": 180,
+            "targetStock": 8,
+            "lowStockThreshold": 5,
+            "publishGuardMinutes": 90,
+        },
+    }
+    saved: list[str] = []
+    original = {
+        "log_dir": worker.LOG_DIR,
+        "load_generation_schedule": worker.load_generation_schedule,
+        "save_generation_schedule": worker.save_generation_schedule,
+        "read_job": worker.read_job,
+    }
+    try:
+        worker.LOG_DIR = fixture
+        worker.load_generation_schedule = lambda: {"nextRunAt": "2026-01-01T00:00:00+00:00"}
+        worker.save_generation_schedule = saved.append
+        worker.read_job = lambda _lane: {"status": "running"}
+        worker.maybe_generate(config, {"pending": [], "candidates": [], "formats": {}})
+        assert len(saved) == 1
+        assert datetime.fromisoformat(saved[0]) > datetime.now(timezone.utc)
+    finally:
+        worker.LOG_DIR = original["log_dir"]
+        worker.load_generation_schedule = original["load_generation_schedule"]
+        worker.save_generation_schedule = original["save_generation_schedule"]
+        worker.read_job = original["read_job"]
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
 def main() -> None:
+    check_generation_lane_guard()
     fixture = ROOT / "out/test-automatic-publishing"
     shutil.rmtree(fixture, ignore_errors=True)
     output = fixture / "out/episodes"
