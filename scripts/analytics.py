@@ -64,8 +64,16 @@ def _published(platform: str, state: dict) -> list[tuple[str, dict, dict]]:
 
 
 def _build_series(snapshots: list[dict]) -> list[dict]:
-    buckets = {}
+    latest_by_video = {}
     for snapshot in snapshots:
+        captured = datetime.fromisoformat(snapshot["capturedAt"]).astimezone(timezone.utc)
+        bucket = captured.replace(minute=0, second=0, microsecond=0).isoformat()
+        key = (snapshot["platform"], bucket, snapshot["episodeId"])
+        current = latest_by_video.get(key)
+        if current is None or captured > datetime.fromisoformat(current["capturedAt"]).astimezone(timezone.utc):
+            latest_by_video[key] = snapshot
+    buckets = {}
+    for snapshot in latest_by_video.values():
         captured = datetime.fromisoformat(snapshot["capturedAt"]).astimezone(timezone.utc)
         bucket = captured.replace(minute=0, second=0, microsecond=0).isoformat()
         key = (snapshot["platform"], bucket)
