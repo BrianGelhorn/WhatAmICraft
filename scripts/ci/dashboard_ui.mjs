@@ -269,6 +269,7 @@ try {
   await clickRequest('#random', '/api/generate');
   await waitPage('random cancel control', () => !document.querySelector('[data-cancel-job]').hidden);
   await clickRequest('[data-cancel-job]', '/api/job/cancel');
+  await waitPage('random cancellation restored', () => !document.querySelector('#random').disabled);
 
   await click('[data-view="music"]');
   await setValue('#music-url', 'https://youtu.be/fixture');

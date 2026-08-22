@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   checks:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository and submodules
