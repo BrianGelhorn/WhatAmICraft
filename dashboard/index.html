@@ -44,9 +44,9 @@
     th { color:var(--muted); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
     tbody tr { cursor:pointer; }
     tbody tr:hover, tbody tr.selected { background:var(--soft); }
-    .status { display:inline-block; border-radius:99px; padding:4px 8px; background:var(--soft); color:var(--yellow); font-size:12px; white-space:nowrap; }
-    .actions { display:flex; flex-wrap:wrap; gap:6px; }
-    .actions button { padding:6px 9px; font-size:12px; }
+    .status { display:inline-flex; align-items:center; justify-content:center; min-height:30px; border-radius:99px; padding:4px 9px; background:var(--soft); color:var(--yellow); font-size:12px; line-height:1.1; white-space:nowrap; }
+    .actions { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+    .actions button { display:inline-flex; align-items:center; justify-content:center; min-height:30px; padding:6px 9px; font-size:12px; line-height:1.1; }
     .published { color:var(--green); font-size:12px; text-transform:capitalize; }
     aside { padding:16px; align-self:start; position:sticky; top:16px; }
     aside h2 { font-size:18px; margin:0 0 12px; }
@@ -54,7 +54,7 @@
     video { width:100%; max-height:500px; border-radius:10px; background:#000; }
     .empty { display:grid; place-items:center; min-height:280px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:10px; padding:25px; }
     .job { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
-    .job-head { display:flex; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .job-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; }
     pre { max-height:220px; overflow:auto; margin:0; padding:10px; border-radius:9px; background:#090d0b; color:#b7c8bc; white-space:pre-wrap; font-size:11px; }
     .publishing { margin-top:16px; padding:20px; }
     .section-head { display:flex; justify-content:space-between; gap:14px; align-items:center; margin-bottom:18px; }

@@ -222,6 +222,7 @@ try {
     const before = requestCount(pathName);
     await click(selector);
     await waitNode(pathName, () => requestCount(pathName) > before);
+    await new Promise((resolve) => setTimeout(resolve, 100));
   };
 
   await waitPage('initial dashboard state', () => document.querySelector('#video-result-count')?.textContent !== '0 resultados');
