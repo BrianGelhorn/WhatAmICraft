@@ -13,6 +13,7 @@ VARIANTS = {"silhouette", "pixelated", "roulette"}
 DEFAULT_DESIGN_VARIANT = "default"
 TYPE_ASSET_DIR = ROOT / "public/images/guess-types/visible"
 HIDDEN_TYPE_ASSET_DIR = ROOT / "public/images/guess-types/hidden"
+THUMBNAIL_RENDER_TIMEOUT_SECONDS = 120
 
 
 def type_names() -> list[str]:
@@ -106,6 +107,7 @@ def render_thumbnails(config: dict, stem: str | None = None) -> list[Path]:
             ],
             cwd=ROOT,
             check=True,
+            timeout=THUMBNAIL_RENDER_TIMEOUT_SECONDS,
         )
         return [output]
     answer_types = type_names()
@@ -133,6 +135,7 @@ def render_thumbnails(config: dict, stem: str | None = None) -> list[Path]:
                 ],
                 cwd=ROOT,
                 check=True,
+                timeout=THUMBNAIL_RENDER_TIMEOUT_SECONDS,
             )
     write_config(config)
     return outputs
