@@ -35,6 +35,7 @@ Backups must stay small. Include:
 - recent log excerpts
 
 Do not include MP4s, full logs, node modules, textures, or audio caches.
+Never include `.env`, `.env.local`, or `data/publishing-secrets.json`.
 
 ## Secrets
 
