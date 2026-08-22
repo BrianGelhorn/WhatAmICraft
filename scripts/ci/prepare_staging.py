@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 from pathlib import Path
 
@@ -59,8 +60,11 @@ def main() -> None:
     parser.add_argument("--reset", action="store_true")
     args = parser.parse_args()
     runtime_path = args.runtime_root.resolve()
-    if STAGING_ROOT.resolve() not in runtime_path.parents:
-        raise SystemExit("staging runtime must live below staging/")
+    allowed_roots = [STAGING_ROOT.resolve()]
+    if runner_temp := os.environ.get("RUNNER_TEMP"):
+        allowed_roots.append(Path(runner_temp).resolve())
+    if not any(root == runtime_path or root in runtime_path.parents for root in allowed_roots):
+        raise SystemExit("staging runtime must live below staging/ or RUNNER_TEMP")
     runtime = prepare_runtime(runtime_path, reset=args.reset)
     print(f"prepared isolated staging runtime: {runtime}")
 

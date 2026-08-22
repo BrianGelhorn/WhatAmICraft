@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
 
     steps:
       - name: Checkout repository and submodules
@@ -49,10 +49,8 @@ jobs:
       - name: Build Remotion bundle
         run: npm run build
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
 
       - name: Compile Python sources
         run: python -m compileall dashboard scripts

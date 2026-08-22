@@ -33,9 +33,9 @@ services:
     ports:
       - "127.0.0.1:${STAGING_DASHBOARD_PORT:-8788}:8787"
     volumes:
-      - ./runtime/data:/app/data
-      - ./runtime/out:/app/out
-      - ./runtime/backups:/app/backups
+      - ${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out
+      - ${STAGING_RUNTIME_DIR:-./runtime}/backups:/app/backups
     depends_on:
       - clues-api
       - analytics-api
@@ -54,7 +54,7 @@ services:
     ports:
       - "127.0.0.1:${STAGING_CLUES_PORT:-8790}:8790"
     volumes:
-      - ./runtime/data:/app/data
+      - ${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data
 
   analytics-api:
     image: minecraft-quiz-guesser:service
@@ -66,9 +66,9 @@ services:
     ports:
       - "127.0.0.1:${STAGING_ANALYTICS_PORT:-8791}:8791"
     volumes:
-      - ./runtime/data:/app/data
-      - ./runtime/out:/app/out
-      - ./runtime/backups:/app/backups
+      - ${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out
+      - ${STAGING_RUNTIME_DIR:-./runtime}/backups:/app/backups
 
   backup-rollback:
     image: minecraft-quiz-guesser:service
@@ -84,9 +84,9 @@ services:
     ports:
       - "127.0.0.1:${STAGING_BACKUP_PORT:-8793}:8793"
     volumes:
-      - ./runtime/data:/app/data
-      - ./runtime/out:/app/out
-      - ./runtime/backups:/app/backups
+      - ${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out
+      - ${STAGING_RUNTIME_DIR:-./runtime}/backups:/app/backups
 
   monitor:
     image: minecraft-quiz-guesser:service
@@ -105,7 +105,7 @@ services:
     ports:
       - "127.0.0.1:${STAGING_MONITOR_PORT:-8792}:8792"
     volumes:
-      - ./runtime/out:/app/out
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out
 
   media:
     image: minecraft-quiz-guesser-media:staging
@@ -116,8 +116,8 @@ services:
     ports:
       - "127.0.0.1:${STAGING_MEDIA_PORT:-8081}:80"
     volumes:
-      - ./runtime/out/episodes:/mnt/out/episodes:ro
-      - ./runtime/out/thumbnails:/mnt/out/thumbnails:ro
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out/episodes:/mnt/out/episodes:ro
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out/thumbnails:/mnt/out/thumbnails:ro
 
   bot:
     profiles: ["integrations"]
@@ -129,8 +129,8 @@ services:
       TELEGRAM_BOT_TOKEN: ""
       TELEGRAM_REVIEW_CHAT_ID: ""
     volumes:
-      - ./runtime/data:/app/data
-      - ./runtime/out:/app/out
+      - ${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out
 
   publisher-worker:
     profiles: ["integrations"]
@@ -150,5 +150,5 @@ services:
       FACEBOOK_PAGE_ID: ""
       PUBLISH_QUEUE_INTERVAL: 30
     volumes:
-      - ./runtime/data:/app/data
-      - ./runtime/out:/app/out
+      - ${STAGING_RUNTIME_DIR:-./runtime}/data:/app/data
+      - ${STAGING_RUNTIME_DIR:-./runtime}/out:/app/out

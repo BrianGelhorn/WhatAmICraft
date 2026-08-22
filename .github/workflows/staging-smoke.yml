@@ -20,20 +20,22 @@ permissions:
 jobs:
   staging:
     name: Isolated staging verification
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.sha }}
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Prepare isolated persistent staging runtime
         shell: bash
         run: |
           set -euo pipefail
-          PYTHONPATH=scripts python scripts/ci/prepare_staging.py --reset
+          export STAGING_RUNTIME_DIR="${RUNNER_TEMP}/whatamicraft-staging-${GITHUB_RUN_ID}"
+          echo "STAGING_RUNTIME_DIR=$STAGING_RUNTIME_DIR" >> "$GITHUB_ENV"
+          PYTHONPATH=scripts python scripts/ci/prepare_staging.py \
+            --runtime-root "$STAGING_RUNTIME_DIR" --reset
       - name: Validate and start staging services
         shell: bash
         run: |
@@ -77,5 +79,5 @@ jobs:
             --monitor http://127.0.0.1:8792 \
             --backup http://127.0.0.1:8793 \
             --backup-token ci-only-backup-token \
-            --runtime-root staging/runtime \
+            --runtime-root "$STAGING_RUNTIME_DIR" \
             --fixture mc-ci-test.mp4

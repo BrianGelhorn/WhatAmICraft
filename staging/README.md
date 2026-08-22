@@ -1,6 +1,6 @@
 # Entorno de staging aislado
 
-Este compose usa el proyecto `minecraftquizguesser-dev`, los puertos `8788` y `8081`, y el runtime persistente `staging/runtime/`. Ese runtime se crea con datos de prueba separados; nunca monta `data/`, `out/` ni `backups/` del proyecto principal.
+Este compose usa el proyecto `minecraftquizguesser-dev`, los puertos `8788` y `8081`, y el runtime persistente `staging/runtime/` por defecto. Podés definir `STAGING_RUNTIME_DIR` para usar otra carpeta aislada; CI lo ubica debajo de `RUNNER_TEMP` para que Docker no deje archivos con permisos de `root` dentro del checkout. Nunca monta `data/`, `out/` ni `backups/` del proyecto principal.
 
 Preparación y arranque local:
 
