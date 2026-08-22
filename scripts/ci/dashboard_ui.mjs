@@ -68,6 +68,7 @@ const state = {
     generatedAt: '2026-08-21T12:00:00Z',
     summary: {videos: 1, views: 100, engagements: 12, engagementRateByViews: 12},
     platforms: [{platform: 'youtube', videos: 1, views: 100, engagements: 12, error: null, syncedAt: '2026-08-21T12:00:00Z'}],
+    series: [{platform: 'youtube', capturedAt: '2026-08-21T12:00:00Z', views: 100, engagements: 12}],
     videos: [{platform: 'youtube', episodeId: 'mc-04', target: 'Golden Apple', formatLabel: 'Quiz definitivo', views: 100, reach: 90, viewsPerHourSincePrevious: 10, engagementRateByViews: 12, likes: 8, comments: 2, shares: 1, saves: 1, averageWatchSeconds: 18, completionRate: 70}],
     observations: ['Fixture observation'],
   },
@@ -282,6 +283,10 @@ try {
   await clickRequest('[data-delete-track]', '/api/music/delete');
 
   await click('[data-view="analytics"]');
+  assert.equal(await evaluate(() => Boolean(document.querySelector('#analytics-chart svg'))), true);
+  await setValue('#analytics-platform', 'youtube');
+  await setValue('#analytics-window', 'all');
+  assert.equal(await evaluate(() => Boolean(document.querySelector('#analytics-chart svg'))), true);
   await clickRequest('#sync-analytics', '/api/analytics/sync');
   assert.deepEqual(await evaluate(() => [...document.querySelectorAll('a[href^="/api/analytics/export"]')].map((link) => link.getAttribute('href'))), ['/api/analytics/export.json', '/api/analytics/export.md']);
 

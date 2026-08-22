@@ -56,6 +56,25 @@ def _published(platform: str, state: dict) -> list[tuple[str, dict, dict]]:
     return rows
 
 
+def _build_series(snapshots: list[dict]) -> list[dict]:
+    buckets = {}
+    for snapshot in snapshots:
+        captured = datetime.fromisoformat(snapshot["capturedAt"]).astimezone(timezone.utc)
+        bucket = captured.replace(minute=0, second=0, microsecond=0).isoformat()
+        key = (snapshot["platform"], bucket)
+        point = buckets.setdefault(key, {
+            "platform": snapshot["platform"], "capturedAt": bucket,
+            "videos": 0, "views": 0, "engagements": 0, "reach": 0,
+        })
+        point["videos"] += 1
+        point["views"] += int(snapshot.get("views") or 0)
+        point["engagements"] += sum(int(snapshot.get(name) or 0) for name in ("likes", "comments", "shares", "saves"))
+        point["reach"] += int(snapshot.get("reach") or 0)
+    for point in buckets.values():
+        point["engagementRateByViews"] = round(point["engagements"] / point["views"] * 100, 2) if point["views"] else None
+    return sorted(buckets.values(), key=lambda point: (point["capturedAt"], point["platform"]))
+
+
 def _insight_values(response: dict) -> dict:
     result = {}
     for metric in response.get("data", []):
@@ -379,6 +398,7 @@ def build_snapshot() -> dict:
             "engagementRateByViews": round(total_engagements / total_views * 100, 2) if total_views else None,
         },
         "platforms": platform_summaries,
+        "series": _build_series(video_metric_snapshots()),
         "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),
         "observations": observations,
         "definitions": {

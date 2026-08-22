@@ -80,6 +80,10 @@
     .platform-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px; }
     .platform-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .analytics-platforms { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+    .analytics-controls { display:flex; flex-wrap:wrap; gap:12px; margin:14px 0; }
+    .analytics-controls .field { min-width:150px; }
+    .analytics-chart { min-height:240px; border:1px solid var(--line); border-radius:10px; padding:10px; background:#101713; }
+    .analytics-chart svg { display:block; width:100%; height:auto; }
     .analytics-platform { border:1px solid var(--line); border-radius:10px; padding:11px; background:#101713; }
     .analytics-platform strong,.analytics-platform span { display:block; }
     .analytics-platform span { margin-top:4px; color:var(--muted); font-size:12px; }
@@ -411,6 +415,11 @@
           <button class="primary" id="sync-analytics">Actualizar todo</button>
         </div>
       </div>
+      <div class="analytics-controls" aria-label="Filtros de rendimiento">
+        <label class="field">Período<select id="analytics-window"><option value="24">Últimas 24 horas</option><option value="168" selected>Últimos 7 días</option><option value="720">Últimos 30 días</option><option value="all">Todo el historial</option></select></label>
+        <label class="field">Plataforma<select id="analytics-platform"><option value="all">Todas</option><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="facebook">Facebook Reels</option></select></label>
+      </div>
+      <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
       <section class="stats" aria-label="Resumen de estadísticas">
         <div class="stat"><span>Videos medidos</span><strong id="analytics-videos">0</strong></div>
         <div class="stat"><span>Vistas</span><strong id="analytics-views">0</strong></div>
@@ -950,6 +959,7 @@
           <span class="${item.error ? 'bad' : 'ok'}">${item.error ? escapeHtml(item.error) : `${number(item.videos)} videos · ${number(item.views)} vistas`}</span>
           <span>${item.syncedAt ? `Actualizado ${new Date(item.syncedAt).toLocaleString()}` : 'Todavía sin sincronizar'}</span>
         </div>`).join('');
+      renderAnalyticsChart(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
       $('analytics-rows').innerHTML = (analytics.videos || []).map(item => `
@@ -961,6 +971,35 @@
           <td><strong>${metric(item.engagementRateByViews, '%')}</strong><br><span class="hint">${metric(item.likes)} likes · ${metric(item.comments)} comentarios · ${metric(item.shares)} compartidos · ${metric(item.saves)} guardados</span></td>
           <td>${metric(item.averageWatchSeconds, ' s')}</td><td>${metric(item.completionRate, '%')}</td>
         </tr>`).join('');
+    }
+
+    function renderAnalyticsChart(analytics) {
+      const number = value => Number(value || 0).toLocaleString('es-AR');
+      const platform = $('analytics-platform').value;
+      const windowValue = $('analytics-window').value;
+      const cutoff = windowValue === 'all' ? 0 : Date.now() - Number(windowValue) * 60 * 60 * 1000;
+      const grouped = new Map();
+      (analytics.series || []).filter(item => platform === 'all' || item.platform === platform).forEach(item => {
+        if (Date.parse(item.capturedAt) < cutoff) return;
+        const current = grouped.get(item.capturedAt) || {capturedAt:item.capturedAt, views:0, engagements:0};
+        current.views += Number(item.views || 0);
+        current.engagements += Number(item.engagements || 0);
+        grouped.set(item.capturedAt, current);
+      });
+      const points = [...grouped.values()].sort((a,b) => Date.parse(a.capturedAt) - Date.parse(b.capturedAt));
+      if (!points.length) {
+        $('analytics-chart').innerHTML = '<p class="hint">Todavía no hay snapshots para este período.</p>';
+        return;
+      }
+      const width = 760, height = 220, left = 48, right = 16, top = 18, bottom = 34;
+      const max = Math.max(...points.map(item => item.views), 1);
+      const x = index => points.length === 1 ? (width - left - right) / 2 + left : left + index * (width - left - right) / (points.length - 1);
+      const y = value => height - bottom - value / max * (height - top - bottom);
+      const path = points.map((item, index) => `${index ? 'L' : 'M'} ${x(index).toFixed(1)} ${y(item.views).toFixed(1)}`).join(' ');
+      const dots = points.map((item, index) => `<circle cx="${x(index).toFixed(1)}" cy="${y(item.views).toFixed(1)}" r="4" fill="var(--green)"><title>${new Date(item.capturedAt).toLocaleString()} · ${number(item.views)} vistas · ${number(item.engagements)} interacciones</title></circle>`).join('');
+      const first = new Date(points[0].capturedAt).toLocaleDateString();
+      const last = new Date(points.at(-1).capturedAt).toLocaleDateString();
+      $('analytics-chart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de vistas"><line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="var(--line-strong)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="var(--line-strong)"/><path d="${path}" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}<text x="${left}" y="${height-10}" fill="var(--muted)">${escapeHtml(first)}</text><text x="${width-right}" y="${height-10}" text-anchor="end" fill="var(--muted)">${escapeHtml(last)}</text><text x="${left-8}" y="${top+4}" text-anchor="end" fill="var(--muted)">${number(max)}</text><text x="${left-8}" y="${height-bottom+4}" text-anchor="end" fill="var(--muted)">0</text></svg>`;
     }
 
     function renderDiagnostics() {
@@ -1135,6 +1174,8 @@
       catch(e) { toast(e.message); }
       finally { $('sync-analytics').disabled = false; }
     };
+    $('analytics-window').onchange = () => renderAnalyticsChart(state.analytics || {});
+    $('analytics-platform').onchange = () => renderAnalyticsChart(state.analytics || {});
     $('publish-now').onclick = async () => { try { await api('/api/publish-now',{}); toast('Publicación iniciada'); refresh(); } catch(e){ toast(e.message); } };
     $('manual-publish').onclick = async event => {
       const platform = event.target.dataset.publishPlatform; if (!platform || !selectedId) return;
