@@ -1,0 +1,13 @@
+name: Runner Python
+description: Use the installed Python runtime on the self-hosted Linux runner.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        python3 --version
+        python3 -c 'import sys; assert sys.version_info >= (3, 12), sys.version'
+        runner_bin="${RUNNER_TEMP}/whatamicraft-python"
+        mkdir -p "$runner_bin"
+        ln -sf "$(command -v python3)" "$runner_bin/python"
+        echo "$runner_bin" >> "$GITHUB_PATH"

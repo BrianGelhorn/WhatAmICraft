@@ -28,9 +28,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - uses: actions/setup-node@v7
         with:
           node-version: 20
@@ -60,9 +59,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Bot behavior contract against fake Telegram API
         shell: bash
         run: |
@@ -79,9 +77,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Validate mini PC and isolated staging contract
         shell: bash
         run: |
@@ -101,9 +98,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Publisher and worker behavior contract with provider fake
         shell: bash
         run: |
@@ -121,9 +117,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - uses: actions/setup-node@v7
         with:
           node-version: 20
@@ -153,9 +148,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Clues API behavior contract
         shell: bash
         run: |
@@ -171,9 +165,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Analytics API behavior contract with provider fake
         shell: bash
         run: |
@@ -189,9 +182,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Monitoring behavior contract
         shell: bash
         run: |
@@ -206,9 +198,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Backup behavior contract
         shell: bash
         run: |
@@ -279,9 +270,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Prepare isolated fixture
         shell: bash
         run: |

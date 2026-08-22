@@ -26,9 +26,8 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.sha }}
           submodules: recursive
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
+      - name: Use runner Python
+        uses: ./.github/actions/runner-python
       - name: Prepare isolated persistent staging runtime
         shell: bash
         run: |
