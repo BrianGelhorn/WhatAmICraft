@@ -11,6 +11,10 @@ export const RemotionRoot: React.FC = () => {
         id="QuizCapasCopy"
         component={QuizVideoCopy}
         durationInFrames={QUIZ_COPY_DURATION_IN_FRAMES}
+        calculateMetadata={({props}) => {
+          const config = (props as {config?: typeof quizConfig}).config ?? quizConfig;
+          return {durationInFrames: config.durationInFrames};
+        }}
         fps={30}
         width={1080}
         height={1920}
