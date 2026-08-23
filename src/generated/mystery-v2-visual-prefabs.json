@@ -50,21 +50,24 @@
     },
     {
       "number": 3,
-      "id": "charge-level",
-      "title": "SE PUEDE CARGAR",
+      "id": "enchantment-glint",
+      "title": "PUEDE ENCANTARSE",
       "role": "property-state",
-      "status": "draft",
-      "description": "Carga progresiva alrededor del objeto.",
+      "status": "approved",
+      "description": "Brillo controlado y libro de encantamiento para propiedades enchantable reutilizables.",
       "relations": [
-        "charge",
-        "loaded_state"
+        "enchantable",
+        "enchantment"
       ],
       "supportedKinds": [
         "weapon",
-        "item"
+        "tool",
+        "item",
+        "armor"
       ],
       "assets": [
-        "mc-assets/item-assets/CROSSBOW.png"
+        "mc-assets/item-assets/DIAMOND_SWORD.png",
+        "mc-assets/item-assets/ENCHANTED_BOOK.png"
       ]
     },
     {
@@ -89,24 +92,21 @@
     },
     {
       "number": 5,
-      "id": "enchantment-glint",
-      "title": "PUEDE ENCANTARSE",
+      "id": "charge-level",
+      "title": "SE PUEDE CARGAR",
       "role": "property-state",
-      "status": "approved",
-      "description": "Brillo controlado y libro de encantamiento para propiedades enchantable reutilizables.",
+      "status": "draft",
+      "description": "Carga progresiva alrededor del objeto.",
       "relations": [
-        "enchantable",
-        "enchantment"
+        "charge",
+        "loaded_state"
       ],
       "supportedKinds": [
         "weapon",
-        "tool",
-        "item",
-        "armor"
+        "item"
       ],
       "assets": [
-        "mc-assets/item-assets/DIAMOND_SWORD.png",
-        "mc-assets/item-assets/ENCHANTED_BOOK.png"
+        "mc-assets/item-assets/CROSSBOW.png"
       ]
     },
     {
