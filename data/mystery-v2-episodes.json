@@ -55,7 +55,7 @@
           "fragments": ["MELEE", "RANGED"],
           "emphasisWords": ["MELEE", "RANGED"],
           "visualType": "combat",
-          "visualAsset": "mc-assets/entity-assets/flat/ARROW.png",
+          "visualAsset": "mc-assets/entity-assets/flat/ZOMBIE.png",
           "difficulty": "medium"
         },
         {
