@@ -34,7 +34,9 @@
         "DURABILITY",
         "STACKING"
       ],
-      "visualType": "durability",
+      "visual": {
+        "scene": "item-state"
+      },
       "difficulty": "hard"
     },
     {
@@ -49,8 +51,10 @@
         "MELEE",
         "RANGED"
       ],
-      "visualType": "combat",
-      "visualAsset": "mc-assets/entity-assets/flat/ZOMBIE.png",
+      "visual": {
+        "scene": "item-versus-entity",
+        "supportingAsset": "mc-assets/entity-assets/flat/ZOMBIE.png"
+      },
       "difficulty": "medium"
     },
     {
@@ -63,8 +67,11 @@
       "emphasisWords": [
         "DROWNED"
       ],
-      "visualType": "mob",
-      "visualAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+      "visual": {
+        "scene": "entity-holds-answer",
+        "supportingAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+        "environment": "water"
+      },
       "difficulty": "easy"
     }
   ],

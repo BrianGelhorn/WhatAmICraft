@@ -31,16 +31,25 @@ export const CategoryBadge: React.FC<{config: MysteryVideoConfig}> = ({config}) 
 export const GlobalProgress: React.FC<{config: MysteryVideoConfig; absoluteFrame: number}> = ({config, absoluteFrame}) => {
   const urgency = absoluteFrame >= config.timeline.countdown.from;
   return (
-    <div style={{display: "flex", gap: 22}}>
+    <div style={{display: "flex", gap: 18, padding: 10, borderRadius: 26, background: `${config.theme.mystery}CC`, boxShadow: "0 12px 28px rgba(0,0,0,.35)"}}>
       {config.timeline.hints.map((hint, index) => {
         const active = absoluteFrame >= hint.from;
-        return <div key={index} style={{width: 82, height: 58, display: "grid", placeItems: "center", border: `4px solid ${active ? urgency ? config.theme.urgency : config.theme.progress : "#33415F"}`, borderRadius: 12, background: active ? config.theme.surface : `${config.theme.mystery}AA`, color: active ? config.theme.text : config.theme.muted, fontSize: 28, boxShadow: active ? `0 0 18px ${urgency ? config.theme.urgency : config.theme.progress}55` : "none"}}>{index + 1}</div>;
+        const entered = interpolate(absoluteFrame - hint.from, [0, 7], [0, 1], ease);
+        const color = urgency ? config.theme.urgency : config.theme.progress;
+        return <div key={index} style={{width: 82, height: 58, display: "grid", placeItems: "center", border: `4px solid ${active ? color : "#33415F"}`, borderRadius: 20, background: active ? `linear-gradient(145deg, ${config.theme.surface}, ${color}2B)` : `${config.theme.mystery}AA`, color: active ? config.theme.text : config.theme.muted, fontSize: 28, boxShadow: active ? `0 8px 0 #02040A, 0 0 18px ${color}55` : "inset 0 0 0 2px rgba(255,255,255,.03)", transform: `scale(${active ? 0.9 + entered * 0.1 : 1})`}}>{index + 1}</div>;
       })}
     </div>
   );
 };
 
 export const ProgressMeter = GlobalProgress;
+
+const RoundedStage: React.FC<{config: MysteryVideoConfig; color: string; children: React.ReactNode; height?: number}> = ({config, color, children, height = 570}) => (
+  <div style={{position: "relative", width: 900, height, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 62, border: `4px solid ${color}88`, background: `linear-gradient(150deg, ${config.theme.surface}F2, ${config.theme.mystery}E6 68%, ${color}18)`, boxShadow: `0 22px 0 #02040A99, inset 0 0 0 3px rgba(255,255,255,.04), 0 0 42px ${color}22`}}>
+    <div style={{position: "absolute", width: 520, height: 520, borderRadius: "50%", background: `radial-gradient(circle, ${color}20, transparent 68%)`}} />
+    {children}
+  </div>
+);
 
 export const MysteryObject: React.FC<{
   config: MysteryVideoConfig;
@@ -84,18 +93,18 @@ export const HookScene: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
     <AbsoluteFill name="Hook scene" style={{alignItems: "center"}}>
       <div style={{position: "absolute", top: 188}}><CategoryBadge config={config} /></div>
       <div style={{position: "absolute", top: 292, transform: `scale(${0.94 + impact * 0.06})`}}><HookQuestion config={config} /></div>
-      <div style={{position: "absolute", top: 540, width: 610, height: 610, display: "grid", placeItems: "center"}}>
-        <div style={{position: "absolute", inset: 18, borderRadius: "50%", border: `5px solid ${config.theme.accent}`, opacity: 0.76, transform: `scale(${ring})`, boxShadow: `0 0 60px ${config.theme.accent}55`}} />
+      <div style={{position: "absolute", top: 520, width: 760, height: 650, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 72, border: `4px solid ${config.theme.accent}99`, background: `linear-gradient(150deg, ${config.theme.surface}F4, ${config.theme.mystery}E8 70%, ${config.theme.accent}1F)`, boxShadow: `0 24px 0 #02040A99, inset 0 0 0 3px rgba(255,255,255,.05), 0 0 54px ${config.theme.accent}22`, transform: `scale(${0.94 + impact * 0.06})`}}>
+        <div style={{position: "absolute", inset: 45, borderRadius: "50%", border: `5px solid ${config.theme.accent}`, opacity: 0.68, transform: `scale(${ring})`, boxShadow: `0 0 60px ${config.theme.accent}44`}} />
         <MysteryObject config={config} size={520} reaction={Math.sin(frame / 4) * 0.2 + 0.2} />
       </div>
-      <div style={{position: "absolute", top: 1238, padding: "13px 26px", borderRadius: 14, background: config.theme.urgency, color: "#10131C", fontSize: 34, letterSpacing: 3, boxShadow: "0 10px 0 rgba(0,0,0,.42)"}}>{config.hook.ruleText}</div>
+      <div style={{position: "absolute", top: 1238, padding: "15px 30px", borderRadius: 28, background: `linear-gradient(135deg, ${config.theme.urgency}, ${config.theme.accent})`, color: "#10131C", fontSize: 34, letterSpacing: 3, boxShadow: "0 12px 0 rgba(0,0,0,.42), 0 0 28px rgba(255,107,53,.28)"}}>{config.hook.ruleText}</div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={frame} /></div>
     </AbsoluteFill>
   );
 };
 
 export const HintHeader: React.FC<{config: MysteryVideoConfig; index: number}> = ({config, index}) => (
-  <div style={{display: "flex", alignItems: "center", gap: 16, color: config.theme.muted, fontSize: 28, letterSpacing: 5}}>
+  <div style={{display: "flex", alignItems: "center", gap: 16, padding: "10px 22px", borderRadius: 999, border: `3px solid ${config.theme.progress}66`, background: `${config.theme.surface}DD`, color: config.theme.muted, fontSize: 28, letterSpacing: 5, boxShadow: "0 10px 24px rgba(0,0,0,.28)"}}>
     <span style={{color: config.theme.progress}}>0{index + 1}</span><span>HINT</span>
   </div>
 );
@@ -104,7 +113,7 @@ export const HintKeyword: React.FC<{config: MysteryVideoConfig; hint: MysteryHin
   const frame = useCurrentFrame();
   const switchFrame = Math.floor(durationInFrames * 0.46);
   return (
-    <div style={{position: "relative", width: 940, height: 150}}>
+    <div style={{position: "relative", width: 940, height: 150, borderRadius: 34, border: `3px solid ${config.theme.accent}45`, background: `${config.theme.mystery}B8`, boxShadow: "0 14px 30px rgba(0,0,0,.28)"}}>
       {hint.fragments.map((fragment, index) => {
         const enter = index === 0 ? 2 : switchFrame;
         const leave = index === hint.fragments.length - 1 ? durationInFrames : switchFrame + 4;
@@ -117,7 +126,7 @@ export const HintKeyword: React.FC<{config: MysteryVideoConfig; hint: MysteryHin
 
 export const HintText = HintKeyword;
 
-export const DurabilityVisual: React.FC<{config: MysteryVideoConfig; duration: number}> = ({config, duration}) => {
+export const ItemStateVisual: React.FC<{config: MysteryVideoConfig; duration: number}> = ({config, duration}) => {
   const frame = useCurrentFrame();
   const secondPhase = interpolate(frame, [duration * 0.42, duration * 0.56], [0, 1], ease);
   const wear = interpolate(frame, [8, duration * 0.42], [0, 1], ease);
@@ -128,47 +137,53 @@ export const DurabilityVisual: React.FC<{config: MysteryVideoConfig; duration: n
         {[0, 1, 2].map((index) => <div key={index} style={{position: "absolute", left: 118 + index * 36, top: 120 + index * 42, width: 11, height: 52, background: config.theme.urgency, transform: `rotate(${34 + index * 14}deg) scaleY(${wear})`, transformOrigin: "top", opacity: wear, boxShadow: "0 5px 0 #02040A"}} />)}
         {[0, 1, 2, 3].map((index) => <div key={index} style={{position: "absolute", left: 130 + index * 38, top: 210 + wear * (95 + index * 18), width: 14 + index * 2, height: 14 + index * 2, background: index % 2 ? config.theme.urgency : config.theme.accent, opacity: wear * (1 - secondPhase)}} />)}
       </div>
-      <div style={{position: "absolute", left: 238, top: 35, width: 304, height: 304, display: "grid", placeItems: "center", border: "10px solid #8892A8", background: "#31394A", boxShadow: "inset 0 0 0 8px #171D2B, 0 12px 0 #02040A", opacity: secondPhase, transform: `scale(${0.9 + secondPhase * 0.1})`}}>
+      <div style={{position: "absolute", left: 228, top: 25, width: 324, height: 324, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 42, border: "10px solid #8892A8", background: "linear-gradient(145deg, #3B455A, #252C3D)", boxShadow: "inset 0 0 0 8px #171D2B, 0 16px 0 #02040A, 0 0 30px rgba(255,209,102,.2)", opacity: secondPhase, transform: `scale(${0.86 + secondPhase * 0.14}) rotate(${(1 - secondPhase) * -4}deg)`}}>
         <MysteryObject config={config} size={250} reaction={0.2} />
-        <div style={{position: "absolute", right: 18, bottom: 10, color: config.theme.text, fontSize: 54, textShadow: "0 5px 0 #000"}}>1</div>
+        <div style={{position: "absolute", right: 15, bottom: 12, width: 66, height: 66, display: "grid", placeItems: "center", borderRadius: 22, background: `${config.theme.mystery}E8`, color: config.theme.text, fontSize: 48, textShadow: "0 5px 0 #000", boxShadow: "0 7px 0 #02040A"}}>1</div>
       </div>
     </div>
   );
 };
 
-export const CombatRangeVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
+export const ItemVersusEntityVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
   const secondPhase = interpolate(frame, [duration * 0.42, duration * 0.56], [0, 1], ease);
   const meleeStrike = interpolate(frame, [8, 24], [0, 1], ease);
   const thrownStrike = interpolate(frame, [duration * 0.52, duration * 0.82], [0, 1], ease);
+  const meleeImpact = interpolate(frame, [18, 23, 31], [0, 1, 0], clamp);
+  const rangedImpact = interpolate(frame, [duration * 0.76, duration * 0.82, duration * 0.92], [0, 1, 0], clamp);
+  const impact = Math.max(meleeImpact * (1 - secondPhase), rangedImpact * secondPhase);
   return (
     <div style={{position: "relative", width: 850, height: 520}}>
-      {hint.visualAsset ? <CanvasImage src={staticFile(hint.visualAsset)} style={{position: "absolute", right: 70, top: 90, width: 270, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: "drop-shadow(0 12px 0 #02040A)"}} /> : null}
-      <div style={{position: "absolute", left: 70 + meleeStrike * 245, top: 115, opacity: 1 - secondPhase, transform: `rotate(${meleeStrike * -14}deg)`}}><MysteryObject config={config} size={260} reaction={meleeStrike * 0.5} /></div>
-      <div style={{position: "absolute", left: 35 + thrownStrike * 440, top: 130 - Math.sin(thrownStrike * Math.PI) * 70, opacity: secondPhase, transform: `rotate(${thrownStrike * 12}deg)`}}><MysteryObject config={config} size={220} reaction={thrownStrike * 0.35} /></div>
+      {hint.visual.supportingAsset ? <CanvasImage src={staticFile(hint.visual.supportingAsset)} style={{position: "absolute", right: 65 + impact * 10, top: 90, width: 270, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: `drop-shadow(0 12px 0 #02040A) drop-shadow(0 0 ${impact * 28}px ${config.theme.urgency})`, transform: `rotate(${impact * 5}deg) scale(${1 - impact * 0.04})`}} /> : null}
+      <div style={{position: "absolute", left: 65 + meleeStrike * 250, top: 115, opacity: 1 - secondPhase, transform: `rotate(${meleeStrike * -16}deg)`}}><MysteryObject config={config} size={260} reaction={meleeStrike * 0.5} /></div>
+      <div style={{position: "absolute", left: 20 + thrownStrike * 465, top: 150 - Math.sin(thrownStrike * Math.PI) * 105, opacity: secondPhase, transform: `rotate(${thrownStrike * 16 - 8}deg)`}}><MysteryObject config={config} size={220} reaction={thrownStrike * 0.35} /></div>
+      {[0, 1, 2, 3].map((index) => <div key={index} style={{position: "absolute", left: 590 + Math.cos(index * 1.7) * impact * 80, top: 235 + Math.sin(index * 1.7) * impact * 90, width: 18 + index * 3, height: 18 + index * 3, borderRadius: 6, background: index % 2 ? config.theme.accent : config.theme.urgency, opacity: impact, transform: `rotate(${index * 25}deg)`}} />)}
     </div>
   );
 };
 
-export const DrownedVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
+export const EntityHoldsAnswerVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
   const rise = interpolate(frame, [8, 28], [0, 1], ease);
-  const connection = interpolate(frame, [duration * 0.42, duration * 0.62], [0, 1], ease);
+  const equip = interpolate(frame, [duration * 0.34, duration * 0.64], [0, 1], ease);
+  const answerLeft = interpolate(equip, [0, 1], [535, 290]);
+  const answerTop = interpolate(equip, [0, 1], [115, 150]);
   return (
     <div style={{position: "relative", width: 850, height: 540, overflow: "hidden"}}>
       {[0, 1, 2].map((index) => <div key={index} style={{position: "absolute", left: -80 + index * 35, top: 400 + index * 28 + Math.sin((frame + index * 9) / 7) * 10, width: 980, height: 90, borderRadius: "50%", border: `5px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.09}} />)}
-      {hint.visualAsset ? <CanvasImage src={staticFile(hint.visualAsset)} style={{position: "absolute", left: 100, top: 80 + (1 - rise) * 220, width: 300, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: `drop-shadow(0 0 28px ${config.theme.progress})`}} /> : null}
-      <div style={{position: "absolute", left: 360, top: 250, width: 130 * connection, height: 6, background: config.theme.accent, boxShadow: `0 0 20px ${config.theme.accent}`, transform: "rotate(-8deg)", transformOrigin: "left"}} />
-      <div style={{position: "absolute", right: 65, top: 105, opacity: connection}}><MysteryObject config={config} size={280} progress={0.14} reaction={connection} /></div>
+      {[0, 1, 2, 3, 4].map((index) => <div key={index} style={{position: "absolute", left: 100 + index * 74, top: 360 - ((frame * (2 + index * 0.15) + index * 75) % 250), width: 16 + index * 3, height: 16 + index * 3, borderRadius: "50%", border: `4px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.07}} />)}
+      {hint.visual.supportingAsset ? <CanvasImage src={staticFile(hint.visual.supportingAsset)} style={{position: "absolute", left: 100, top: 80 + (1 - rise) * 220, width: 300, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: `drop-shadow(0 0 28px ${config.theme.progress})`, transform: `scale(${0.92 + rise * 0.08})`}} /> : null}
+      <div style={{position: "absolute", left: answerLeft, top: answerTop, opacity: 0.25 + equip * 0.75, transform: `rotate(${-18 + equip * 8}deg) scale(${0.9 + equip * 0.1})`}}><MysteryObject config={config} size={280} progress={0.14} reaction={equip} /></div>
     </div>
   );
 };
 
 export const HintVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; durationInFrames: number}> = ({config, hint, durationInFrames}) => {
-  if (hint.visualType === "durability") return <DurabilityVisual config={config} duration={durationInFrames} />;
-  if (hint.visualType === "combat") return <CombatRangeVisual config={config} hint={hint} duration={durationInFrames} />;
-  if (hint.visualType === "mob") return <DrownedVisual config={config} hint={hint} duration={durationInFrames} />;
-  return <MysteryObject config={config} size={340} />;
+  if (hint.visual.scene === "item-state") return <ItemStateVisual config={config} duration={durationInFrames} />;
+  if (hint.visual.scene === "item-versus-entity") return <ItemVersusEntityVisual config={config} hint={hint} duration={durationInFrames} />;
+  if (hint.visual.scene === "entity-holds-answer") return <EntityHoldsAnswerVisual config={config} hint={hint} duration={durationInFrames} />;
+  throw new Error(`Unsupported mystery visual recipe: ${hint.visual.scene}`);
 };
 
 export const HintScene: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; index: number; durationInFrames: number}> = ({config, hint, index, durationInFrames}) => {
@@ -179,7 +194,7 @@ export const HintScene: React.FC<{config: MysteryVideoConfig; hint: MysteryHint;
     <AbsoluteFill name={`Hint ${index + 1}`} style={{alignItems: "center", background: `radial-gradient(circle at 50% 55%, ${index === 2 ? config.theme.progress : config.theme.accent}18, transparent 62%)`}}>
       <div style={{position: "absolute", top: 190, opacity: entry}}><HintHeader config={config} index={index} /></div>
       <div style={{position: "absolute", top: 295}}><HintKeyword config={config} hint={hint} durationInFrames={durationInFrames} /></div>
-      <div style={{position: "absolute", top: 535, opacity: entry}}><HintVisual config={config} hint={hint} durationInFrames={durationInFrames} /></div>
+      <div style={{position: "absolute", top: 515, opacity: entry, transform: `translateY(${(1 - entry) * 30}px) scale(${0.96 + entry * 0.04})`}}><RoundedStage config={config} color={index === 2 ? config.theme.progress : config.theme.accent}><HintVisual config={config} hint={hint} durationInFrames={durationInFrames} /></RoundedStage></div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={scene.from + frame} /></div>
     </AbsoluteFill>
   );
@@ -208,6 +223,7 @@ export const CountdownScene: React.FC<{config: MysteryVideoConfig}> = ({config})
   const numberColor = [config.theme.progress, config.theme.accent, config.theme.urgency][activeIndex] ?? config.theme.urgency;
   return (
     <AbsoluteFill name="Countdown" style={{alignItems: "center", background: `radial-gradient(circle at 50% 48%, ${config.theme.urgency}52, transparent 64%)`}}>
+      <div style={{position: "absolute", top: 445, width: 760, height: 600, borderRadius: 72, border: `5px solid ${numberColor}88`, background: `linear-gradient(155deg, ${config.theme.surface}F4, ${config.theme.mystery}E8)`, boxShadow: `0 24px 0 #02040A99, inset 0 0 0 3px rgba(255,255,255,.05), 0 0 48px ${numberColor}33`, transform: `scale(${0.96 + scale * 0.04})`}} />
       <div style={{position: "absolute", top: 260, color: config.theme.text, fontSize: 62, textShadow: "0 8px 0 #02040A"}}>{config.countdown.displayText}</div>
       <div style={{position: "absolute", top: 500, color: numberColor, fontSize: 330, textShadow: `0 18px 0 #02040A, 0 0 60px ${numberColor}`, transform: `scale(${scale})`}}>{value}</div>
       <div style={{position: "absolute", top: 1020}}><MysteryObject config={config} size={320} reaction={0.8} /></div>
@@ -242,10 +258,11 @@ export const RevealAnswer: React.FC<{config: MysteryVideoConfig}> = ({config}) =
 
 export const RevealScene: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
   const frame = useCurrentFrame();
+  const entry = interpolate(frame, [0, 10], [0, 1], ease);
   return (
     <AbsoluteFill name="Reveal" style={{alignItems: "center", background: `radial-gradient(circle at 50% 48%, ${config.theme.answer}48, transparent 64%)`}}>
       <RevealAnswer config={config} />
-      <div style={{position: "absolute", top: 390}}><RevealTransform config={config} /></div>
+      <div style={{position: "absolute", top: 350, transform: `translateY(${(1 - entry) * 26}px) scale(${0.96 + entry * 0.04})`}}><RoundedStage config={config} color={config.theme.answer} height={680}><RevealTransform config={config} /></RoundedStage></div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={config.timeline.reveal.from + frame} /></div>
     </AbsoluteFill>
   );
@@ -263,10 +280,11 @@ const NumberOptions: React.FC<{config: MysteryVideoConfig; frame: number; opacit
 
 export const CommentCTA: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
   const frame = useCurrentFrame();
+  const entry = interpolate(frame, [0, 10], [0, 1], ease);
   return (
     <AbsoluteFill name="Comment CTA" style={{alignItems: "center"}}>
-      <div style={{position: "absolute", top: 305}}><MysteryObject config={config} progress={1} size={420} reaction={0.35} /></div>
-      <div style={{position: "absolute", top: 790, width: 930, color: config.theme.text, fontSize: fittedFontSize(config.cta.text, 68, 52, 22), lineHeight: 1.04, textAlign: "center", overflowWrap: "anywhere", textShadow: "0 8px 0 #02040A"}}>{config.cta.text}</div>
+      <div style={{position: "absolute", top: 285, width: 580, height: 470, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 66, border: `4px solid ${config.theme.answer}88`, background: `linear-gradient(150deg, ${config.theme.surface}EE, ${config.theme.answer}16)`, boxShadow: "0 20px 0 #02040A88, inset 0 0 0 3px rgba(255,255,255,.04)", transform: `scale(${0.94 + entry * 0.06})`}}><MysteryObject config={config} progress={1} size={420} reaction={0.35} /></div>
+      <div style={{position: "absolute", top: 790, width: 930, padding: "18px 24px", boxSizing: "border-box", borderRadius: 34, background: `${config.theme.mystery}C9`, color: config.theme.text, fontSize: fittedFontSize(config.cta.text, 60, 48, 17), lineHeight: 1.04, textAlign: "center", overflowWrap: "anywhere", textShadow: "0 8px 0 #02040A", boxShadow: "0 14px 28px rgba(0,0,0,.28)"}}>{config.cta.text}</div>
       <div style={{position: "absolute", top: 1015}}><NumberOptions config={config} frame={frame} /></div>
       <div style={{position: "absolute", top: 1210, width: 900, color: config.theme.muted, fontFamily: config.theme.bodyFont, fontSize: fittedFontSize(config.cta.prompt, 34, 27, 32), letterSpacing: 2, textAlign: "center"}}>{config.cta.prompt}</div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={config.timeline.cta.from + frame} /></div>
@@ -286,13 +304,13 @@ export const LoopBridge: React.FC<{config: MysteryVideoConfig}> = ({config}) => 
     <AbsoluteFill name="Loop bridge" style={{alignItems: "center", background: `radial-gradient(circle at 50% 50%, ${config.theme.answer}${Math.round((1 - progress) * 50).toString(16).padStart(2, "0")}, transparent 64%)`}}>
       <div style={{position: "absolute", top: 188, opacity: progress}}><CategoryBadge config={config} /></div>
       <div style={{position: "absolute", top: 292, opacity: progress}}><HookQuestion config={config} /></div>
-      <div style={{position: "absolute", top: objectTop, width: 610, height: 610, display: "grid", placeItems: "center"}}>
-        <div style={{position: "absolute", inset: 18, borderRadius: "50%", border: `5px solid ${config.theme.accent}`, opacity: progress * 0.76, boxShadow: `0 0 60px ${config.theme.accent}55`}} />
+      <div style={{position: "absolute", top: objectTop, width: 760, height: 650, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 72, border: `4px solid ${config.theme.accent}99`, background: `linear-gradient(150deg, ${config.theme.surface}F4, ${config.theme.mystery}E8 70%, ${config.theme.accent}1F)`, boxShadow: `0 24px 0 #02040A99, inset 0 0 0 3px rgba(255,255,255,.05)`, opacity: 0.25 + progress * 0.75}}>
+        <div style={{position: "absolute", inset: 45, borderRadius: "50%", border: `5px solid ${config.theme.accent}`, opacity: progress * 0.68, boxShadow: `0 0 60px ${config.theme.accent}44`}} />
         <MysteryObject config={config} size={objectSize} progress={1 - progress} />
       </div>
       <div style={{position: "absolute", top: 790, width: 930, color: config.theme.text, fontSize: 68, textAlign: "center", opacity: 1 - progress}}>{config.cta.text}</div>
       <div style={{position: "absolute", top: 1015}}><NumberOptions config={config} frame={50} opacity={1 - progress} /></div>
-      <div style={{position: "absolute", top: 1238, padding: "13px 26px", borderRadius: 14, background: config.theme.urgency, color: "#10131C", fontSize: 34, letterSpacing: 3, opacity: progress}}>{config.hook.ruleText}</div>
+      <div style={{position: "absolute", top: 1238, padding: "15px 30px", borderRadius: 28, background: `linear-gradient(135deg, ${config.theme.urgency}, ${config.theme.accent})`, color: "#10131C", fontSize: 34, letterSpacing: 3, opacity: progress}}>{config.hook.ruleText}</div>
       <div style={{position: "absolute", top: 1392, opacity: progress}}><GlobalProgress config={config} absoluteFrame={Math.floor((1 - progress) * Math.max(0, config.timeline.loop.from - 1))} /></div>
     </AbsoluteFill>
   );
@@ -307,7 +325,7 @@ export const CaptionRenderer: React.FC<{config: MysteryVideoConfig}> = ({config}
   const activeWordIndex = segment.words.findIndex((item) => frame >= item.startFrame && frame < item.endFrame);
   let wordIndex = -1;
   return (
-    <div style={{position: "absolute", zIndex: 20, left: 90, top: 1505, width: 900, minHeight: 82, padding: "14px 22px", boxSizing: "border-box", borderRadius: 16, background: "rgba(4,8,18,.9)", border: "2px solid rgba(255,255,255,.15)", color: config.theme.text, textAlign: "center", fontSize: 29, lineHeight: 1.15, textShadow: "0 4px 0 #000"}}>
+    <div style={{position: "absolute", zIndex: 20, left: 90, top: 1505, width: 900, minHeight: 82, padding: "14px 22px", boxSizing: "border-box", borderRadius: 28, background: "rgba(4,8,18,.9)", border: "2px solid rgba(255,255,255,.15)", color: config.theme.text, textAlign: "center", fontSize: 29, lineHeight: 1.15, textShadow: "0 4px 0 #000", boxShadow: "0 12px 30px rgba(0,0,0,.3)"}}>
       {segment.text.split(/(\s+)/).map((token, index) => {
         if (/^\s+$/.test(token)) return token;
         wordIndex += 1;

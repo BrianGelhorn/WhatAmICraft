@@ -1,7 +1,12 @@
 export type MysteryVariant = "fast" | "balanced" | "comment_bait";
 export type MysteryRenderMode = "preview" | "final";
 export type VisualIntensity = "low" | "medium" | "high";
-export type HintVisualType = "durability" | "combat" | "mob" | "recipe" | "generic";
+export type HintVisualScene = "item-state" | "item-versus-entity" | "entity-holds-answer";
+export type HintVisualRecipe = {
+  scene: HintVisualScene;
+  supportingAsset?: string;
+  environment?: "default" | "water";
+};
 
 export type WordTiming = {word: string; startFrame: number; endFrame: number};
 export type VoiceSegment = {
@@ -20,8 +25,7 @@ export type MysteryHint = {
   displayText: string;
   fragments: string[];
   emphasisWords: string[];
-  visualType: HintVisualType;
-  visualAsset?: string;
+  visual: HintVisualRecipe;
   difficulty: "hard" | "medium" | "easy";
 };
 

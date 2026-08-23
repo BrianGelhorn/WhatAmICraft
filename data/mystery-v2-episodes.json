@@ -45,7 +45,9 @@
           "displayText": "LOSES DURABILITY · NO STACKING",
           "fragments": ["LOSES DURABILITY", "NO STACKING"],
           "emphasisWords": ["DURABILITY", "STACKING"],
-          "visualType": "durability",
+          "visual": {
+            "scene": "item-state"
+          },
           "difficulty": "hard"
         },
         {
@@ -54,8 +56,10 @@
           "displayText": "MELEE · RANGED",
           "fragments": ["MELEE", "RANGED"],
           "emphasisWords": ["MELEE", "RANGED"],
-          "visualType": "combat",
-          "visualAsset": "mc-assets/entity-assets/flat/ZOMBIE.png",
+          "visual": {
+            "scene": "item-versus-entity",
+            "supportingAsset": "mc-assets/entity-assets/flat/ZOMBIE.png"
+          },
           "difficulty": "medium"
         },
         {
@@ -64,8 +68,11 @@
           "displayText": "CARRIED BY A DROWNED",
           "fragments": ["CARRIED BY A DROWNED"],
           "emphasisWords": ["DROWNED"],
-          "visualType": "mob",
-          "visualAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+          "visual": {
+            "scene": "entity-holds-answer",
+            "supportingAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+            "environment": "water"
+          },
           "difficulty": "easy"
         }
       ],

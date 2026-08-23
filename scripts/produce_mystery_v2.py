@@ -20,6 +20,8 @@ BANK_PATH = ROOT / "data/mystery-v2-episodes.json"
 GENERATED_PATH = ROOT / "src/generated/mystery-v2-episode.json"
 FPS = 30
 VARIANTS = ("fast", "balanced", "comment_bait")
+VISUAL_SCENES_REQUIRING_ASSET = {"item-versus-entity", "entity-holds-answer"}
+VISUAL_SCENES = {"item-state", *VISUAL_SCENES_REQUIRING_ASSET}
 
 
 def read_json(path: Path):
@@ -67,10 +69,17 @@ def validate_episode(episode: dict) -> None:
         require_text(hint.get("displayText"), f"hints[{index}].displayText", 54)
         if not 1 <= len(hint.get("fragments", [])) <= 2:
             raise RuntimeError(f"hints[{index}].fragments requiere 1 o 2 fragmentos")
-        if hint.get("visualType") not in {"durability", "combat", "mob", "recipe", "generic"}:
-            raise RuntimeError(f"hints[{index}].visualType desconocido")
-        if hint.get("visualAsset"):
-            project_asset(hint["visualAsset"], f"hints[{index}].visualAsset")
+        visual = hint.get("visual", {})
+        scene = visual.get("scene")
+        if scene not in VISUAL_SCENES:
+            raise RuntimeError(f"hints[{index}].visual.scene no tiene una receta implementada")
+        supporting_asset = visual.get("supportingAsset")
+        if scene in VISUAL_SCENES_REQUIRING_ASSET and not supporting_asset:
+            raise RuntimeError(f"hints[{index}].visual.supportingAsset es obligatorio para {scene}")
+        if supporting_asset:
+            project_asset(supporting_asset, f"hints[{index}].visual.supportingAsset")
+        if visual.get("environment", "default") not in {"default", "water"}:
+            raise RuntimeError(f"hints[{index}].visual.environment desconocido")
     normalized_hints = [(hint["voiceText"].strip().lower(), hint["displayText"].strip().lower()) for hint in hints]
     for left, right in zip(normalized_hints, normalized_hints[1:]):
         if left[0] == right[0] or left[1] == right[1]:
