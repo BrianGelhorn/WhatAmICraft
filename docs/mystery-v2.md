@@ -18,12 +18,23 @@ Formato vertical 1080×1920 a 30 fps para Shorts, Reels y TikTok. El reto empiez
 - Las voces se cachean por texto, voz y modelo, no por variante: las pistas compartidas no vuelven a consumir ElevenLabs cuando cambia únicamente el timeline.
 - FAST, BALANCED y COMMENT BAIT comparten configuración, componentes y validaciones. El modo preview reduce resolución y partículas y evita blur de fondo. No se añadieron dependencias.
 
+## Recetas visuales
+
+Cada pista declara una receta en `hints[].visual`; Remotion decide la composición y el movimiento. No existe un fallback genérico: una receta desconocida o sin su asset requerido detiene la producción antes de generar voz.
+
+- `item-state`: muestra estados verificables del objeto, como desgaste y slot único.
+- `item-versus-entity`: enfrenta la respuesta con una entidad configurada y representa contacto o lanzamiento.
+- `entity-holds-answer`: equipa la respuesta en una entidad configurada y puede activar un entorno como `water`.
+
+Las recetas actuales son las únicas habilitadas porque ya tienen un caso visual revisado. Al incorporar una pista de receta, uso de herramienta, drop o dimensión se agrega una receta nueva con su propio episodio de prueba; no se simula con barras, flechas ni flashes decorativos.
+
 ## Guía visual
 
 - Misterio/fondo: `#070B1A`; superficie: `#10172B`.
 - Progreso: `#2DE2E6`; highlight: `#FFD166`; urgencia: `#FF6B35`; respuesta: `#6BFF95`; texto: blanco.
 - Títulos: fuente pixel instalada por el proyecto, mínimo 68 px; texto auxiliar mínimo 27 px.
 - Outline: 6 px; sombra dura para texto y glow solo para dirigir la mirada.
+- Escenarios y tarjetas: bordes redondeados de 28–72 px, profundidad mediante sombra y movimiento ligado a la acción representada.
 - Contenido esencial entre 160 y 1.560 px verticales y con 72 px de margen lateral. Subtítulos no comparten la franja del CTA.
 
 ## Hipótesis y A/B tests
