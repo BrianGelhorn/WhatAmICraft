@@ -2,9 +2,9 @@
   "$schema": "../schemas/mystery-v2-visual-prefabs.schema.json",
   "schema_version": 1,
   "format": "mystery-v2-visual-prefabs",
-  "status": "draft",
+  "status": "review",
   "prefabs": [
-    {"number": 1, "id": "durability-loss", "title": "PIERDE DURABILIDAD", "role": "property-state", "status": "draft", "description": "Impactos acelerados bajan la barra por escalones hasta romper el objeto.", "relations": ["durability", "wear", "item_break"], "supportedKinds": ["weapon", "tool", "item", "armor"], "assets": ["mc-assets/item-assets/IRON_PICKAXE.png"]},
+    {"number": 1, "id": "durability-loss", "title": "PIERDE DURABILIDAD", "role": "property-state", "status": "approved", "description": "Impactos acelerados bajan la barra por escalones hasta romper el objeto.", "relations": ["durability", "wear", "item_break"], "supportedKinds": ["weapon", "tool", "item", "armor"], "assets": ["mc-assets/item-assets/IRON_PICKAXE.png"]},
     {"number": 2, "id": "stack-limit", "title": "LÍMITE DE STACK", "role": "property-state", "status": "draft", "description": "Slot de inventario que destaca la cantidad máxima.", "relations": ["stack_limit", "inventory"], "supportedKinds": ["item", "food", "weapon", "tool", "block"], "assets": ["mc-assets/item-assets/ENDER_PEARL.png"]},
     {"number": 3, "id": "charge-level", "title": "SE PUEDE CARGAR", "role": "property-state", "status": "draft", "description": "Carga progresiva alrededor del objeto.", "relations": ["charge", "loaded_state"], "supportedKinds": ["weapon", "item"], "assets": ["mc-assets/item-assets/CROSSBOW.png"]},
     {"number": 4, "id": "cooldown", "title": "TIENE COOLDOWN", "role": "property-state", "status": "draft", "description": "Reloj radial que bloquea y libera el uso.", "relations": ["cooldown", "reuse_delay"], "supportedKinds": ["item", "weapon", "food"], "assets": ["mc-assets/item-assets/ENDER_PEARL.png"]},

@@ -13,7 +13,7 @@ ROLES = ("property-state", "action-interaction", "origin-context")
 
 def load_prefab_catalog(path: Path = CATALOG_PATH) -> dict:
     value = json.loads(path.read_text(encoding="utf-8"))
-    if value.get("schema_version") != 1 or value.get("format") != "mystery-v2-visual-prefabs" or value.get("status") != "draft":
+    if value.get("schema_version") != 1 or value.get("format") != "mystery-v2-visual-prefabs" or value.get("status") not in {"review", "approved"}:
         raise RuntimeError("Catálogo de prefabs inválido")
     prefabs = value.get("prefabs")
     if not isinstance(prefabs, list) or len(prefabs) != 30:
@@ -28,8 +28,8 @@ def load_prefab_catalog(path: Path = CATALOG_PATH) -> dict:
             raise RuntimeError(f"Prefab {number}: id inválido")
         if prefab.get("role") != ROLES[(number - 1) // 10]:
             raise RuntimeError(f"Prefab {number}: role no coincide con su bloque de galería")
-        if prefab.get("status") != "draft":
-            raise RuntimeError(f"Prefab {number}: solo puede estar draft antes de aprobación")
+        if prefab.get("status") not in {"draft", "approved"}:
+            raise RuntimeError(f"Prefab {number}: status inválido")
         for field in ("title", "description"):
             if not isinstance(prefab.get(field), str) or not prefab[field].strip():
                 raise RuntimeError(f"Prefab {number}: falta {field}")
@@ -40,4 +40,6 @@ def load_prefab_catalog(path: Path = CATALOG_PATH) -> dict:
         for asset in prefab["assets"]:
             if not (ROOT / "public" / asset).is_file():
                 raise RuntimeError(f"Prefab {number}: falta public/{asset}")
+    if value["status"] == "approved" and any(prefab["status"] != "approved" for prefab in prefabs):
+        raise RuntimeError("Un catálogo approved no puede contener prefabs draft")
     return value

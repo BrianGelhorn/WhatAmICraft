@@ -12,6 +12,7 @@ from pathlib import Path
 
 from production_common import load_env_local, production_lock, speech_with_timestamps, write_json
 from produce_quiz_copy import normalize_audio, public_path
+from mystery_prefabs import load_prefab_catalog
 from template_artifacts import render_props_path
 
 
@@ -21,6 +22,7 @@ GENERATED_PATH = ROOT / "src/generated/mystery-v2-episode.json"
 FPS = 30
 VARIANTS = ("fast", "balanced", "comment_bait")
 VISUAL_PREFAB_STEPS = {
+    "durability-loss": {"durability"},
     "inventory-properties": {"durability", "stack-limit"},
     "item-entity-interaction": {"melee", "ranged"},
     "entity-equipment": {"holds-answer"},
@@ -70,6 +72,7 @@ def validate_episode(episode: dict) -> None:
         require_text(hook.get("emphasisText"), f"hookOptions.{hook_id}.emphasisText", 28)
         require_text(hook.get("voiceText"), f"hookOptions.{hook_id}.voiceText", 80)
     hints = episode.get("hints", [])
+    reviewed_prefabs = {prefab["id"]: prefab for prefab in load_prefab_catalog()["prefabs"]}
     if len(hints) != 3:
         raise RuntimeError("La plantilla requiere exactamente 3 pistas")
     for index, hint in enumerate(hints):
@@ -81,6 +84,8 @@ def validate_episode(episode: dict) -> None:
         prefab = visual.get("prefab")
         if prefab not in VISUAL_PREFAB_STEPS:
             raise RuntimeError(f"hints[{index}].visual.prefab no tiene un prefabricado implementado")
+        if prefab in reviewed_prefabs and reviewed_prefabs[prefab]["status"] != "approved":
+            raise RuntimeError(f"hints[{index}].visual.prefab todavía no está aprobado")
         steps = visual.get("steps", [])
         if not 1 <= len(steps) <= 2:
             raise RuntimeError(f"hints[{index}].visual.steps requiere 1 o 2 pasos")

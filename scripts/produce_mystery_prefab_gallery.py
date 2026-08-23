@@ -20,7 +20,8 @@ def main() -> int:
     args = parser.parse_args()
     catalog = load_prefab_catalog()
     if args.dry_run:
-        print(f"ok: {len(catalog['prefabs'])} draft prefabs")
+        approved = sum(prefab["status"] == "approved" for prefab in catalog["prefabs"])
+        print(f"ok: {approved} approved, {len(catalog['prefabs']) - approved} draft prefabs")
         return 0
     write_json(GENERATED_PATH, catalog)
     print(f"config: {GENERATED_PATH.relative_to(ROOT)}")

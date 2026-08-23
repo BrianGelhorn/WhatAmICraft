@@ -1,12 +1,11 @@
 import {CanvasImage, staticFile, useCurrentFrame} from "remotion";
 import catalog from "../../generated/mystery-v2-visual-prefabs.json";
+import {DurabilityLossVisual} from "./DurabilityLossVisual";
 
 export type MysteryPrefabRecord = (typeof catalog.prefabs)[number];
 
 const colors = {cyan: "#2DE2E6", gold: "#FFD166", orange: "#FF6B35", green: "#6BFF95", ink: "#070B1A", surface: "#10172B", text: "#F7FAFF"};
 const phase = (frame: number, offset = 0) => (Math.sin((frame + offset) / 13) + 1) / 2;
-const durabilitySteps = [1, 0.82, 0.6, 0.38, 0.18, 0] as const;
-const durabilityStepFrames = [0, 14, 26, 36, 44, 50] as const;
 
 const Asset: React.FC<{src: string; size?: number; style?: React.CSSProperties}> = ({src, size = 112, style}) => (
   <CanvasImage src={staticFile(src)} style={{width: size, height: size, objectFit: "contain", imageRendering: "pixelated", filter: "drop-shadow(0 10px 0 rgba(0,0,0,.65))", ...style}} />
@@ -49,27 +48,9 @@ const ScenarioVisual: React.FC<{prefab: MysteryPrefabRecord}> = ({prefab}) => {
   const p = phase(frame, prefab.number * 4);
   const [a, b, c] = prefab.assets;
   const center: React.CSSProperties = {position: "relative", width: 470, height: 245, display: "grid", placeItems: "center"};
-  const durabilityFrame = frame % 84;
-  const durabilityStep = durabilityFrame < durabilityStepFrames[1] ? 0 : durabilityFrame < durabilityStepFrames[2] ? 1 : durabilityFrame < durabilityStepFrames[3] ? 2 : durabilityFrame < durabilityStepFrames[4] ? 3 : durabilityFrame < durabilityStepFrames[5] ? 4 : 5;
-  const durabilityRespawn = Math.max(0, Math.min(1, (durabilityFrame - 74) / 8));
-  const durability = durabilityFrame >= 74 ? 1 : durabilitySteps[durabilityStep];
-  const durabilityHitAge = durabilityFrame - durabilityStepFrames[durabilityStep];
-  const durabilityHit = durabilityStep > 0 && durabilityHitAge < 5 ? 1 - durabilityHitAge / 5 : 0;
-  const breakProgress = Math.max(0, Math.min(1, (durabilityFrame - 54) / 14));
-  const breakPieces = [
-    {clipPath: "inset(0 50% 50% 0)", x: -1, y: -1, rotate: -18},
-    {clipPath: "inset(0 0 50% 50%)", x: 1, y: -1, rotate: 20},
-    {clipPath: "inset(50% 50% 0 0)", x: -1, y: 1, rotate: -28},
-    {clipPath: "inset(50% 0 0 50%)", x: 1, y: 1, rotate: 25},
-  ] as const;
 
   switch (prefab.id) {
-    case "durability-loss": return <div style={center}><div style={{transform: `scale(${1 + durabilityHit * 0.07})`, filter: `drop-shadow(0 0 ${durabilityHit * 24}px ${durability <= 0.38 ? "#FF3048" : colors.gold})`}}><Slot>
-      {durabilityFrame < 54 || durabilityFrame >= 74 ? <Asset src={a} style={{opacity: durabilityFrame >= 74 ? durabilityRespawn : 1, transform: `translateX(${durabilityFrame >= 44 && durabilityFrame < 54 ? (durabilityFrame % 2 ? -7 : 7) : durabilityHit * -10}px) rotate(${durabilityFrame >= 44 && durabilityFrame < 54 ? (durabilityFrame % 2 ? -5 : 5) : durabilityHit * -7}deg) scale(${durabilityFrame >= 74 ? 0.72 + durabilityRespawn * 0.28 : 1 + durabilityHit * 0.11})`, filter: `drop-shadow(0 10px 0 rgba(0,0,0,.65)) ${durability <= 0.18 ? "drop-shadow(0 0 18px #FF3048)" : ""}`}} /> : breakProgress < 1 ? breakPieces.map((piece) => <Asset key={piece.clipPath} src={a} style={{position: "absolute", clipPath: piece.clipPath, transform: `translate(${piece.x * breakProgress * 62}px,${piece.y * breakProgress * 64}px) rotate(${piece.rotate * breakProgress * 1.35}deg)`, opacity: 1 - breakProgress * 0.9}} />) : null}
-      {durabilityHit > 0 ? [0, 1, 2].map((index) => <div key={index} style={{position: "absolute", left: 24 + index * 46, top: 48 + index % 2 * 35, width: 28, height: 8, borderRadius: 4, background: durability <= 0.38 ? "#FF3048" : colors.gold, transform: `translateX(${-durabilityHit * (18 + index * 5)}px) rotate(${index * 28 - 25}deg)`, opacity: durabilityHit}} />) : null}
-      {durabilityFrame >= 54 && durabilityFrame < 70 ? [0, 1, 2, 3, 4, 5, 6, 7].map((index) => <div key={index} style={{position: "absolute", left: 67 + Math.cos(index * 0.79) * breakProgress * 76, top: 65 + Math.sin(index * 0.79) * breakProgress * 76, width: 12 + index % 2 * 6, height: 12 + index % 2 * 6, background: index % 2 ? colors.orange : colors.gold, transform: `rotate(${index * 31 + breakProgress * 110}deg)`, opacity: 1 - breakProgress}} />) : null}
-      <div style={{position: "absolute", bottom: 13, transform: `scaleX(${1 + durabilityHit * 0.08})`}}><Meter value={durability} color={durability > 0.38 ? colors.green : durability > 0 ? colors.orange : "#FF3048"} width={108} /></div>
-    </Slot></div></div>;
+    case "durability-loss": return <div style={center}><DurabilityLossVisual assetSrc={a} /></div>;
     case "stack-limit": return <div style={center}><Slot><Asset src={a} /><div style={{position: "absolute", right: 10, bottom: 7, padding: "2px 10px", borderRadius: 12, background: colors.ink, color: colors.text, fontSize: 34, transform: `scale(${0.92 + p * 0.08})`}}>16</div></Slot></div>;
     case "charge-level": return <div style={center}><div style={{position: "absolute", width: 185, height: 185, borderRadius: "50%", background: `conic-gradient(${colors.cyan} ${p * 360}deg,#26324C 0)`, boxShadow: `0 0 28px ${colors.cyan}55`}} /><div style={{position: "absolute", width: 150, height: 150, borderRadius: "50%", background: colors.surface}} /><Asset src={a} size={125} style={{zIndex: 2, transform: `scale(${0.9 + p * 0.1})`}} /></div>;
     case "cooldown": return <div style={center}><Asset src={a} size={150} style={{opacity: 0.45 + p * 0.55}} /><div style={{position: "absolute", width: 184, height: 184, borderRadius: "50%", border: `9px solid ${colors.orange}`, borderTopColor: "transparent", transform: `rotate(${p * 320}deg)`}} /><div style={{position: "absolute", bottom: 18, color: colors.orange, fontSize: 24}}>{p > 0.75 ? "READY" : "WAIT"}</div></div>;
@@ -117,12 +98,13 @@ const ScenarioVisual: React.FC<{prefab: MysteryPrefabRecord}> = ({prefab}) => {
 
 export const MysteryPrefabCard: React.FC<{prefab: MysteryPrefabRecord}> = ({prefab}) => {
   const accent = prefab.role === "property-state" ? colors.cyan : prefab.role === "action-interaction" ? colors.orange : colors.green;
+  const approved = prefab.status === "approved";
   return (
-    <div style={{position: "relative", overflow: "hidden", borderRadius: 32, border: `4px solid ${accent}88`, background: `linear-gradient(145deg,${colors.surface},${colors.ink})`, boxShadow: "0 12px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.04)", fontFamily: "Minecraft", color: colors.text}}>
+    <div style={{position: "relative", overflow: "hidden", borderRadius: 32, border: `4px solid ${approved ? colors.green : `${accent}88`}`, background: `linear-gradient(145deg,${colors.surface},${colors.ink})`, boxShadow: approved ? `0 12px 0 rgba(0,0,0,.5),inset 0 0 0 2px ${colors.green}55,0 0 24px ${colors.green}33` : "0 12px 0 rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.04)", fontFamily: "Minecraft", color: colors.text}}>
       <div style={{position: "absolute", left: 18, top: 15, width: 56, height: 56, display: "grid", placeItems: "center", borderRadius: 18, background: accent, color: colors.ink, fontSize: 28}}>{String(prefab.number).padStart(2, "0")}</div>
       <div style={{position: "absolute", left: 84, right: 15, top: 18, height: 52, display: "grid", alignItems: "center", fontSize: prefab.title.length > 23 ? 20 : 24, lineHeight: 1, color: accent}}>{prefab.title}</div>
       <div style={{position: "absolute", left: 15, right: 15, top: 74, bottom: 52, display: "grid", placeItems: "center", borderRadius: 24, background: `radial-gradient(circle,${accent}18,transparent 66%)`}}><ScenarioVisual prefab={prefab} /></div>
-      <div style={{position: "absolute", left: 18, right: 18, bottom: 13, display: "flex", justifyContent: "space-between", color: "#AAB6CE", fontSize: 17}}><span>{prefab.role}</span><span style={{color: accent}}>{prefab.relations[0]}</span></div>
+      <div style={{position: "absolute", left: 18, right: 18, bottom: 13, display: "flex", justifyContent: "space-between", color: approved ? colors.green : "#AAB6CE", fontSize: 17}}><span>{approved ? "APPROVED" : prefab.role}</span><span style={{color: accent}}>{prefab.relations[0]}</span></div>
     </div>
   );
 };

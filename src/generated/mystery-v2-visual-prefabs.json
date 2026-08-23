@@ -2,14 +2,14 @@
   "$schema": "../schemas/mystery-v2-visual-prefabs.schema.json",
   "schema_version": 1,
   "format": "mystery-v2-visual-prefabs",
-  "status": "draft",
+  "status": "review",
   "prefabs": [
     {
       "number": 1,
       "id": "durability-loss",
       "title": "PIERDE DURABILIDAD",
       "role": "property-state",
-      "status": "draft",
+      "status": "approved",
       "description": "Impactos acelerados bajan la barra por escalones hasta romper el objeto.",
       "relations": [
         "durability",

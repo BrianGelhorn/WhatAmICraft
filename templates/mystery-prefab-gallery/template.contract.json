@@ -17,7 +17,7 @@
     "handoffDurationFrames": 6,
     "contentStartFrame": 0,
     "maxContentStartFrame": 0,
-    "visualBeats": [{"id": "gallery-visible", "from": 0, "description": "all 30 numbered draft prefabs are visible"}]
+    "visualBeats": [{"id": "gallery-visible", "from": 0, "description": "all 30 numbered prefabs and their review state are visible"}]
   },
   "audio": {"status": "pending", "allowedSources": [], "cues": []},
   "scenes": [{"id": "gallery", "from": 0, "durationInFrames": 120}],

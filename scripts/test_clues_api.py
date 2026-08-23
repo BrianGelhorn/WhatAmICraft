@@ -78,7 +78,8 @@ def main() -> None:
         status, unused = call(base, "/api/clues?status=unused")
         assert status == 200 and unused["items"] == []
         status, prefabs = call(base, "/api/clue-prefabs")
-        assert status == 200 and prefabs["status"] == "draft" and len(prefabs["prefabs"]) == 30
+        assert status == 200 and prefabs["status"] == "review" and len(prefabs["prefabs"]) == 30
+        assert [prefab["id"] for prefab in prefabs["prefabs"] if prefab["status"] == "approved"] == ["durability-loss"]
         os.environ["CLUES_API_URL"] = base
         assert get_clue("amethyst_block")["used"] is True
         proxy_status, proxy = call(dashboard_base, "/api/clues?status=used")

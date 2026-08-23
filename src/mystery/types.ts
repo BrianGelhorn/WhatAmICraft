@@ -1,7 +1,7 @@
 export type MysteryVariant = "fast" | "balanced" | "comment_bait";
 export type MysteryRenderMode = "preview" | "final";
 export type VisualIntensity = "low" | "medium" | "high";
-export type HintVisualPrefab = "inventory-properties" | "item-entity-interaction" | "entity-equipment";
+export type HintVisualPrefab = "durability-loss" | "inventory-properties" | "item-entity-interaction" | "entity-equipment";
 export type HintVisualStep =
   | {type: "durability"; label: string; from: number}
   | {type: "stack-limit"; label: string; value: string; from: number}

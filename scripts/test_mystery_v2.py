@@ -59,7 +59,7 @@ assert all(item["answer"]["id"] != "crossbow" for item in read_json(BANK_PATH)["
 component = (ROOT / "src/components/mystery/MysteryComponents.tsx").read_text(encoding="utf-8")
 for name in (
     "HookScene", "HookQuestion", "MysteryObject", "CategoryBadge", "GlobalProgress", "HintScene",
-    "HintHeader", "HintKeyword", "HintVisual", "InventoryPropertiesPrefab", "ItemEntityInteractionPrefab", "EntityEquipmentPrefab",
+    "HintHeader", "HintKeyword", "HintVisual", "DurabilityLossPrefab", "InventoryPropertiesPrefab", "ItemEntityInteractionPrefab", "EntityEquipmentPrefab",
     "CountdownScene", "RevealTransform", "RevealAnswer", "CommentCTA", "CaptionRenderer", "AudioTimeline",
     "MusicDucker", "LoopBridge", "SafeZoneOverlay", "DebugTimeline",
 ):
@@ -81,6 +81,7 @@ assert "return <MysteryObject config={config} size={340}" not in component
 assert "config.hook.emphasis" in component and "activeStep.label" in component and "const wear =" not in component
 assert 'name="Category silhouette"' in component and ">?</div>" in component
 assert "progress={0.14}" not in component
+assert 'hint.visual.prefab === "durability-loss"' in component
 
 schema = read_json(ROOT / "schemas/mystery-v2-episode.schema.json")
 assert schema["properties"]["schema_version"]["const"] == 2
@@ -127,6 +128,11 @@ rejected(unknown_visual, "prefabricado implementado")
 wrong_prefab_step = deepcopy(episode)
 wrong_prefab_step["hints"][0]["visual"]["steps"][0]["type"] = "melee"
 rejected(wrong_prefab_step, "no es compatible")
+
+approved_durability = deepcopy(episode)
+approved_durability["hints"][0]["fragments"] = approved_durability["hints"][0]["fragments"][:1]
+approved_durability["hints"][0]["visual"] = {"prefab": "durability-loss", "steps": [approved_durability["hints"][0]["visual"]["steps"][0]]}
+validate_episode(approved_durability)
 
 late_first_step = deepcopy(episode)
 late_first_step["hints"][0]["visual"]["steps"][0]["from"] = 0.1
