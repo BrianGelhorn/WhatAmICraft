@@ -59,7 +59,7 @@ assert all(item["answer"]["id"] != "crossbow" for item in read_json(BANK_PATH)["
 component = (ROOT / "src/components/mystery/MysteryComponents.tsx").read_text(encoding="utf-8")
 for name in (
     "HookScene", "HookQuestion", "MysteryObject", "CategoryBadge", "GlobalProgress", "HintScene",
-    "HintHeader", "HintKeyword", "HintVisual", "DurabilityLossPrefab", "InventoryPropertiesPrefab", "ItemEntityInteractionPrefab", "EntityEquipmentPrefab",
+    "HintHeader", "HintKeyword", "HintVisual", "DurabilityLossPrefab", "StackLimitPrefab", "InventoryPropertiesPrefab", "ItemEntityInteractionPrefab", "EntityEquipmentPrefab",
     "CountdownScene", "RevealTransform", "RevealAnswer", "CommentCTA", "CaptionRenderer", "AudioTimeline",
     "MusicDucker", "LoopBridge", "SafeZoneOverlay", "DebugTimeline",
 ):
@@ -82,6 +82,7 @@ assert "config.hook.emphasis" in component and "activeStep.label" in component a
 assert 'name="Category silhouette"' in component and ">?</div>" in component
 assert "progress={0.14}" not in component
 assert 'hint.visual.prefab === "durability-loss"' in component
+assert 'hint.visual.prefab === "stack-limit"' in component
 
 schema = read_json(ROOT / "schemas/mystery-v2-episode.schema.json")
 assert schema["properties"]["schema_version"]["const"] == 2
@@ -133,6 +134,12 @@ approved_durability = deepcopy(episode)
 approved_durability["hints"][0]["fragments"] = approved_durability["hints"][0]["fragments"][:1]
 approved_durability["hints"][0]["visual"] = {"prefab": "durability-loss", "steps": [approved_durability["hints"][0]["visual"]["steps"][0]]}
 validate_episode(approved_durability)
+
+approved_stack = deepcopy(episode)
+approved_stack["hints"][0]["fragments"] = ["STACK LIMIT: 16"]
+approved_stack["hints"][0]["displayText"] = "STACK LIMIT: 16"
+approved_stack["hints"][0]["visual"] = {"prefab": "stack-limit", "steps": [{"type": "stack-limit", "label": "STACK LIMIT", "value": "16", "from": 0}]}
+validate_episode(approved_stack)
 
 late_first_step = deepcopy(episode)
 late_first_step["hints"][0]["visual"]["steps"][0]["from"] = 0.1

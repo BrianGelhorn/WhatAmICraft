@@ -11,6 +11,7 @@ import {
 } from "remotion";
 import type {MysteryHint, MysteryVideoConfig, VoiceSegment} from "../../mystery/types";
 import {DurabilityLossVisual} from "./DurabilityLossVisual";
+import {StackLimitVisual} from "./StackLimitVisual";
 
 const clamp = {extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const};
 const ease = {...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1)};
@@ -140,6 +141,16 @@ export const DurabilityLossPrefab: React.FC<{config: MysteryVideoConfig; hint: M
   </div>
 );
 
+export const StackLimitPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint}> = ({config, hint}) => {
+  const step = hint.visual.steps.find((candidate) => candidate.type === "stack-limit");
+  return (
+    <div style={{position: "relative", width: 780, height: 520}}>
+      <div style={{position: "absolute", left: 190, top: 5, width: 400, textAlign: "center", color: config.theme.accent, fontSize: 29, letterSpacing: 3, textShadow: "0 5px 0 #02040A"}}>{step && "label" in step ? step.label : ""}</div>
+      <div style={{position: "absolute", left: 228, top: 60}}><StackLimitVisual assetSrc={config.answer.silhouette} stackValue={step && "value" in step ? step.value : "1"} accentColor={config.theme.accent} conceal /></div>
+    </div>
+  );
+};
+
 export const InventoryPropertiesPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
   const [firstStep, secondStep] = hint.visual.steps;
@@ -209,6 +220,7 @@ export const EntityEquipmentPrefab: React.FC<{config: MysteryVideoConfig; hint: 
 
 export const HintVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; durationInFrames: number}> = ({config, hint, durationInFrames}) => {
   if (hint.visual.prefab === "durability-loss") return <DurabilityLossPrefab config={config} hint={hint} />;
+  if (hint.visual.prefab === "stack-limit") return <StackLimitPrefab config={config} hint={hint} />;
   if (hint.visual.prefab === "inventory-properties") return <InventoryPropertiesPrefab config={config} hint={hint} duration={durationInFrames} />;
   if (hint.visual.prefab === "item-entity-interaction") return <ItemEntityInteractionPrefab config={config} hint={hint} duration={durationInFrames} />;
   if (hint.visual.prefab === "entity-equipment") return <EntityEquipmentPrefab config={config} hint={hint} duration={durationInFrames} />;

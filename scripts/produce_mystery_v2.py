@@ -23,6 +23,7 @@ FPS = 30
 VARIANTS = ("fast", "balanced", "comment_bait")
 VISUAL_PREFAB_STEPS = {
     "durability-loss": {"durability"},
+    "stack-limit": {"stack-limit"},
     "inventory-properties": {"durability", "stack-limit"},
     "item-entity-interaction": {"melee", "ranged"},
     "entity-equipment": {"holds-answer"},
