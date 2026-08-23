@@ -22,7 +22,7 @@ Formato vertical 1080×1920 a 30 fps para Shorts, Reels y TikTok. El reto empiez
 
 Cada pista declara una receta en `hints[].visual`; Remotion decide la composición y el movimiento. No existe un fallback genérico: una receta desconocida o sin su asset requerido detiene la producción antes de generar voz.
 
-- `item-state`: muestra estados verificables del objeto, como desgaste y slot único.
+- `item-state`: muestra estados verificables dentro de un slot de inventario; la durabilidad usa su indicador rotulado y el límite de stack muestra la cantidad `1`.
 - `item-versus-entity`: enfrenta la respuesta con una entidad configurada y representa contacto o lanzamiento.
 - `entity-holds-answer`: equipa la respuesta en una entidad configurada y puede activar un entorno como `water`.
 
@@ -35,6 +35,7 @@ Las recetas actuales son las únicas habilitadas porque ya tienen un caso visual
 - Títulos: fuente pixel instalada por el proyecto, mínimo 68 px; texto auxiliar mínimo 27 px.
 - Outline: 6 px; sombra dura para texto y glow solo para dirigir la mirada.
 - Escenarios y tarjetas: bordes redondeados de 28–72 px, profundidad mediante sombra y movimiento ligado a la acción representada.
+- Hooks: `displayText` funciona como contexto breve y `emphasisText` ocupa la jerarquía principal; en BALANCED, `NAME IT?` domina el primer frame.
 - Contenido esencial entre 160 y 1.560 px verticales y con 72 px de margen lateral. Subtítulos no comparten la franja del CTA.
 
 ## Hipótesis y A/B tests
