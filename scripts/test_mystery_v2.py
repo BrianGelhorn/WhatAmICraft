@@ -58,7 +58,7 @@ assert all(item["answer"]["id"] != "crossbow" for item in read_json(BANK_PATH)["
 component = (ROOT / "src/components/mystery/MysteryComponents.tsx").read_text(encoding="utf-8")
 for name in (
     "HookScene", "HookQuestion", "MysteryObject", "CategoryBadge", "GlobalProgress", "HintScene",
-    "HintHeader", "HintKeyword", "HintVisual", "DurabilityVisual", "CombatRangeVisual", "DrownedVisual",
+    "HintHeader", "HintKeyword", "HintVisual", "ItemStateVisual", "ItemVersusEntityVisual", "EntityHoldsAnswerVisual",
     "CountdownScene", "RevealTransform", "RevealAnswer", "CommentCTA", "CaptionRenderer", "AudioTimeline",
     "MusicDucker", "LoopBridge", "SafeZoneOverlay", "DebugTimeline",
 ):
@@ -68,10 +68,12 @@ assert "NEXT CLUE" not in component and "×64" not in component and "YOUR TURN" 
 assert "SAFE_TOP = 170" in component and "SAFE_BOTTOM = 1600" in component
 assert "activeTiming.startFrame" in component and "config.cta.prompt" in component
 assert 'config.renderMode === "preview"' in component
-assert episode["hints"][1]["visualAsset"].endswith("/ZOMBIE.png")
+assert episode["hints"][1]["visual"]["supportingAsset"].endswith("/ZOMBIE.png")
+assert [hint["visual"]["scene"] for hint in episode["hints"]] == ["item-state", "item-versus-entity", "entity-holds-answer"]
 for decorative_primitive in ("finalFlash", "const sweep", "const scan", "borderRight:", "width: `${progress * 100}%`"):
     assert decorative_primitive not in component
-assert "CombatRangeVisual config={config} hint={hint}" in component
+assert "ItemVersusEntityVisual config={config} hint={hint}" in component
+assert "return <MysteryObject config={config} size={340}" not in component
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryVideo"' in root and "fps={30}" in root and "width={1080}" in root and "height={1920}" in root
@@ -103,5 +105,17 @@ rejected(wrong_countdown, "números visibles")
 contradictory_cta = deepcopy(episode)
 contradictory_cta["ctaOptions"]["hint-count"]["displayText"] = "DID YOU GET IT?"
 rejected(contradictory_cta, "CTA contradictorio")
+
+unknown_visual = deepcopy(episode)
+unknown_visual["hints"][0]["visual"]["scene"] = "generic"
+rejected(unknown_visual, "receta implementada")
+
+missing_supporting_asset = deepcopy(episode)
+del missing_supporting_asset["hints"][1]["visual"]["supportingAsset"]
+rejected(missing_supporting_asset, "supportingAsset es obligatorio")
+
+unknown_environment = deepcopy(episode)
+unknown_environment["hints"][2]["visual"]["environment"] = "random-flash"
+rejected(unknown_environment, "environment desconocido")
 
 print("ok: mystery-v2 retention, audio, CTA and generation contract")
