@@ -72,6 +72,7 @@ export const QuizVideoCopy: React.FC<{config?: QuizCopyConfig}> = ({config = def
       easing: Easing.out(Easing.quad),
     },
   );
+  const silhouettePulseEndFrame = Math.max(contentStartFrame, reelStopFrame + 121);
   const silhouettePulse = interpolate(
     frame,
     [
@@ -80,7 +81,7 @@ export const QuizVideoCopy: React.FC<{config?: QuizCopyConfig}> = ({config = def
       reelStopFrame + 60,
       reelStopFrame + 90,
       reelStopFrame + 120,
-      contentStartFrame,
+      silhouettePulseEndFrame,
     ],
     [1, 1.03, 1, 1.03, 1, 0.98],
     {extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad)},
