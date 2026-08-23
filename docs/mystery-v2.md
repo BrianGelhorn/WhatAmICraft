@@ -18,15 +18,27 @@ Formato vertical 1080×1920 a 30 fps para Shorts, Reels y TikTok. El reto empiez
 - Las voces se cachean por texto, voz y modelo, no por variante: las pistas compartidas no vuelven a consumir ElevenLabs cuando cambia únicamente el timeline.
 - FAST, BALANCED y COMMENT BAIT comparten configuración, componentes y validaciones. El modo preview reduce resolución y partículas y evita blur de fondo. No se añadieron dependencias.
 
-## Recetas visuales
+## Prefabricados visuales
 
-Cada pista declara una receta en `hints[].visual`; Remotion decide la composición y el movimiento. No existe un fallback genérico: una receta desconocida o sin su asset requerido detiene la producción antes de generar voz.
+Cada pista elige un `prefab` y uno o dos `steps`. Cada paso comparte su `from` normalizado (de `0` a `0.9`) con el fragmento de texto correspondiente, por lo que copy y acción cambian juntos sin editar React.
 
-- `item-state`: muestra estados verificables dentro de un slot de inventario; la durabilidad usa su indicador rotulado y el límite de stack muestra la cantidad `1`.
-- `item-versus-entity`: enfrenta la respuesta con una entidad configurada y representa contacto o lanzamiento.
-- `entity-holds-answer`: equipa la respuesta en una entidad configurada y puede activar un entorno como `water`.
+- `inventory-properties`: pasos `durability` y/o `stack-limit`; sus etiquetas y el límite son configurables.
+- `item-entity-interaction`: pasos `melee` y/o `ranged`; `supportingAsset` define la entidad objetivo.
+- `entity-equipment`: paso `holds-answer`; `supportingAsset` define la entidad y `environment: "water"` activa el contexto acuático.
 
-Las recetas actuales son las únicas habilitadas porque ya tienen un caso visual revisado. Al incorporar una pista de receta, uso de herramienta, drop o dimensión se agrega una receta nueva con su propio episodio de prueba; no se simula con barras, flechas ni flashes decorativos.
+Ejemplo reutilizable:
+
+```json
+"visual": {
+  "prefab": "inventory-properties",
+  "steps": [
+    {"type": "durability", "label": "DURABILITY ↓", "from": 0},
+    {"type": "stack-limit", "label": "STACK LIMIT", "value": "1", "from": 0.58}
+  ]
+}
+```
+
+La cantidad de `steps` debe coincidir con `fragments`; el primer paso empieza en `0` y los siguientes van en orden. El productor rechaza pasos incompatibles, valores faltantes y assets inexistentes antes de generar voz. Para sumar un nuevo concepto —por ejemplo receta o drop— se agrega cuando exista una pista real, junto con su prefab, esquema, validación y render de prueba; no se reemplaza con efectos decorativos genéricos.
 
 ## Guía visual
 
