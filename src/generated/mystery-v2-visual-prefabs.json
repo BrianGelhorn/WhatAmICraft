@@ -53,8 +53,8 @@
       "id": "enchantment-glint",
       "title": "PUEDE ENCANTARSE",
       "role": "property-state",
-      "status": "draft",
-      "description": "Brillo controlado y libro de encantamiento para propiedades enchantable reutilizables.",
+      "status": "approved",
+      "description": "El libro impacta el ítem y deja el objeto centrado con aura de encantamiento configurable.",
       "relations": [
         "enchantable",
         "enchantment"
