@@ -422,6 +422,7 @@
         <label class="field">Período<select id="analytics-window"><option value="24">Últimas 24 horas</option><option value="168" selected>Últimos 7 días</option><option value="720">Últimos 30 días</option><option value="all">Todo el historial</option></select></label>
         <label class="field">Plataforma<select id="analytics-platform"><option value="all">Todas</option><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="facebook">Facebook Reels</option></select></label>
       </div>
+      <p class="hint" id="analytics-scope" aria-live="polite"></p>
       <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
       <div class="analytics-callouts" id="analytics-alerts" aria-live="polite"></div>
       <div class="analytics-callouts" id="analytics-recommendations" aria-live="polite"></div>
@@ -969,12 +970,16 @@
     function renderAnalytics() {
       const analytics = state.analytics || {videos:[], platforms:[], summary:{}};
       const summary = analytics.summary || {};
+      const external = analytics.externalSummary || {};
       const number = value => Number(value || 0).toLocaleString('es-AR');
       const metric = (value, suffix = '') => value == null ? '—' : `${Number(value).toLocaleString('es-AR')}${suffix}`;
       $('analytics-videos').textContent = number(summary.videos);
       $('analytics-views').textContent = number(summary.views);
       $('analytics-engagements').textContent = number(summary.engagements);
       $('analytics-rate').textContent = metric(summary.engagementRateByViews, '%');
+      $('analytics-scope').textContent = external.videos
+        ? `Se excluyeron ${number(external.videos)} posts históricos externos (${number(external.views)} vistas) hasta vincularlos con episodios del proyecto.`
+        : summary.videos ? 'Mostrando únicamente videos publicados por el proyecto.' : 'Todavía no hay métricas propias del proyecto.';
       $('analytics-updated').textContent = analytics.generatedAt
         ? `Panel calculado: ${new Date(analytics.generatedAt).toLocaleString()}`
         : 'Todavía no hay datos. Publicá el piloto y actualizá las plataformas.';

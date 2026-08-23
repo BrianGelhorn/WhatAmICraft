@@ -27,6 +27,13 @@ analytics.video_metrics = lambda: [{
     "watchTimeSeconds": None, "averageWatchSeconds": None, "completionRate": None,
     "raw": {"availableMetrics": ["views", "likes", "comments", "shares"]},
     "updatedAt": now.isoformat(),
+}, {
+    "episodeId": "instagram:external-01", "platform": "instagram", "videoId": "external-01", "title": "External",
+    "shareUrl": "https://example.test/external", "createTime": 0, "views": 500, "likes": 5,
+    "comments": 1, "shares": 0, "saves": 0, "reach": 400,
+    "watchTimeSeconds": None, "averageWatchSeconds": None, "completionRate": None,
+    "raw": {"availableMetrics": ["views", "likes", "comments", "shares", "saves", "reach"], "external": True},
+    "updatedAt": now.isoformat(),
 }]
 analytics.video_metric_snapshots = lambda: [
     {"episodeId": "mc-99", "platform": "tiktok", "views": 100, "likes": 10, "comments": 2, "shares": 1, "capturedAt": (now + timedelta(minutes=15)).isoformat()},
@@ -37,6 +44,8 @@ analytics.state_db.load_flag = lambda key, default: {"tiktok": {"configured": Tr
 
 snapshot = analytics.build_snapshot()
 assert snapshot["summary"] == {"videos": 1, "views": 100, "engagements": 13, "engagementRateByViews": 13.0}
+assert snapshot["externalSummary"]["videos"] == 1
+assert snapshot["externalSummary"]["views"] == 500
 assert snapshot["videos"][0]["viewsPerHourSincePrevious"] == 40
 assert snapshot["videos"][0]["averageWatchSeconds"] is None
 assert [point["views"] for point in snapshot["series"]] == [80, 100]

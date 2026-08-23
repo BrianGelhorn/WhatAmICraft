@@ -610,6 +610,7 @@ def sync_instagram(state: dict) -> int:
             "averageWatchSeconds": insights.get("ig_reels_avg_watch_time", 0) / 1000 if insights.get("ig_reels_avg_watch_time") is not None else None,
             "raw": {
                 "media": media, "insights": insights, "partialErrors": errors,
+                "external": episode_id.startswith("instagram:"),
                 "availableMetrics": [
                     name for name, source in {
                         "views": "views", "likes": "likes", "comments": "comments", "shares": "shares",
@@ -703,13 +704,17 @@ def build_snapshot() -> dict:
             "lifetimeViewsPerHour": round(visible["views"] / age_hours, 2) if visible["views"] is not None and age_hours else None,
             "viewsSincePrevious": visible["views"] - previous["views"] if visible["views"] is not None and previous else None,
             "viewsPerHourSincePrevious": round((visible["views"] - previous["views"]) / delta_hours, 2) if visible["views"] is not None and previous and delta_hours and delta_hours > 0 else None,
+            "dataSource": "external" if metric["episodeId"].startswith("instagram:") or metric["raw"].get("external") else "project" if episode else "unmatched",
         }
         item.update(_creative_metadata(episode, published_at, platform_payload))
         items.append(item)
+    project_items = [item for item in items if item["dataSource"] == "project"]
+    external_items = [item for item in items if item["dataSource"] == "external"]
+    project_episode_ids = {item["episodeId"] for item in project_items}
     platform_summaries = []
     statuses = state_db.load_flag("analytics_sync_status", {})
     for platform in PLATFORMS:
-        rows = [item for item in items if item["platform"] == platform]
+        rows = [item for item in project_items if item["platform"] == platform]
         views = sum(item["views"] or 0 for item in rows)
         engagements = sum(item["engagements"] for item in rows)
         platform_summaries.append({
@@ -717,15 +722,15 @@ def build_snapshot() -> dict:
             "engagementRateByViews": round(engagements / views * 100, 2) if views else None,
             **statuses.get(platform, {}),
         })
-    total_views = sum(item["views"] or 0 for item in items)
-    total_engagements = sum(item["engagements"] for item in items)
-    series = _build_series(video_metric_snapshots())
-    quality = _build_quality(items)
+    total_views = sum(item["views"] or 0 for item in project_items)
+    total_engagements = sum(item["engagements"] for item in project_items)
+    series = _build_series([row for row in video_metric_snapshots() if row["episodeId"] in project_episode_ids])
+    quality = _build_quality(project_items)
     trends = _build_trends(series)
-    alerts = _build_alerts(items, quality, trends, statuses)
-    cohorts = _build_cohorts(items)
+    alerts = _build_alerts(project_items, quality, trends, statuses)
+    cohorts = _build_cohorts(project_items)
     observations = []
-    measured = [item for item in items if item["views"] is not None]
+    measured = [item for item in project_items if item["views"] is not None]
     if measured:
         top = max(measured, key=lambda item: item["views"])
         observations.append(f"Mayor alcance acumulado: {top['episodeId']} en {top['platform']} con {top['views']} vistas.")
@@ -748,8 +753,13 @@ def build_snapshot() -> dict:
         "schemaVersion": 1,
         "generatedAt": now.isoformat(),
         "summary": {
-            "videos": len(items), "views": total_views, "engagements": total_engagements,
+            "videos": len(project_items), "views": total_views, "engagements": total_engagements,
             "engagementRateByViews": round(total_engagements / total_views * 100, 2) if total_views else None,
+        },
+        "externalSummary": {
+            "videos": len(external_items),
+            "views": sum(item["views"] or 0 for item in external_items),
+            "engagements": sum(item["engagements"] for item in external_items),
         },
         "platforms": platform_summaries,
         "series": series,
@@ -758,10 +768,11 @@ def build_snapshot() -> dict:
         "trends": trends,
         "trendSignals": _active_trend_signals(),
         "trendSync": state_db.load_flag("analytics_trend_sync_status", {"configured": False, "synced": 0, "error": None}),
-        "experiments": _build_experiments(items),
+        "experiments": _build_experiments(project_items),
         "alerts": alerts,
         "recommendations": _build_recommendations(cohorts, trends),
-        "videos": sorted(items, key=lambda item: item["views"] or 0, reverse=True),
+        "videos": sorted(project_items, key=lambda item: item["views"] or 0, reverse=True),
+        "externalVideos": sorted(external_items, key=lambda item: item["views"] or 0, reverse=True),
         "observations": observations,
         "definitions": {
             "engagements": "likes + comments + shares + saves when the platform exposes saves",
@@ -774,6 +785,7 @@ def build_snapshot() -> dict:
             "Unavailable metrics are null, never estimated as zero.",
             "Recommendations require at least two measured videos per cohort and do not replace external trend research.",
             "Experiments compare observed variant and baseline cohorts; they are not randomized unless the content plan assigns both groups deliberately.",
+            "External account history is shown separately and excluded from project recommendations until it is linked to a project episode.",
         ],
         "suggestedGptTask": "Analyze platform health, trends, cohort winners, data quality, alerts and concrete next experiments. Separate facts from hypotheses and cite episode IDs.",
     }
@@ -791,6 +803,8 @@ def write_exports(snapshot: dict | None = None) -> dict:
         f"Engagements: {snapshot['summary']['engagements']}", "", "## Platform status", "",
     ]
     lines.extend(f"- {row['platform']}: {row['videos']} videos, {row['views']} views" + (f" — {row['error']}" if row.get("error") else "") for row in snapshot["platforms"])
+    if snapshot["externalSummary"]["videos"]:
+        lines.extend(["", "## External history excluded from project decisions", "", f"- {snapshot['externalSummary']['videos']} posts, {snapshot['externalSummary']['views']} views"])
     lines.extend(["", "## Observations", ""])
     lines.extend(f"- {item}" for item in snapshot["observations"] or ["Not enough data yet."])
     lines.extend(["", "## Trends", ""])
