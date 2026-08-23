@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "format", "episodes"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"const": 1},
+    "format": {"const": "mystery-v2"},
+    "episodes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/episode"}}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "textPair": {
+      "type": "object",
+      "required": ["displayText", "voiceText"],
+      "properties": {
+        "displayText": {"type": "string", "minLength": 1, "maxLength": 56},
+        "voiceText": {"type": "string", "minLength": 1, "maxLength": 120},
+        "options": {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "string", "minLength": 1, "maxLength": 5}}
+      },
+      "additionalProperties": false
+    },
+    "timeline": {
+      "type": "object",
+      "required": ["hook", "hints", "countdown", "reveal", "cta", "loop"],
+      "properties": {
+        "hook": {"type": "integer", "minimum": 12, "maximum": 45},
+        "hints": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 60, "maximum": 100}},
+        "countdown": {"type": "integer", "minimum": 45, "maximum": 75},
+        "reveal": {"type": "integer", "minimum": 60, "maximum": 100},
+        "cta": {"type": "integer", "minimum": 45, "maximum": 125},
+        "loop": {"type": "integer", "minimum": 6, "maximum": 18}
+      },
+      "additionalProperties": false
+    },
+    "episode": {
+      "type": "object",
+      "required": ["id", "format", "language", "answer", "background", "hookOptions", "ruleText", "hints", "countdown", "reveal", "ctaOptions", "variants", "theme", "voiceGeneration", "audio", "debug"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "format": {"const": "mystery-v2"},
+        "language": {"type": "string", "minLength": 2, "maxLength": 8},
+        "answer": {
+          "type": "object",
+          "required": ["id", "text", "category", "image", "silhouette"],
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "text": {"type": "string", "minLength": 1, "maxLength": 24},
+            "category": {"type": "string", "minLength": 1, "maxLength": 16},
+            "image": {"type": "string", "minLength": 1},
+            "silhouette": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "background": {"type": "string", "minLength": 1},
+        "hookOptions": {"type": "object", "minProperties": 5, "additionalProperties": {"$ref": "#/$defs/textPair"}},
+        "ruleText": {"type": "string", "minLength": 1, "maxLength": 28},
+        "hints": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["id", "voiceText", "displayText", "fragments", "emphasisWords", "visualType", "difficulty"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "voiceText": {"type": "string", "minLength": 1, "maxLength": 90},
+              "displayText": {"type": "string", "minLength": 1, "maxLength": 54},
+              "fragments": {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "string", "minLength": 1, "maxLength": 28}},
+              "emphasisWords": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1, "maxLength": 18}},
+              "visualType": {"enum": ["durability", "combat", "mob", "recipe", "generic"]},
+              "visualAsset": {"type": "string", "minLength": 1},
+              "difficulty": {"enum": ["hard", "medium", "easy"]}
+            },
+            "additionalProperties": false
+          }
+        },
+        "countdown": {
+          "type": "object",
+          "required": ["displayText", "voiceText", "values"],
+          "properties": {
+            "displayText": {"type": "string", "minLength": 1, "maxLength": 32},
+            "voiceText": {"type": "string", "minLength": 1, "maxLength": 80},
+            "values": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 1, "maximum": 9}}
+          },
+          "additionalProperties": false
+        },
+        "reveal": {
+          "type": "object",
+          "required": ["preRevealText", "answerText", "voiceText"],
+          "properties": {
+            "preRevealText": {"type": "string", "minLength": 1, "maxLength": 24},
+            "answerText": {"type": "string", "minLength": 1, "maxLength": 24},
+            "voiceText": {"type": "string", "minLength": 1, "maxLength": 80}
+          },
+          "additionalProperties": false
+        },
+        "ctaOptions": {"type": "object", "minProperties": 3, "additionalProperties": {"$ref": "#/$defs/textPair"}},
+        "variants": {
+          "type": "object",
+          "required": ["fast", "balanced", "comment_bait"],
+          "additionalProperties": {
+            "type": "object",
+            "required": ["hookVariant", "ctaVariant", "visualIntensity", "hypothesis", "timeline"],
+            "properties": {
+              "hookVariant": {"type": "string", "minLength": 1},
+              "ctaVariant": {"type": "string", "minLength": 1},
+              "visualIntensity": {"enum": ["low", "medium", "high"]},
+              "hypothesis": {"type": "string", "minLength": 1, "maxLength": 120},
+              "timeline": {"$ref": "#/$defs/timeline"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "theme": {"type": "object"},
+        "voiceGeneration": {"type": "object"},
+        "audio": {"type": "object"},
+        "debug": {"type": "object"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

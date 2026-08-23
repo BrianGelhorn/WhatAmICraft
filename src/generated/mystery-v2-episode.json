@@ -1,0 +1,158 @@
+{
+  "id": "mystery-trident-v2",
+  "format": "mystery-v2",
+  "language": "en",
+  "variant": "balanced",
+  "hookVariant": "question-first",
+  "ctaVariant": "hint-count",
+  "visualIntensity": "medium",
+  "hypothesis": "A 19 second pace balances comprehension and completion.",
+  "answer": {
+    "id": "trident",
+    "text": "TRIDENT",
+    "category": "WEAPON",
+    "image": "mc-assets/item-assets/TRIDENT.png",
+    "silhouette": "mc-assets/item-assets/TRIDENT.png"
+  },
+  "background": "images/template-layers/background.png",
+  "hook": {
+    "question": "CAN YOU GUESS THIS WEAPON?",
+    "ruleText": "3 HINTS · 1 CHANCE",
+    "showBrandMark": true
+  },
+  "hints": [
+    {
+      "id": "durability",
+      "voiceText": "It wears down and won't stack.",
+      "displayText": "LOSES DURABILITY · NO STACKING",
+      "fragments": [
+        "LOSES DURABILITY",
+        "NO STACKING"
+      ],
+      "emphasisWords": [
+        "DURABILITY",
+        "STACKING"
+      ],
+      "visualType": "durability",
+      "difficulty": "hard"
+    },
+    {
+      "id": "combat",
+      "voiceText": "It hits up close or at range.",
+      "displayText": "MELEE · OR · RANGED",
+      "fragments": [
+        "UP CLOSE",
+        "OR",
+        "FROM A DISTANCE"
+      ],
+      "emphasisWords": [
+        "CLOSE",
+        "DISTANCE"
+      ],
+      "visualType": "combat",
+      "visualAsset": "mc-assets/entity-assets/flat/ARROW.png",
+      "difficulty": "medium"
+    },
+    {
+      "id": "drowned",
+      "voiceText": "A drowned can carry it.",
+      "displayText": "A DROWNED CAN CARRY IT",
+      "fragments": [
+        "A DROWNED",
+        "CAN CARRY IT"
+      ],
+      "emphasisWords": [
+        "DROWNED"
+      ],
+      "visualType": "mob",
+      "visualAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+      "difficulty": "easy"
+    }
+  ],
+  "countdown": {
+    "displayText": "LOCK IN YOUR ANSWER",
+    "values": [
+      3,
+      2,
+      1
+    ]
+  },
+  "reveal": {
+    "preRevealText": "THE ANSWER IS…",
+    "answerText": "TRIDENT"
+  },
+  "cta": {
+    "text": "DID YOU GET IT WITH 1, 2 OR 3 HINTS?",
+    "options": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  "timeline": {
+    "durationInFrames": 585,
+    "hook": {
+      "from": 0,
+      "durationInFrames": 45
+    },
+    "hints": [
+      {
+        "from": 45,
+        "durationInFrames": 90
+      },
+      {
+        "from": 135,
+        "durationInFrames": 90
+      },
+      {
+        "from": 225,
+        "durationInFrames": 90
+      }
+    ],
+    "countdown": {
+      "from": 315,
+      "durationInFrames": 72
+    },
+    "reveal": {
+      "from": 387,
+      "durationInFrames": 84
+    },
+    "cta": {
+      "from": 471,
+      "durationInFrames": 99
+    },
+    "loop": {
+      "from": 570,
+      "durationInFrames": 15
+    }
+  },
+  "theme": {
+    "mystery": "#091225",
+    "surface": "#111B32",
+    "progress": "#63D471",
+    "accent": "#FFD34F",
+    "urgency": "#FF6B35",
+    "answer": "#7CFF6B",
+    "text": "#FFFFFF",
+    "muted": "#A9B6D3",
+    "titleFont": "Minecraft",
+    "bodyFont": "Minecraft",
+    "outlinePx": 6,
+    "cardRadius": 34
+  },
+  "voice": {
+    "status": "pending",
+    "segments": []
+  },
+  "audio": {
+    "status": "pending",
+    "effects": []
+  },
+  "debug": {
+    "showSafeZones": false,
+    "showSceneBoundaries": false,
+    "showTimestampLabels": false,
+    "showVoiceSegments": false,
+    "showRetentionMarkers": false
+  }
+}
