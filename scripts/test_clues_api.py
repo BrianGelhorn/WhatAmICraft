@@ -63,7 +63,7 @@ def main() -> None:
     used_path = fixture / "data/used-targets.json"
     used_path.parent.mkdir(parents=True, exist_ok=True)
     used_path.write_text(json.dumps({"target_ids": ["amethyst_block"], "targets": [{"id": "amethyst_block", "sources": ["clue_bank"], "episode_ids": [], "video_files": []}]}), encoding="utf-8")
-    server = make_server("127.0.0.1", 0, ClueCatalog(fixture, [source], fixture / "data/clues/inbox", used_path))
+    server = make_server("127.0.0.1", 0, ClueCatalog(fixture, [source], fixture / "data/clues/inbox", used_path, ROOT / "data/mystery-v2-visual-prefabs.json"))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     base = f"http://127.0.0.1:{server.server_port}"
@@ -77,10 +77,14 @@ def main() -> None:
         assert used["items"][0]["status"] == "used"
         status, unused = call(base, "/api/clues?status=unused")
         assert status == 200 and unused["items"] == []
+        status, prefabs = call(base, "/api/clue-prefabs")
+        assert status == 200 and prefabs["status"] == "draft" and len(prefabs["prefabs"]) == 30
         os.environ["CLUES_API_URL"] = base
         assert get_clue("amethyst_block")["used"] is True
         proxy_status, proxy = call(dashboard_base, "/api/clues?status=used")
         assert proxy_status == 200 and proxy["items"][0]["id"] == "amethyst_block"
+        proxy_status, proxy_prefabs = call(dashboard_base, "/api/clue-prefabs")
+        assert proxy_status == 200 and len(proxy_prefabs["prefabs"]) == 30
 
         value = upload_fixture()
         uploaded = upload_clue(value)

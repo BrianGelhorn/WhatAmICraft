@@ -1,0 +1,636 @@
+{
+  "$schema": "../schemas/mystery-v2-visual-prefabs.schema.json",
+  "schema_version": 1,
+  "format": "mystery-v2-visual-prefabs",
+  "status": "draft",
+  "prefabs": [
+    {
+      "number": 1,
+      "id": "durability-loss",
+      "title": "PIERDE DURABILIDAD",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Slot con barra de durabilidad que desciende.",
+      "relations": [
+        "durability",
+        "wear"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "tool",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/IRON_PICKAXE.png"
+      ]
+    },
+    {
+      "number": 2,
+      "id": "stack-limit",
+      "title": "LÍMITE DE STACK",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Slot de inventario que destaca la cantidad máxima.",
+      "relations": [
+        "stack_limit",
+        "inventory"
+      ],
+      "supportedKinds": [
+        "item",
+        "food",
+        "weapon",
+        "tool",
+        "block"
+      ],
+      "assets": [
+        "mc-assets/item-assets/ENDER_PEARL.png"
+      ]
+    },
+    {
+      "number": 3,
+      "id": "charge-level",
+      "title": "SE PUEDE CARGAR",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Carga progresiva alrededor del objeto.",
+      "relations": [
+        "charge",
+        "loaded_state"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/CROSSBOW.png"
+      ]
+    },
+    {
+      "number": 4,
+      "id": "cooldown",
+      "title": "TIENE COOLDOWN",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Reloj radial que bloquea y libera el uso.",
+      "relations": [
+        "cooldown",
+        "reuse_delay"
+      ],
+      "supportedKinds": [
+        "item",
+        "weapon",
+        "food"
+      ],
+      "assets": [
+        "mc-assets/item-assets/ENDER_PEARL.png"
+      ]
+    },
+    {
+      "number": 5,
+      "id": "enchantment-glint",
+      "title": "PUEDE ENCANTARSE",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Brillo encantado recorre el objeto.",
+      "relations": [
+        "enchantable",
+        "enchantment"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "tool",
+        "item",
+        "armor"
+      ],
+      "assets": [
+        "mc-assets/item-assets/DIAMOND_SWORD.png",
+        "mc-assets/item-assets/ENCHANTED_BOOK.png"
+      ]
+    },
+    {
+      "number": 6,
+      "id": "consumable-bites",
+      "title": "SE CONSUME",
+      "role": "property-state",
+      "status": "draft",
+      "description": "El alimento pierde porciones de forma progresiva.",
+      "relations": [
+        "consumable",
+        "food"
+      ],
+      "supportedKinds": [
+        "food",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/APPLE.png"
+      ]
+    },
+    {
+      "number": 7,
+      "id": "smelting-progress",
+      "title": "SE PUEDE FUNDIR",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Proceso de horno con entrada y resultado.",
+      "relations": [
+        "smeltable",
+        "smelting"
+      ],
+      "supportedKinds": [
+        "item",
+        "mineral",
+        "block"
+      ],
+      "assets": [
+        "mc-assets/item-assets/RAW_IRON.png",
+        "mc-assets/item-assets/FURNACE.png",
+        "mc-assets/item-assets/IRON_INGOT.png"
+      ]
+    },
+    {
+      "number": 8,
+      "id": "growth-stages",
+      "title": "TIENE ETAPAS",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Secuencia visible de crecimiento.",
+      "relations": [
+        "growth",
+        "age_state"
+      ],
+      "supportedKinds": [
+        "plant",
+        "block"
+      ],
+      "assets": [
+        "mc-assets/item-assets/WHEAT_SEEDS.png",
+        "mc-assets/item-assets/WHEAT.png"
+      ]
+    },
+    {
+      "number": 9,
+      "id": "emits-light",
+      "title": "EMITE LUZ",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Halo que aumenta para representar nivel de luz.",
+      "relations": [
+        "light",
+        "luminance"
+      ],
+      "supportedKinds": [
+        "block",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/TORCH.png"
+      ]
+    },
+    {
+      "number": 10,
+      "id": "blocks-damage",
+      "title": "BLOQUEA DAÑO",
+      "role": "property-state",
+      "status": "draft",
+      "description": "Impacto detenido por un escudo.",
+      "relations": [
+        "damage_block",
+        "defense"
+      ],
+      "supportedKinds": [
+        "item",
+        "tool"
+      ],
+      "assets": [
+        "mc-assets/item-assets/SHIELD.png",
+        "mc-assets/item-assets/ARROW.png"
+      ]
+    },
+    {
+      "number": 11,
+      "id": "melee-strike",
+      "title": "ATAQUE CUERPO A CUERPO",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "El objeto golpea una entidad cercana.",
+      "relations": [
+        "melee",
+        "attack"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "tool",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/DIAMOND_SWORD.png",
+        "mc-assets/entity-assets/flat/ZOMBIE.png"
+      ]
+    },
+    {
+      "number": 12,
+      "id": "projectile-throw",
+      "title": "SE PUEDE LANZAR",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "El objeto viaja en arco e impacta.",
+      "relations": [
+        "projectile",
+        "throw",
+        "ranged"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/TRIDENT.png",
+        "mc-assets/entity-assets/flat/ZOMBIE.png"
+      ]
+    },
+    {
+      "number": 13,
+      "id": "mining-break",
+      "title": "ROMPE BLOQUES",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "Herramienta golpea y fragmenta un bloque.",
+      "relations": [
+        "mining",
+        "break_block",
+        "tool"
+      ],
+      "supportedKinds": [
+        "tool"
+      ],
+      "assets": [
+        "mc-assets/item-assets/DIAMOND_PICKAXE.png",
+        "mc-assets/item-assets/STONE.png"
+      ]
+    },
+    {
+      "number": 14,
+      "id": "block-place",
+      "title": "SE PUEDE COLOCAR",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "El bloque encaja sobre una cuadrícula.",
+      "relations": [
+        "placeable",
+        "placement"
+      ],
+      "supportedKinds": [
+        "block",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/STONE.png"
+      ]
+    },
+    {
+      "number": 15,
+      "id": "consume-use",
+      "title": "SE PUEDE COMER",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "El alimento se acerca y restaura hambre.",
+      "relations": [
+        "eat",
+        "consume",
+        "hunger"
+      ],
+      "supportedKinds": [
+        "food"
+      ],
+      "assets": [
+        "mc-assets/item-assets/COOKED_BEEF.png"
+      ]
+    },
+    {
+      "number": 16,
+      "id": "equip-armor",
+      "title": "SE PUEDE EQUIPAR",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "La pieza entra en una ranura de armadura.",
+      "relations": [
+        "equip",
+        "armor_slot"
+      ],
+      "supportedKinds": [
+        "item",
+        "armor"
+      ],
+      "assets": [
+        "mc-assets/item-assets/DIAMOND_CHESTPLATE.png"
+      ]
+    },
+    {
+      "number": 17,
+      "id": "ignite-target",
+      "title": "PUEDE ENCENDER",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "El objeto inicia fuego sobre un objetivo.",
+      "relations": [
+        "ignite",
+        "fire_interaction"
+      ],
+      "supportedKinds": [
+        "tool",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/FLINT_AND_STEEL.png",
+        "mc-assets/item-assets/STONE.png"
+      ]
+    },
+    {
+      "number": 18,
+      "id": "water-interaction",
+      "title": "INTERACTÚA CON AGUA",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "Ondas y burbujas reaccionan al objeto.",
+      "relations": [
+        "water_interaction",
+        "aquatic"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "item",
+        "block",
+        "mob"
+      ],
+      "assets": [
+        "mc-assets/item-assets/TRIDENT.png"
+      ]
+    },
+    {
+      "number": 19,
+      "id": "redstone-activate",
+      "title": "ACTIVA REDSTONE",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "Señal conecta y enciende un circuito.",
+      "relations": [
+        "redstone",
+        "activation",
+        "power"
+      ],
+      "supportedKinds": [
+        "block",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/LEVER.png",
+        "mc-assets/item-assets/REDSTONE.png"
+      ]
+    },
+    {
+      "number": 20,
+      "id": "teleport-use",
+      "title": "TELETRANSPORTA",
+      "role": "action-interaction",
+      "status": "draft",
+      "description": "El objeto dispara una transición de posición.",
+      "relations": [
+        "teleport",
+        "use_effect"
+      ],
+      "supportedKinds": [
+        "item"
+      ],
+      "assets": [
+        "mc-assets/item-assets/ENDER_PEARL.png",
+        "mc-assets/entity-assets/flat/ENDERMAN.png"
+      ]
+    },
+    {
+      "number": 21,
+      "id": "mob-drop",
+      "title": "DROP DE UN MOB",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Una entidad deja caer el objeto.",
+      "relations": [
+        "mob_drop",
+        "loot"
+      ],
+      "supportedKinds": [
+        "item",
+        "food",
+        "weapon",
+        "tool"
+      ],
+      "assets": [
+        "mc-assets/entity-assets/flat/ZOMBIE.png",
+        "mc-assets/item-assets/ROTTEN_FLESH.png"
+      ]
+    },
+    {
+      "number": 22,
+      "id": "mob-equipment",
+      "title": "LO LLEVA UN MOB",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Una entidad aparece equipada con el objeto.",
+      "relations": [
+        "mob_equipment",
+        "held_item"
+      ],
+      "supportedKinds": [
+        "weapon",
+        "tool",
+        "item"
+      ],
+      "assets": [
+        "mc-assets/entity-assets/flat/DROWNED.png",
+        "mc-assets/item-assets/TRIDENT.png"
+      ]
+    },
+    {
+      "number": 23,
+      "id": "crafting-recipe",
+      "title": "SE FABRICA",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Ingredientes entran a una cuadrícula y producen el resultado.",
+      "relations": [
+        "crafting",
+        "recipe"
+      ],
+      "supportedKinds": [
+        "item",
+        "weapon",
+        "tool",
+        "block",
+        "food"
+      ],
+      "assets": [
+        "mc-assets/item-assets/STICK.png",
+        "mc-assets/item-assets/STRING.png",
+        "mc-assets/item-assets/BOW.png"
+      ]
+    },
+    {
+      "number": 24,
+      "id": "smelting-recipe",
+      "title": "SALE DE UN HORNO",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Entrada, combustible y resultado del horno.",
+      "relations": [
+        "smelting_result",
+        "furnace_recipe"
+      ],
+      "supportedKinds": [
+        "item",
+        "mineral",
+        "food",
+        "block"
+      ],
+      "assets": [
+        "mc-assets/item-assets/RAW_IRON.png",
+        "mc-assets/item-assets/FURNACE.png",
+        "mc-assets/item-assets/IRON_INGOT.png"
+      ]
+    },
+    {
+      "number": 25,
+      "id": "structure-chest",
+      "title": "APARECE EN COFRES",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Un cofre de estructura se abre y muestra el objeto.",
+      "relations": [
+        "chest_loot",
+        "structure_loot"
+      ],
+      "supportedKinds": [
+        "item",
+        "weapon",
+        "tool",
+        "food",
+        "mineral"
+      ],
+      "assets": [
+        "mc-assets/item-assets/CHEST.png",
+        "mc-assets/item-assets/ENCHANTED_BOOK.png"
+      ]
+    },
+    {
+      "number": 26,
+      "id": "biome-spawn",
+      "title": "APARECE EN UN BIOMA",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "El entorno del bioma aparece alrededor del objetivo.",
+      "relations": [
+        "biome",
+        "natural_generation",
+        "spawn"
+      ],
+      "supportedKinds": [
+        "block",
+        "plant",
+        "mob",
+        "structure"
+      ],
+      "assets": [
+        "mc-assets/item-assets/SAND.png",
+        "mc-assets/item-assets/CACTUS.png"
+      ]
+    },
+    {
+      "number": 27,
+      "id": "dimension-origin",
+      "title": "VIENE DE OTRA DIMENSIÓN",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Un portal contextualiza la dimensión de origen.",
+      "relations": [
+        "dimension",
+        "dimension_origin"
+      ],
+      "supportedKinds": [
+        "item",
+        "block",
+        "mob",
+        "structure"
+      ],
+      "assets": [
+        "mc-assets/item-assets/BLAZE_ROD.png",
+        "mc-assets/entity-assets/flat/BLAZE.png"
+      ]
+    },
+    {
+      "number": 28,
+      "id": "fishing-loot",
+      "title": "SE OBTIENE PESCANDO",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Anzuelo, agua y captura representan el loot.",
+      "relations": [
+        "fishing",
+        "fishing_loot"
+      ],
+      "supportedKinds": [
+        "item",
+        "food"
+      ],
+      "assets": [
+        "mc-assets/item-assets/FISHING_ROD.png",
+        "mc-assets/item-assets/COD.png"
+      ]
+    },
+    {
+      "number": 29,
+      "id": "trade-offer",
+      "title": "SE CONSIGUE COMERCIANDO",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Esmeraldas se intercambian con un aldeano.",
+      "relations": [
+        "trade",
+        "villager_trade"
+      ],
+      "supportedKinds": [
+        "item",
+        "weapon",
+        "tool",
+        "food",
+        "block"
+      ],
+      "assets": [
+        "mc-assets/entity-assets/flat/VILLAGER.png",
+        "mc-assets/item-assets/EMERALD.png",
+        "mc-assets/item-assets/ENCHANTED_BOOK.png"
+      ]
+    },
+    {
+      "number": 30,
+      "id": "entity-transformation",
+      "title": "TRANSFORMA UNA ENTIDAD",
+      "role": "origin-context",
+      "status": "draft",
+      "description": "Una entidad cambia de estado mediante el objeto.",
+      "relations": [
+        "transformation",
+        "curing",
+        "conversion"
+      ],
+      "supportedKinds": [
+        "item",
+        "food",
+        "potion"
+      ],
+      "assets": [
+        "mc-assets/entity-assets/flat/ZOMBIE_VILLAGER.png",
+        "mc-assets/item-assets/GOLDEN_APPLE.png",
+        "mc-assets/entity-assets/flat/VILLAGER.png"
+      ]
+    }
+  ]
+}
