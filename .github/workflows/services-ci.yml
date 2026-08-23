@@ -133,9 +133,11 @@ jobs:
           npm ci
           npx remotion browser ensure
           python scripts/ci/prepare_media_fixtures.py
-          python -m py_compile scripts/produce_quiz_copy.py scripts/thumbnails.py scripts/template_artifacts.py scripts/template_release.py
+          python -m py_compile scripts/produce_quiz_copy.py scripts/produce_mystery_v2.py scripts/thumbnails.py scripts/template_artifacts.py scripts/template_release.py
           PYTHONPATH=scripts python scripts/test_quiz_copy_validation.py
           python scripts/test_quiz_copy_hook_experiments.py
+          PYTHONPATH=scripts python scripts/test_mystery_v2.py
+          python scripts/produce_mystery_v2.py --variant balanced --visual-only
           PYTHONPATH=scripts python scripts/test_automatic_rendering.py
           PYTHONPATH=scripts python scripts/test_template_artifacts.py
           PYTHONPATH=scripts python scripts/test_thumbnails.py
@@ -143,8 +145,13 @@ jobs:
           python skills/remotion-template-builder/scripts/validate_template_contract.py \
             --manifest templates/quiz-copy/template.contract.json \
             --source-dir src
+          python skills/remotion-template-builder/scripts/validate_template_contract.py \
+            --manifest templates/mystery-v2/template.contract.json \
+            --source-dir src
           npx remotion render QuizCapasCopy out/ci-producer-check.mp4 --frames=0-1
           test -s out/ci-producer-check.mp4
+          npx remotion render MysteryVideo out/ci-mystery-v2-check.mp4 --frames=0-1
+          test -s out/ci-mystery-v2-check.mp4
 
   clues-api:
     name: Clues API service

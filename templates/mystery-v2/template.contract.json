@@ -1,0 +1,69 @@
+{
+  "template": "mystery-v2",
+  "compositionId": "MysteryVideo",
+  "fps": 30,
+  "durationInFrames": 585,
+  "automation": {
+    "format": "mystery-v2",
+    "inputPath": "data/mystery-v2-episodes.json",
+    "schemaPath": "schemas/mystery-v2-episode.schema.json",
+    "producer": "scripts/produce_mystery_v2.py",
+    "generatedConfigPath": "src/generated/mystery-v2-episode.json",
+    "editableFields": [
+      "answer",
+      "background",
+      "hookOptions",
+      "ruleText",
+      "hints",
+      "countdown",
+      "reveal",
+      "ctaOptions",
+      "variants",
+      "theme",
+      "voiceGeneration",
+      "audio",
+      "debug"
+    ],
+    "generatedFields": [
+      "hook",
+      "cta",
+      "timeline",
+      "voice.segments[]",
+      "voice.segments[].words[]",
+      "audio.effects[]"
+    ]
+  },
+  "intro": {
+    "hookDurationFrames": 45,
+    "handoffDurationFrames": 6,
+    "contentStartFrame": 45,
+    "maxContentStartFrame": 45,
+    "visualBeats": [
+      {"id": "question", "from": 0, "description": "question, category, urgency and exact silhouette are visible"},
+      {"id": "rule", "from": 18, "description": "three-hints rule and progress become prominent"},
+      {"id": "first-hint", "from": 45, "description": "first configured hint begins"}
+    ]
+  },
+  "audio": {
+    "status": "pending",
+    "allowedSources": [],
+    "cues": [],
+    "normalization": {"voiceTargetLufs": -16, "voiceTruePeakDb": -1.5, "voiceLoudnessRange": 11}
+  },
+  "scenes": [
+    {"id": "hook", "from": 0, "durationInFrames": 45},
+    {"id": "hint-1", "from": 45, "durationInFrames": 90},
+    {"id": "hint-2", "from": 135, "durationInFrames": 90},
+    {"id": "hint-3", "from": 225, "durationInFrames": 90},
+    {"id": "countdown", "from": 315, "durationInFrames": 72},
+    {"id": "reveal", "from": 387, "durationInFrames": 84},
+    {"id": "cta", "from": 471, "durationInFrames": 99},
+    {"id": "loop", "from": 570, "durationInFrames": 15}
+  ],
+  "animationPolicy": {
+    "allowed": ["fade", "translate", "scale", "rotate"],
+    "maxScale": 1.12,
+    "allowCssTransitions": false,
+    "allowRandomness": false
+  }
+}
