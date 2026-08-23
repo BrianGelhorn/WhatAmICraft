@@ -2,7 +2,7 @@
   "template": "mystery-v2",
   "compositionId": "MysteryVideo",
   "fps": 30,
-  "durationInFrames": 585,
+  "durationInFrames": 542,
   "automation": {
     "format": "mystery-v2",
     "inputPath": "data/mystery-v2-episodes.json",
@@ -34,14 +34,14 @@
     ]
   },
   "intro": {
-    "hookDurationFrames": 45,
+    "hookDurationFrames": 35,
     "handoffDurationFrames": 6,
-    "contentStartFrame": 45,
-    "maxContentStartFrame": 45,
+    "contentStartFrame": 35,
+    "maxContentStartFrame": 35,
     "visualBeats": [
       {"id": "question", "from": 0, "description": "question, category, urgency and exact silhouette are visible"},
-      {"id": "rule", "from": 18, "description": "three-hints rule and progress become prominent"},
-      {"id": "first-hint", "from": 45, "description": "first configured hint begins"}
+      {"id": "rule", "from": 12, "description": "three-hints rule and global tension become prominent"},
+      {"id": "first-hint", "from": 35, "description": "first configured hint begins before 1.2 seconds"}
     ]
   },
   "audio": {
@@ -51,14 +51,14 @@
     "normalization": {"voiceTargetLufs": -16, "voiceTruePeakDb": -1.5, "voiceLoudnessRange": 11}
   },
   "scenes": [
-    {"id": "hook", "from": 0, "durationInFrames": 45},
-    {"id": "hint-1", "from": 45, "durationInFrames": 90},
-    {"id": "hint-2", "from": 135, "durationInFrames": 90},
-    {"id": "hint-3", "from": 225, "durationInFrames": 90},
-    {"id": "countdown", "from": 315, "durationInFrames": 72},
-    {"id": "reveal", "from": 387, "durationInFrames": 84},
-    {"id": "cta", "from": 471, "durationInFrames": 99},
-    {"id": "loop", "from": 570, "durationInFrames": 15}
+    {"id": "hook", "from": 0, "durationInFrames": 35},
+    {"id": "hint-1", "from": 35, "durationInFrames": 90},
+    {"id": "hint-2", "from": 125, "durationInFrames": 87},
+    {"id": "hint-3", "from": 212, "durationInFrames": 87},
+    {"id": "countdown", "from": 299, "durationInFrames": 60},
+    {"id": "reveal", "from": 359, "durationInFrames": 78},
+    {"id": "cta", "from": 437, "durationInFrames": 93},
+    {"id": "loop", "from": 530, "durationInFrames": 12}
   ],
   "animationPolicy": {
     "allowed": ["fade", "translate", "scale", "rotate"],

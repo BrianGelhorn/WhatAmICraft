@@ -17,16 +17,16 @@
       "background": "images/template-layers/background.png",
       "hookOptions": {
         "question-first": {
-          "displayText": "CAN YOU GUESS THIS WEAPON?",
-          "voiceText": "Guess this weapon."
+          "displayText": "CAN YOU NAME THIS WEAPON?",
+          "voiceText": "Name it."
         },
         "difficulty-challenge": {
           "displayText": "CAN YOU GET IT IN 1 HINT?",
           "voiceText": "Get it in one."
         },
         "category-visible": {
-          "displayText": "MINECRAFT WEAPON. NAME IT.",
-          "voiceText": "Minecraft weapon. Name it."
+          "displayText": "NAME THIS MINECRAFT WEAPON",
+          "voiceText": "Name this weapon."
         },
         "timer-challenge": {
           "displayText": "NAME IT BEFORE TIME RUNS OUT",
@@ -37,7 +37,7 @@
           "voiceText": "Three hints. Don't waste them."
         }
       },
-      "ruleText": "3 HINTS · 1 CHANCE",
+      "ruleText": "3 HINTS · 1 ANSWER",
       "hints": [
         {
           "id": "durability",
@@ -51,9 +51,9 @@
         {
           "id": "combat",
           "voiceText": "It hits up close or at range.",
-          "displayText": "MELEE · OR · RANGED",
-          "fragments": ["UP CLOSE", "OR", "FROM A DISTANCE"],
-          "emphasisWords": ["CLOSE", "DISTANCE"],
+          "displayText": "MELEE · RANGED",
+          "fragments": ["MELEE", "RANGED"],
+          "emphasisWords": ["MELEE", "RANGED"],
           "visualType": "combat",
           "visualAsset": "mc-assets/entity-assets/flat/ARROW.png",
           "difficulty": "medium"
@@ -61,8 +61,8 @@
         {
           "id": "drowned",
           "voiceText": "A drowned can carry it.",
-          "displayText": "A DROWNED CAN CARRY IT",
-          "fragments": ["A DROWNED", "CAN CARRY IT"],
+          "displayText": "CARRIED BY A DROWNED",
+          "fragments": ["CARRIED BY A DROWNED"],
           "emphasisWords": ["DROWNED"],
           "visualType": "mob",
           "visualAsset": "mc-assets/entity-assets/flat/DROWNED.png",
@@ -70,8 +70,8 @@
         }
       ],
       "countdown": {
-        "displayText": "LOCK IN YOUR ANSWER",
-        "voiceText": "Three-two-one!",
+        "displayText": "LOCK IT IN",
+        "voiceText": "Three two one",
         "values": [3, 2, 1]
       },
       "reveal": {
@@ -81,48 +81,43 @@
       },
       "ctaOptions": {
         "hint-count": {
-          "displayText": "DID YOU GET IT WITH 1, 2 OR 3 HINTS?",
-          "voiceText": "One, two, or three hints?",
+          "displayText": "COMMENT 1, 2, OR 3",
+          "voiceText": "How many hints did you need?",
           "options": ["1", "2", "3"]
         },
         "score": {
-          "displayText": "WHAT SCORE DID YOU GET?",
-          "voiceText": "What score did you get?",
+          "displayText": "COMMENT YOUR SCORE: 1, 2, OR 3",
+          "voiceText": "Comment your score.",
           "options": ["1", "2", "3"]
-        },
-        "answer": {
-          "displayText": "DID YOU GUESS TRIDENT?",
-          "voiceText": "Did you guess the trident?",
-          "options": ["YES", "NO"]
         }
       },
       "variants": {
         "fast": {
           "hookVariant": "timer-challenge",
-          "ctaVariant": "answer",
+          "ctaVariant": "hint-count",
           "visualIntensity": "high",
           "hypothesis": "A 15 second challenge increases completion rate.",
           "timeline": {
-            "hook": 42,
-            "hints": [72, 72, 72],
-            "countdown": 72,
-            "reveal": 63,
-            "cta": 51,
-            "loop": 6
+            "hook": 35,
+            "hints": [75, 75, 75],
+            "countdown": 60,
+            "reveal": 75,
+            "cta": 69,
+            "loop": 9
           }
         },
         "balanced": {
           "hookVariant": "question-first",
           "ctaVariant": "hint-count",
           "visualIntensity": "medium",
-          "hypothesis": "A 19 second pace balances comprehension and completion.",
+          "hypothesis": "A 17.9 second pace balances comprehension and completion.",
           "timeline": {
-            "hook": 45,
-            "hints": [90, 90, 90],
-            "countdown": 72,
-            "reveal": 84,
-            "cta": 99,
-            "loop": 15
+            "hook": 35,
+            "hints": [90, 87, 87],
+            "countdown": 60,
+            "reveal": 78,
+            "cta": 93,
+            "loop": 12
           }
         },
         "comment_bait": {
@@ -131,24 +126,24 @@
           "visualIntensity": "high",
           "hypothesis": "A numeric CTA increases comments per thousand views.",
           "timeline": {
-            "hook": 45,
-            "hints": [84, 84, 84],
-            "countdown": 72,
-            "reveal": 78,
-            "cta": 99,
-            "loop": 15
+            "hook": 35,
+            "hints": [81, 78, 78],
+            "countdown": 60,
+            "reveal": 75,
+            "cta": 96,
+            "loop": 12
           }
         }
       },
       "theme": {
-        "mystery": "#091225",
-        "surface": "#111B32",
-        "progress": "#63D471",
-        "accent": "#FFD34F",
+        "mystery": "#070B1A",
+        "surface": "#10172B",
+        "progress": "#2DE2E6",
+        "accent": "#FFD166",
         "urgency": "#FF6B35",
-        "answer": "#7CFF6B",
+        "answer": "#6BFF95",
         "text": "#FFFFFF",
-        "muted": "#A9B6D3",
+        "muted": "#A8B3CF",
         "titleFont": "Minecraft",
         "bodyFont": "Minecraft",
         "outlinePx": 6,

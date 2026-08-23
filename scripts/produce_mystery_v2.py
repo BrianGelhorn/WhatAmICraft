@@ -64,12 +64,23 @@ def validate_episode(episode: dict) -> None:
     for index, hint in enumerate(hints):
         require_text(hint.get("voiceText"), f"hints[{index}].voiceText", 90)
         require_text(hint.get("displayText"), f"hints[{index}].displayText", 54)
-        if not 2 <= len(hint.get("fragments", [])) <= 3:
-            raise RuntimeError(f"hints[{index}].fragments requiere 2 o 3 fragmentos")
+        if not 1 <= len(hint.get("fragments", [])) <= 2:
+            raise RuntimeError(f"hints[{index}].fragments requiere 1 o 2 fragmentos")
         if hint.get("visualType") not in {"durability", "combat", "mob", "recipe", "generic"}:
             raise RuntimeError(f"hints[{index}].visualType desconocido")
         if hint.get("visualAsset"):
             project_asset(hint["visualAsset"], f"hints[{index}].visualAsset")
+    normalized_hints = [(hint["voiceText"].strip().lower(), hint["displayText"].strip().lower()) for hint in hints]
+    for left, right in zip(normalized_hints, normalized_hints[1:]):
+        if left[0] == right[0] or left[1] == right[1]:
+            raise RuntimeError("No se permiten pistas repetidas en escenas consecutivas")
+    countdown = episode.get("countdown", {})
+    visible_numbers = countdown.get("values", [])
+    number_aliases = {"1": "one", "2": "two", "3": "three", "one": "one", "two": "two", "three": "three"}
+    spoken_numbers = [number_aliases[word] for word in re.findall(r"[a-z]+|[123]", countdown.get("voiceText", "").lower()) if word in number_aliases]
+    expected_numbers = [{1: "one", 2: "two", 3: "three"}.get(value) for value in visible_numbers]
+    if spoken_numbers != expected_numbers:
+        raise RuntimeError("countdown.voiceText debe decir exactamente los números visibles y en el mismo orden")
     if episode.get("reveal", {}).get("answerText", "").strip().lower() != answer["text"].strip().lower():
         raise RuntimeError("reveal.answerText debe coincidir con answer.text")
     for variant_name in VARIANTS:
@@ -81,13 +92,27 @@ def validate_episode(episode: dict) -> None:
         if variant["ctaVariant"] not in episode.get("ctaOptions", {}):
             raise RuntimeError(f"{variant_name}.ctaVariant no existe")
         timeline = variant["timeline"]
-        if timeline["hook"] > 45:
-            raise RuntimeError(f"{variant_name}: la primera pista debe comenzar antes del frame 46")
+        if timeline["hook"] > 35:
+            raise RuntimeError(f"{variant_name}: la primera pista debe comenzar antes de 1.20s (frame 36)")
+        minimum_cta = {"fast": 60, "balanced": 75, "comment_bait": 90}[variant_name]
+        if timeline["cta"] < minimum_cta:
+            raise RuntimeError(f"{variant_name}: CTA requiere al menos {minimum_cta / FPS:.1f}s")
+        if timeline["reveal"] < 66:
+            raise RuntimeError(f"{variant_name}: reveal requiere al menos 2.2s")
+        cta = episode["ctaOptions"][variant["ctaVariant"]]
+        forbidden = ("YES", "NO", "DID YOU GET", "YOUR TURN", "TYPE ONE")
+        if any(token in cta["displayText"].upper() for token in forbidden) or cta.get("options") != ["1", "2", "3"]:
+            raise RuntimeError(f"{variant_name}: CTA contradictorio; usa una única respuesta numérica 1/2/3")
+        if variant_name == "comment_bait" and cta["displayText"] != "COMMENT 1, 2, OR 3":
+            raise RuntimeError("comment_bait debe usar exactamente 'COMMENT 1, 2, OR 3'")
         duration = timeline["hook"] + sum(timeline["hints"]) + timeline["countdown"] + timeline["reveal"] + timeline["cta"] + timeline["loop"]
         seconds = duration / FPS
-        limits = {"fast": (14, 16), "balanced": (18, 21), "comment_bait": (17, 20)}[variant_name]
+        limits = {"fast": (14, 16), "balanced": (17, 20), "comment_bait": (16, 19)}[variant_name]
         if not limits[0] <= seconds <= limits[1]:
             raise RuntimeError(f"{variant_name}: duración {seconds:.1f}s fuera de {limits[0]}–{limits[1]}s")
+    music = episode.get("audio", {}).get("music", {})
+    if not 0 <= music.get("duckedVolume", 1) < music.get("volume", 0):
+        raise RuntimeError("audio.music.duckedVolume debe ser menor que volume")
 
 
 def build_timeline(raw: dict) -> dict:
@@ -109,10 +134,30 @@ def build_timeline(raw: dict) -> dict:
     return {"durationInFrames": cursor, "hook": hook, "hints": hints, "countdown": countdown, "reveal": reveal, "cta": cta, "loop": loop}
 
 
+def build_retention_beats(timeline: dict) -> list[dict]:
+    beats = [("hook-impact", 0), ("hook-rule", 12), ("hook-pulse", 24)]
+    for index, scene in enumerate(timeline["hints"]):
+        beats.extend([
+            (f"hint-{index + 1}-entry", scene["from"]),
+            (f"hint-{index + 1}-visual", scene["from"] + 18),
+            (f"hint-{index + 1}-keyword", scene["from"] + scene["durationInFrames"] // 2),
+            (f"hint-{index + 1}-exit", scene["from"] + scene["durationInFrames"] - 12),
+        ])
+    countdown = timeline["countdown"]
+    beats.extend((f"countdown-{index}", countdown["from"] + index * countdown["durationInFrames"] // 3) for index in range(3))
+    reveal = timeline["reveal"]
+    beats.extend((name, reveal["from"] + offset) for name, offset in (("reveal-shake", 0), ("reveal-line", 10), ("reveal-light", 24), ("reveal-answer", 38), ("reveal-payoff", 56)))
+    cta = timeline["cta"]
+    beats.extend((name, cta["from"] + offset) for name, offset in (("cta-question", 0), ("cta-one", 12), ("cta-two", 24), ("cta-three", 36), ("cta-pulse", 54)))
+    beats.extend([("loop-start", timeline["loop"]["from"]), ("loop-hook", timeline["durationInFrames"] - 1)])
+    return [{"id": name, "frame": frame} for name, frame in sorted(beats, key=lambda item: item[1]) if frame < timeline["durationInFrames"]]
+
+
 def selected_config(episode: dict, variant_name: str) -> dict:
     variant = episode["variants"][variant_name]
     hook = episode["hookOptions"][variant["hookVariant"]]
     cta = episode["ctaOptions"][variant["ctaVariant"]]
+    timeline = build_timeline(variant["timeline"])
     return {
         "id": episode["id"],
         "format": "mystery-v2",
@@ -124,12 +169,13 @@ def selected_config(episode: dict, variant_name: str) -> dict:
         "hypothesis": variant["hypothesis"],
         "answer": deepcopy(episode["answer"]),
         "background": episode["background"],
-        "hook": {"question": hook["displayText"], "ruleText": episode["ruleText"], "showBrandMark": True},
+        "hook": {"question": hook["displayText"], "ruleText": episode["ruleText"], "showBrandMark": False},
         "hints": deepcopy(episode["hints"]),
         "countdown": {"displayText": episode["countdown"]["displayText"], "values": episode["countdown"]["values"]},
         "reveal": {"preRevealText": episode["reveal"]["preRevealText"], "answerText": episode["reveal"]["answerText"]},
         "cta": {"text": cta["displayText"], "options": cta["options"]},
-        "timeline": build_timeline(variant["timeline"]),
+        "timeline": timeline,
+        "retentionBeats": build_retention_beats(timeline),
         "theme": deepcopy(episode["theme"]),
         "voice": {"status": "pending", "segments": []},
         "audio": {"status": "pending", "effects": []},
@@ -148,14 +194,21 @@ def voice_specs(episode: dict, config: dict) -> list[dict]:
             {"id": f"hint-{index + 1}", "text": hint["voiceText"], "from": timeline["hints"][index]["from"] + 2, "sceneEnd": timeline["hints"][index]["from"] + timeline["hints"][index]["durationInFrames"], "emphasisWords": hint["emphasisWords"]}
             for index, hint in enumerate(episode["hints"])
         ],
-        {"id": "countdown", "text": episode["countdown"]["voiceText"], "from": timeline["countdown"]["from"] + 2, "sceneEnd": timeline["countdown"]["from"] + timeline["countdown"]["durationInFrames"], "emphasisWords": []},
+        {"id": "countdown", "text": episode["countdown"]["voiceText"], "from": timeline["countdown"]["from"] + 2, "sceneEnd": timeline["countdown"]["from"] + timeline["countdown"]["durationInFrames"], "emphasisWords": [], "maxTempo": 1.6},
         {"id": "reveal", "text": episode["reveal"]["voiceText"], "from": timeline["reveal"]["from"] + 5, "sceneEnd": timeline["reveal"]["from"] + timeline["reveal"]["durationInFrames"], "emphasisWords": [episode["answer"]["text"]]},
         {"id": "cta", "text": cta["voiceText"], "from": timeline["cta"]["from"] + 4, "sceneEnd": timeline["cta"]["from"] + timeline["cta"]["durationInFrames"], "emphasisWords": cta["options"]},
     ]
 
 
 def audio_signature(episode: dict, config: dict, spec: dict) -> str:
-    payload = {"text": spec["text"], "voice": episode["voiceGeneration"], "variant": config["variant"], "version": 1}
+    payload = {
+        "text": spec["text"],
+        "voice": episode["voiceGeneration"],
+        "variant": config["variant"],
+        "sceneFrames": spec["sceneEnd"] - spec["from"],
+        "maxTempo": spec.get("maxTempo", 1),
+        "version": 3,
+    }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 
@@ -172,6 +225,23 @@ def word_timings(alignment: dict, absolute_from: int) -> list[dict]:
             "endFrame": absolute_from + math.ceil(ends[end - 1] * FPS),
         })
     return words
+
+
+def paced_audio(source: Path, signature: str, tempo: float) -> Path:
+    destination = source.with_name(f"{source.stem}-{signature[:12]}-paced.m4a")
+    if destination.is_file():
+        return destination
+    temporary = destination.with_name(f"{destination.stem}.tmp.m4a")
+    temporary.unlink(missing_ok=True)
+    try:
+        subprocess.run([
+            "node", "node_modules/@remotion/cli/remotion-cli.js", "ffmpeg", "-y", "-i", str(source),
+            "-af", f"atempo={tempo:.6f}", "-vn", "-c:a", "aac", "-b:a", "192k", "-f", "mp4", str(temporary),
+        ], cwd=ROOT, check=True)
+        temporary.replace(destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return destination
 
 
 def generate_voice(episode: dict, config: dict, spec: dict, force: bool) -> dict:
@@ -192,8 +262,19 @@ def generate_voice(episode: dict, config: dict, spec: dict, force: bool) -> dict
             episode["voiceGeneration"].get("speed", 1),
         )
         write_json(manifest_path, {"signature": signature, "alignment": alignment})
+    alignment = deepcopy(alignment)
+    duration_seconds = alignment["character_end_times_seconds"][-1]
+    available_frames = spec["sceneEnd"] - spec["from"]
+    tempo = duration_seconds * FPS / max(1, available_frames - 1)
+    audio_source = raw_path
+    if tempo > 1:
+        if tempo > spec.get("maxTempo", 1):
+            raise RuntimeError(f"Voz {spec['id']} dura {duration_seconds:.2f}s y su escena permite {available_frames / FPS:.2f}s; acorta el copy")
+        audio_source = paced_audio(raw_path, signature, tempo)
+        alignment["character_start_times_seconds"] = [value / tempo for value in alignment["character_start_times_seconds"]]
+        alignment["character_end_times_seconds"] = [value / tempo for value in alignment["character_end_times_seconds"]]
     normalization = episode["audio"]["normalization"]
-    normalized = normalize_audio(raw_path, "audio/mystery-v2/normalized", {
+    normalized = normalize_audio(audio_source, "audio/mystery-v2/normalized", {
         "targetLufs": normalization["voiceTargetLufs"],
         "truePeakDb": normalization["voiceTruePeakDb"],
         "loudnessRange": normalization["voiceLoudnessRange"],
@@ -225,11 +306,15 @@ def complete_audio(episode: dict, config: dict, force: bool) -> None:
     for name, effect in (("impact", impact), ("tick", tick), ("reveal", reveal)):
         project_asset(effect["publicSrc"], f"audio.{name}.publicSrc")
     countdown = config["timeline"]["countdown"]
-    step = countdown["durationInFrames"] // len(config["countdown"]["values"])
-    effects = [{"id": "impact", **impact, "from": 0}]
-    effects.extend({"id": f"hint-{index + 1}-hit", **tick, "from": scene["from"]} for index, scene in enumerate(config["timeline"]["hints"]))
-    effects.extend({"id": f"countdown-{value}", **tick, "from": countdown["from"] + index * step} for index, value in enumerate(config["countdown"]["values"]))
-    effects.append({"id": "answer-reveal", **reveal, "from": config["timeline"]["reveal"]["from"] + 8})
+    countdown_words = next(segment for segment in segments if segment["id"] == "countdown")["words"]
+    if len(countdown_words) != len(config["countdown"]["values"]):
+        raise RuntimeError("La alineación del countdown no contiene exactamente tres números")
+    effects = [{"id": "impact", **impact, "from": 0, "visualEvent": "hook-impact", "maxOffsetFrames": 0}]
+    for index, scene in enumerate(config["timeline"]["hints"]):
+        effects.append({"id": f"hint-{index + 1}-hit", **tick, "from": scene["from"], "visualEvent": f"hint-{index + 1}-entry", "maxOffsetFrames": 0})
+        effects.append({"id": f"hint-{index + 1}-shift", **tick, "from": scene["from"] + scene["durationInFrames"] // 2, "visualEvent": f"hint-{index + 1}-keyword", "maxOffsetFrames": 1})
+    effects.extend({"id": f"countdown-{value}", **tick, "from": countdown_words[index]["startFrame"], "visualEvent": f"countdown-{index}", "maxOffsetFrames": 0} for index, value in enumerate(config["countdown"]["values"]))
+    effects.append({"id": "answer-reveal", **reveal, "from": config["timeline"]["reveal"]["from"] + 24, "visualEvent": "reveal-light", "maxOffsetFrames": 1})
     config["voice"] = {"status": "complete", "segments": segments}
     config["audio"] = {"status": "complete", "music": music, "effects": effects}
 

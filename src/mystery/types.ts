@@ -51,6 +51,7 @@ export type MysteryVideoConfig = {
   reveal: {preRevealText: string; answerText: string};
   cta: {text: string; options: string[]};
   timeline: MysteryTimeline;
+  retentionBeats: Array<{id: string; frame: number}>;
   theme: {
     mystery: string; surface: string; progress: string; accent: string; urgency: string;
     answer: string; text: string; muted: string; titleFont: string; bodyFont: string;
@@ -60,7 +61,7 @@ export type MysteryVideoConfig = {
   audio: {
     status: "pending" | "complete";
     music?: {publicSrc: string; from: number; durationInFrames: number; volume: number; duckedVolume: number; fadeInFrames: number; fadeOutFrames: number; duckFadeFrames: number};
-    effects: Array<{id: string; publicSrc: string; from: number; durationInFrames: number; volume: number}>;
+    effects: Array<{id: string; publicSrc: string; from: number; durationInFrames: number; volume: number; visualEvent: string; maxOffsetFrames: number}>;
   };
   debug: {showSafeZones: boolean; showSceneBoundaries: boolean; showTimestampLabels: boolean; showVoiceSegments: boolean; showRetentionMarkers: boolean};
 };

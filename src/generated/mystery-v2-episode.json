@@ -6,7 +6,7 @@
   "hookVariant": "question-first",
   "ctaVariant": "hint-count",
   "visualIntensity": "medium",
-  "hypothesis": "A 19 second pace balances comprehension and completion.",
+  "hypothesis": "A 17.9 second pace balances comprehension and completion.",
   "answer": {
     "id": "trident",
     "text": "TRIDENT",
@@ -16,9 +16,9 @@
   },
   "background": "images/template-layers/background.png",
   "hook": {
-    "question": "CAN YOU GUESS THIS WEAPON?",
-    "ruleText": "3 HINTS · 1 CHANCE",
-    "showBrandMark": true
+    "question": "CAN YOU NAME THIS WEAPON?",
+    "ruleText": "3 HINTS · 1 ANSWER",
+    "showBrandMark": false
   },
   "hints": [
     {
@@ -39,15 +39,14 @@
     {
       "id": "combat",
       "voiceText": "It hits up close or at range.",
-      "displayText": "MELEE · OR · RANGED",
+      "displayText": "MELEE · RANGED",
       "fragments": [
-        "UP CLOSE",
-        "OR",
-        "FROM A DISTANCE"
+        "MELEE",
+        "RANGED"
       ],
       "emphasisWords": [
-        "CLOSE",
-        "DISTANCE"
+        "MELEE",
+        "RANGED"
       ],
       "visualType": "combat",
       "visualAsset": "mc-assets/entity-assets/flat/ARROW.png",
@@ -56,10 +55,9 @@
     {
       "id": "drowned",
       "voiceText": "A drowned can carry it.",
-      "displayText": "A DROWNED CAN CARRY IT",
+      "displayText": "CARRIED BY A DROWNED",
       "fragments": [
-        "A DROWNED",
-        "CAN CARRY IT"
+        "CARRIED BY A DROWNED"
       ],
       "emphasisWords": [
         "DROWNED"
@@ -70,7 +68,7 @@
     }
   ],
   "countdown": {
-    "displayText": "LOCK IN YOUR ANSWER",
+    "displayText": "LOCK IT IN",
     "values": [
       3,
       2,
@@ -82,7 +80,7 @@
     "answerText": "TRIDENT"
   },
   "cta": {
-    "text": "DID YOU GET IT WITH 1, 2 OR 3 HINTS?",
+    "text": "COMMENT 1, 2, OR 3",
     "options": [
       "1",
       "2",
@@ -90,51 +88,173 @@
     ]
   },
   "timeline": {
-    "durationInFrames": 585,
+    "durationInFrames": 542,
     "hook": {
       "from": 0,
-      "durationInFrames": 45
+      "durationInFrames": 35
     },
     "hints": [
       {
-        "from": 45,
+        "from": 35,
         "durationInFrames": 90
       },
       {
-        "from": 135,
-        "durationInFrames": 90
+        "from": 125,
+        "durationInFrames": 87
       },
       {
-        "from": 225,
-        "durationInFrames": 90
+        "from": 212,
+        "durationInFrames": 87
       }
     ],
     "countdown": {
-      "from": 315,
-      "durationInFrames": 72
+      "from": 299,
+      "durationInFrames": 60
     },
     "reveal": {
-      "from": 387,
-      "durationInFrames": 84
+      "from": 359,
+      "durationInFrames": 78
     },
     "cta": {
-      "from": 471,
-      "durationInFrames": 99
+      "from": 437,
+      "durationInFrames": 93
     },
     "loop": {
-      "from": 570,
-      "durationInFrames": 15
+      "from": 530,
+      "durationInFrames": 12
     }
   },
+  "retentionBeats": [
+    {
+      "id": "hook-impact",
+      "frame": 0
+    },
+    {
+      "id": "hook-rule",
+      "frame": 12
+    },
+    {
+      "id": "hook-pulse",
+      "frame": 24
+    },
+    {
+      "id": "hint-1-entry",
+      "frame": 35
+    },
+    {
+      "id": "hint-1-visual",
+      "frame": 53
+    },
+    {
+      "id": "hint-1-keyword",
+      "frame": 80
+    },
+    {
+      "id": "hint-1-exit",
+      "frame": 113
+    },
+    {
+      "id": "hint-2-entry",
+      "frame": 125
+    },
+    {
+      "id": "hint-2-visual",
+      "frame": 143
+    },
+    {
+      "id": "hint-2-keyword",
+      "frame": 168
+    },
+    {
+      "id": "hint-2-exit",
+      "frame": 200
+    },
+    {
+      "id": "hint-3-entry",
+      "frame": 212
+    },
+    {
+      "id": "hint-3-visual",
+      "frame": 230
+    },
+    {
+      "id": "hint-3-keyword",
+      "frame": 255
+    },
+    {
+      "id": "hint-3-exit",
+      "frame": 287
+    },
+    {
+      "id": "countdown-0",
+      "frame": 299
+    },
+    {
+      "id": "countdown-1",
+      "frame": 319
+    },
+    {
+      "id": "countdown-2",
+      "frame": 339
+    },
+    {
+      "id": "reveal-shake",
+      "frame": 359
+    },
+    {
+      "id": "reveal-line",
+      "frame": 369
+    },
+    {
+      "id": "reveal-light",
+      "frame": 383
+    },
+    {
+      "id": "reveal-answer",
+      "frame": 397
+    },
+    {
+      "id": "reveal-payoff",
+      "frame": 415
+    },
+    {
+      "id": "cta-question",
+      "frame": 437
+    },
+    {
+      "id": "cta-one",
+      "frame": 449
+    },
+    {
+      "id": "cta-two",
+      "frame": 461
+    },
+    {
+      "id": "cta-three",
+      "frame": 473
+    },
+    {
+      "id": "cta-pulse",
+      "frame": 491
+    },
+    {
+      "id": "loop-start",
+      "frame": 530
+    },
+    {
+      "id": "loop-hook",
+      "frame": 541
+    }
+  ],
   "theme": {
-    "mystery": "#091225",
-    "surface": "#111B32",
-    "progress": "#63D471",
-    "accent": "#FFD34F",
+    "mystery": "#070B1A",
+    "surface": "#10172B",
+    "progress": "#2DE2E6",
+    "accent": "#FFD166",
     "urgency": "#FF6B35",
-    "answer": "#7CFF6B",
+    "answer": "#6BFF95",
     "text": "#FFFFFF",
-    "muted": "#A9B6D3",
+    "muted": "#A8B3CF",
     "titleFont": "Minecraft",
     "bodyFont": "Minecraft",
     "outlinePx": 6,
