@@ -145,7 +145,7 @@ approved_enchantment = deepcopy(episode)
 approved_enchantment["hints"][0]["fragments"] = ["PUEDE ENCANTARSE"]
 approved_enchantment["hints"][0]["displayText"] = "PUEDE ENCANTARSE"
 approved_enchantment["hints"][0]["visual"] = {"prefab": "enchantment-glint", "steps": [{"type": "enchantment", "label": "ENCHANTABLE", "from": 0}], "supportingAsset": "mc-assets/item-assets/ENCHANTED_BOOK.png"}
-validate_episode(approved_enchantment)
+rejected(approved_enchantment, "todavía no está aprobado")
 
 late_first_step = deepcopy(episode)
 late_first_step["hints"][0]["visual"]["steps"][0]["from"] = 0.1

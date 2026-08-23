@@ -12,8 +12,8 @@ assert [prefab["role"] for prefab in prefabs[:10]] == ["property-state"] * 10
 assert [prefab["role"] for prefab in prefabs[10:20]] == ["action-interaction"] * 10
 assert [prefab["role"] for prefab in prefabs[20:]] == ["origin-context"] * 10
 assert catalog["status"] == "review"
-assert [prefab["id"] for prefab in prefabs if prefab["status"] == "approved"] == ["durability-loss", "stack-limit", "enchantment-glint"]
-assert all(prefab["status"] == ("approved" if prefab["id"] == "enchantment-glint" else "draft") for prefab in prefabs[2:])
+assert [prefab["id"] for prefab in prefabs if prefab["status"] == "approved"] == ["durability-loss", "stack-limit"]
+assert all(prefab["status"] == "draft" for prefab in prefabs[2:])
 assert len({relation for prefab in prefabs for relation in prefab["relations"]}) >= 30
 ids = {prefab["id"] for prefab in prefabs}
 assert {"repair-restore", "grants-status-effect", "mob-interaction", "special-movement", "block-transformation"} <= ids
@@ -42,4 +42,4 @@ assert generated == catalog
 api = (ROOT / "scripts/clues_api.py").read_text(encoding="utf-8")
 assert 'parsed.path == "/api/clue-prefabs"' in api
 
-print("ok: 3 approved and 27 draft mystery prefabs, shared renderer, catalog API")
+print("ok: 2 approved and 28 draft mystery prefabs, shared renderer, catalog API")
