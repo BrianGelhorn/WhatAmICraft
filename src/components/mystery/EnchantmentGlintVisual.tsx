@@ -20,7 +20,6 @@ export const EnchantmentGlintVisual: React.FC<{
       <div style={{position: "absolute", width: size * 0.88, height: size * 0.88, borderRadius: size * 0.22, border: `${size * 0.035}px solid ${accentColor}66`, boxShadow: `0 0 ${glow * 1.5}px ${accentColor}55`, transform: `rotate(${sweep * 7}deg)`}} />
       <CanvasImage src={staticFile(assetSrc)} style={{width: size * 0.72, height: size * 0.72, objectFit: "contain", imageRendering: "pixelated", filter: itemFilter, transform: `scale(${0.96 + Math.sin(frame / 11) * 0.025})`}} />
       <div style={{position: "absolute", top: size * 0.08, left: `calc(50% + ${sweep * size * 0.4}px)`, width: size * 0.06, height: size * 0.78, borderRadius: size * 0.03, background: `linear-gradient(transparent,${accentColor},transparent)`, opacity: 0.7, transform: "rotate(28deg)", boxShadow: `0 0 ${size * 0.08}px ${accentColor}`}} />
-      {conceal ? <div style={{position: "absolute", inset: 0, display: "grid", placeItems: "center", color: accentColor, fontSize: size * 0.25, textShadow: "0 5px 0 #02040A"}}>?</div> : null}
     </div>
   );
 };
