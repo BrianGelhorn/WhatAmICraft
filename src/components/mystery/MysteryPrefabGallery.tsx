@@ -5,6 +5,8 @@ export type MysteryPrefabRecord = (typeof catalog.prefabs)[number];
 
 const colors = {cyan: "#2DE2E6", gold: "#FFD166", orange: "#FF6B35", green: "#6BFF95", ink: "#070B1A", surface: "#10172B", text: "#F7FAFF"};
 const phase = (frame: number, offset = 0) => (Math.sin((frame + offset) / 13) + 1) / 2;
+const durabilitySteps = [1, 0.82, 0.6, 0.38, 0.18, 0] as const;
+const durabilityStepFrames = [0, 26, 48, 65, 77, 86] as const;
 
 const Asset: React.FC<{src: string; size?: number; style?: React.CSSProperties}> = ({src, size = 112, style}) => (
   <CanvasImage src={staticFile(src)} style={{width: size, height: size, objectFit: "contain", imageRendering: "pixelated", filter: "drop-shadow(0 10px 0 rgba(0,0,0,.65))", ...style}} />
@@ -16,7 +18,7 @@ const Slot: React.FC<{children: React.ReactNode; size?: number}> = ({children, s
 
 const Meter: React.FC<{value: number; color?: string; width?: number}> = ({value, color = colors.green, width = 150}) => (
   <div style={{width, height: 20, padding: 3, borderRadius: 8, background: "#080C16", border: "3px solid #02040A"}}>
-    <div style={{width: `${Math.max(5, value * 100)}%`, height: "100%", borderRadius: 4, background: color, boxShadow: `0 0 12px ${color}`}} />
+    <div style={{width: `${Math.max(0, value * 100)}%`, height: "100%", borderRadius: 4, background: color, boxShadow: `0 0 12px ${color}`}} />
   </div>
 );
 
@@ -47,9 +49,23 @@ const ScenarioVisual: React.FC<{prefab: MysteryPrefabRecord}> = ({prefab}) => {
   const p = phase(frame, prefab.number * 4);
   const [a, b, c] = prefab.assets;
   const center: React.CSSProperties = {position: "relative", width: 470, height: 245, display: "grid", placeItems: "center"};
+  const durabilityFrame = frame % 120;
+  const durabilityStep = durabilityFrame < durabilityStepFrames[1] ? 0 : durabilityFrame < durabilityStepFrames[2] ? 1 : durabilityFrame < durabilityStepFrames[3] ? 2 : durabilityFrame < durabilityStepFrames[4] ? 3 : durabilityFrame < durabilityStepFrames[5] ? 4 : 5;
+  const durability = durabilitySteps[durabilityStep];
+  const breakProgress = Math.max(0, Math.min(1, (durabilityFrame - 90) / 18));
+  const breakPieces = [
+    {clipPath: "inset(0 50% 50% 0)", x: -1, y: -1, rotate: -18},
+    {clipPath: "inset(0 0 50% 50%)", x: 1, y: -1, rotate: 20},
+    {clipPath: "inset(50% 50% 0 0)", x: -1, y: 1, rotate: -28},
+    {clipPath: "inset(50% 0 0 50%)", x: 1, y: 1, rotate: 25},
+  ] as const;
 
   switch (prefab.id) {
-    case "durability-loss": return <div style={center}><Slot><Asset src={a} /><div style={{position: "absolute", bottom: 13}}><Meter value={1 - p * 0.8} color={p > 0.65 ? colors.orange : colors.green} width={108} /></div></Slot></div>;
+    case "durability-loss": return <div style={center}><Slot>
+      {durabilityFrame < 90 ? <Asset src={a} style={{transform: `translateX(${durabilityFrame >= 77 ? (durabilityFrame % 2 ? -5 : 5) : 0}px) rotate(${durabilityFrame >= 77 ? (durabilityFrame % 2 ? -3 : 3) : 0}deg)`, filter: `drop-shadow(0 10px 0 rgba(0,0,0,.65)) ${durability <= 0.18 ? "drop-shadow(0 0 14px #FF3048)" : ""}`}} /> : breakProgress < 1 ? breakPieces.map((piece) => <Asset key={piece.clipPath} src={a} style={{position: "absolute", clipPath: piece.clipPath, transform: `translate(${piece.x * breakProgress * 46}px,${piece.y * breakProgress * 48}px) rotate(${piece.rotate * breakProgress}deg)`, opacity: 1 - breakProgress * 0.8}} />) : null}
+      {durabilityFrame >= 90 ? [0, 1, 2, 3, 4, 5].map((index) => <div key={index} style={{position: "absolute", left: 67 + Math.cos(index * 1.05) * breakProgress * 62, top: 65 + Math.sin(index * 1.05) * breakProgress * 62, width: 12 + index % 2 * 5, height: 12 + index % 2 * 5, background: index % 2 ? colors.orange : colors.gold, transform: `rotate(${index * 25 + breakProgress * 80}deg)`, opacity: 1 - breakProgress}} />) : null}
+      <div style={{position: "absolute", bottom: 13}}><Meter value={durability} color={durability > 0.38 ? colors.green : durability > 0 ? colors.orange : "#FF3048"} width={108} /></div>
+    </Slot></div>;
     case "stack-limit": return <div style={center}><Slot><Asset src={a} /><div style={{position: "absolute", right: 10, bottom: 7, padding: "2px 10px", borderRadius: 12, background: colors.ink, color: colors.text, fontSize: 34, transform: `scale(${0.92 + p * 0.08})`}}>16</div></Slot></div>;
     case "charge-level": return <div style={center}><div style={{position: "absolute", width: 185, height: 185, borderRadius: "50%", background: `conic-gradient(${colors.cyan} ${p * 360}deg,#26324C 0)`, boxShadow: `0 0 28px ${colors.cyan}55`}} /><div style={{position: "absolute", width: 150, height: 150, borderRadius: "50%", background: colors.surface}} /><Asset src={a} size={125} style={{zIndex: 2, transform: `scale(${0.9 + p * 0.1})`}} /></div>;
     case "cooldown": return <div style={center}><Asset src={a} size={150} style={{opacity: 0.45 + p * 0.55}} /><div style={{position: "absolute", width: 184, height: 184, borderRadius: "50%", border: `9px solid ${colors.orange}`, borderTopColor: "transparent", transform: `rotate(${p * 320}deg)`}} /><div style={{position: "absolute", bottom: 18, color: colors.orange, fontSize: 24}}>{p > 0.75 ? "READY" : "WAIT"}</div></div>;

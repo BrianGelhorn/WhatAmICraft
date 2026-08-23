@@ -10,15 +10,17 @@
       "title": "PIERDE DURABILIDAD",
       "role": "property-state",
       "status": "draft",
-      "description": "Slot con barra de durabilidad que desciende.",
+      "description": "La barra baja en escalones cada vez más rápidos hasta que el objeto se rompe.",
       "relations": [
         "durability",
-        "wear"
+        "wear",
+        "item_break"
       ],
       "supportedKinds": [
         "weapon",
         "tool",
-        "item"
+        "item",
+        "armor"
       ],
       "assets": [
         "mc-assets/item-assets/IRON_PICKAXE.png"

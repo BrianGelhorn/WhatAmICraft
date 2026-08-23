@@ -23,6 +23,8 @@ for prefab in prefabs:
 assert "Math.random(" not in component and "transition:" not in component
 assert "Unknown prefab preview" in component
 assert component.count("<Steve") >= 10
+assert "durabilitySteps = [1, 0.82, 0.6, 0.38, 0.18, 0]" in component
+assert "breakPieces" in component and "clipPath" in component
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryPrefabGallery"' in root and "width={3840}" in root and "height={2160}" in root
