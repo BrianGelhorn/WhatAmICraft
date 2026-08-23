@@ -9,9 +9,10 @@ Formato vertical 1080×1920 a 30 fps para Shorts, Reels y TikTok. El reto empiez
 - El countdown sigue los timestamps reales de `three`, `two`, `one`; cada golpe de sonido comparte el mismo frame que su cambio visual.
 - El reveal transforma la misma silueta en el asset final. El CTA de todas las variantes pide una única respuesta numérica: `1`, `2` o `3`.
 - El último tramo vuelve a la posición, silueta, color y composición del hook para crear un loop reconocible.
-- El hook principal se redujo a `CAN YOU NAME IT?`; la silueta oscila, pulsa y recibe un scan sutil desde el primer frame.
-- El countdown usa el inicio real de cada palabra para escalar y cambiar de cian a dorado y naranja; el último número genera un flash breve.
-- El reveal muestra un flash de tres frames y demora el nombre seis frames respecto de la transformación visual.
+- El hook principal se redujo a `CAN YOU NAME IT?`; la silueta oscila y pulsa desde el primer frame.
+- El countdown usa el inicio real de cada palabra para escalar y cambiar de cian a dorado y naranja.
+- El reveal demora el nombre seis frames respecto de la transformación visual para que la respuesta tenga un payoff legible.
+- Las pistas usan únicamente contexto reconocible de Minecraft: el tridente se desgasta, ocupa un slot, golpea o se lanza contra un zombie y aparece equipado por un Drowned. Se eliminaron barras, flechas, scanlines y flashes de pantalla decorativos.
 - El CTA mantiene `COMMENT 1, 2, OR 3` y ahora muestra también `HOW MANY HINTS DID YOU NEED?` dentro de la composición, no solo en la voz.
 - La voz ElevenLabs se genera por bloque, se normaliza y conserva timestamps por palabra. Solo el countdown puede acelerarse, hasta `1.6x`, si la toma real no entra; el resto exige acortar el copy.
 - Las voces se cachean por texto, voz y modelo, no por variante: las pistas compartidas no vuelven a consumir ElevenLabs cuando cambia únicamente el timeline.
