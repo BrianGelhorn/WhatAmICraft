@@ -1,0 +1,30 @@
+{
+  "template": "mystery-prefab-gallery",
+  "compositionId": "MysteryPrefabGallery",
+  "fps": 30,
+  "durationInFrames": 120,
+  "automation": {
+    "format": "mystery-v2-visual-prefabs",
+    "inputPath": "data/mystery-v2-visual-prefabs.json",
+    "schemaPath": "schemas/mystery-v2-visual-prefabs.schema.json",
+    "producer": "scripts/produce_mystery_prefab_gallery.py",
+    "generatedConfigPath": "src/generated/mystery-v2-visual-prefabs.json",
+    "editableFields": ["prefabs"],
+    "generatedFields": []
+  },
+  "intro": {
+    "hookDurationFrames": 12,
+    "handoffDurationFrames": 6,
+    "contentStartFrame": 0,
+    "maxContentStartFrame": 0,
+    "visualBeats": [{"id": "gallery-visible", "from": 0, "description": "all 30 numbered draft prefabs are visible"}]
+  },
+  "audio": {"status": "pending", "allowedSources": [], "cues": []},
+  "scenes": [{"id": "gallery", "from": 0, "durationInFrames": 120}],
+  "animationPolicy": {
+    "allowed": ["translate", "scale", "rotate", "opacity"],
+    "maxScale": 1.12,
+    "allowCssTransitions": false,
+    "allowRandomness": false
+  }
+}

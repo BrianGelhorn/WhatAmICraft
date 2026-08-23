@@ -5,6 +5,7 @@ import quizConfig from "./generated/quiz-copy-episode.json";
 import thumbnailConfig from "./generated/thumbnail-config.json";
 import {defaultMysteryConfig, MysteryVideo} from "./compositions/MysteryVideo";
 import type {MysteryVideoConfig} from "./mystery/types";
+import {MYSTERY_PREFAB_GALLERY_DURATION, MysteryPrefabGallery} from "./compositions/MysteryPrefabGallery";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -41,6 +42,14 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{config: defaultMysteryConfig}}
+      />
+      <Composition
+        id="MysteryPrefabGallery"
+        component={MysteryPrefabGallery}
+        durationInFrames={MYSTERY_PREFAB_GALLERY_DURATION}
+        fps={30}
+        width={3840}
+        height={2160}
       />
     </>
   );
