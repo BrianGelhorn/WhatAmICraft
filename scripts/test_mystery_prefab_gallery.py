@@ -13,12 +13,16 @@ assert [prefab["role"] for prefab in prefabs[10:20]] == ["action-interaction"] *
 assert [prefab["role"] for prefab in prefabs[20:]] == ["origin-context"] * 10
 assert all(prefab["status"] == "draft" for prefab in prefabs)
 assert len({relation for prefab in prefabs for relation in prefab["relations"]}) >= 30
+ids = {prefab["id"] for prefab in prefabs}
+assert {"repair-restore", "grants-status-effect", "mob-interaction", "special-movement", "block-transformation"} <= ids
+assert not {"smelting-progress", "blocks-damage", "ignite-target", "water-interaction", "teleport-use"} & ids
 
 component = (ROOT / "src/components/mystery/MysteryPrefabGallery.tsx").read_text(encoding="utf-8")
 for prefab in prefabs:
     assert f'case "{prefab["id"]}"' in component
 assert "Math.random(" not in component and "transition:" not in component
 assert "Unknown prefab preview" in component
+assert component.count("<Steve") >= 10
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryPrefabGallery"' in root and "width={3840}" in root and "height={2160}" in root
