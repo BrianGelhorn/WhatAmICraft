@@ -28,7 +28,8 @@ for variant in VARIANTS:
     assert config["renderMode"] == "final" and timeline["durationInFrames"] == expected_frames[variant]
     assert timeline["cta"]["durationInFrames"] >= {"fast": 60, "balanced": 75, "comment_bait": 90}[variant]
     assert timeline["reveal"]["durationInFrames"] >= 66
-    assert config["answer"]["image"] == config["answer"]["silhouette"]
+    assert config["answer"]["image"] != config["answer"]["silhouette"]
+    assert config["answer"]["silhouette"] == "images/guess-types/hidden/Weapon.png"
     assert config["reveal"]["answerText"].lower() == config["answer"]["text"].lower()
     assert len(config["hints"]) == 3 and all(1 <= len(hint["fragments"]) <= 2 for hint in config["hints"])
     assert config["cta"]["options"] == ["1", "2", "3"]
@@ -78,6 +79,8 @@ for decorative_primitive in ("finalFlash", "const sweep", "const scan", "borderR
 assert "ItemEntityInteractionPrefab config={config} hint={hint}" in component
 assert "return <MysteryObject config={config} size={340}" not in component
 assert "config.hook.emphasis" in component and "activeStep.label" in component and "const wear =" not in component
+assert 'name="Category silhouette"' in component and ">?</div>" in component
+assert "progress={0.14}" not in component
 
 schema = read_json(ROOT / "schemas/mystery-v2-episode.schema.json")
 assert schema["properties"]["schema_version"]["const"] == 2
@@ -90,8 +93,8 @@ assert '"--scale=0.5"' in producer and '"--contact-sheet"' in producer
 assert 'audio/mystery-v2/voice-cache/' in producer and '"voiceSignature": signature' in producer
 
 bad_silhouette = deepcopy(episode)
-bad_silhouette["answer"]["silhouette"] = "mc-assets/entity-assets/flat/ARROW.png"
-rejected(bad_silhouette, "forma exacta")
+bad_silhouette["answer"]["silhouette"] = bad_silhouette["answer"]["image"]
+rejected(bad_silhouette, "silueta genérica de la categoría")
 
 missing_hook_emphasis = deepcopy(episode)
 del missing_hook_emphasis["hookOptions"]["question-first"]["emphasisText"]

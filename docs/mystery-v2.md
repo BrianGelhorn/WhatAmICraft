@@ -4,10 +4,10 @@ Formato vertical 1080×1920 a 30 fps para Shorts, Reels y TikTok. El reto empiez
 
 ## Tercera auditoría
 
-- Se eliminó toda introducción separada: pregunta, categoría, silueta exacta y urgencia aparecen en el frame 0; la pista 1 empieza en el frame 35 (1,17 s).
+- Se eliminó toda introducción separada: pregunta, categoría, silueta genérica y urgencia aparecen en el frame 0; la pista 1 empieza en el frame 35 (1,17 s).
 - Se quitaron las tarjetas de pista. Cada pista reemplaza una o dos palabras clave y usa una mecánica visual propia: durabilidad/inventario, melee-ranged y Drowned/agua.
 - El countdown sigue los timestamps reales de `three`, `two`, `one`; cada golpe de sonido comparte el mismo frame que su cambio visual.
-- El reveal transforma la misma silueta en el asset final. El CTA de todas las variantes pide una única respuesta numérica: `1`, `2` o `3`.
+- Antes del reveal solo aparece la silueta negra del tipo (`Weapon`, `Block`, etc.) con `?`; nunca la forma del objeto exacto. El reveal la transforma en el asset final. El CTA de todas las variantes pide una única respuesta numérica: `1`, `2` o `3`.
 - El último tramo vuelve a la posición, silueta, color y composición del hook para crear un loop reconocible.
 - El hook principal se redujo a `CAN YOU NAME IT?`; la silueta oscila y pulsa desde el primer frame.
 - El countdown usa el inicio real de cada palabra para escalar y cambiar de cian a dorado y naranja.

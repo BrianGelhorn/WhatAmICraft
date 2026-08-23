@@ -65,10 +65,11 @@ export const MysteryObject: React.FC<{
   return (
     <div style={{position: "relative", width: size, height: size, transform: `translateX(${drift}px) rotate(${sway}deg) scale(${pulse})`}}>
       <CanvasImage
-        name="Exact answer silhouette"
+        name="Category silhouette"
         src={staticFile(config.answer.silhouette)}
         style={{position: "absolute", inset: 0, width: size, height: size, objectFit: "contain", imageRendering: "pixelated", filter: `brightness(0) drop-shadow(0 22px 0 #02040A) drop-shadow(0 0 ${30 + reaction * 28}px ${config.theme.accent})`, opacity: 1 - progress}}
       />
+      <div style={{position: "absolute", inset: 0, display: "grid", placeItems: "center", color: config.theme.accent, fontSize: size * 0.28, lineHeight: 1, textShadow: "0 8px 0 #02040A, 0 0 24px #02040A", opacity: 1 - progress}}>?</div>
       <CanvasImage
         name="Answer image"
         src={staticFile(config.answer.image)}
@@ -193,7 +194,7 @@ export const EntityEquipmentPrefab: React.FC<{config: MysteryVideoConfig; hint: 
       {hint.visual.environment === "water" ? <>{[0, 1, 2].map((index) => <div key={`wave-${index}`} style={{position: "absolute", left: -80 + index * 35, top: 400 + index * 28 + Math.sin((frame + index * 9) / 7) * 10, width: 980, height: 90, borderRadius: "50%", border: `5px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.09}} />)}
       {[0, 1, 2, 3, 4].map((index) => <div key={`bubble-${index}`} style={{position: "absolute", left: 100 + index * 74, top: 360 - ((frame * (2 + index * 0.15) + index * 75) % 250), width: 16 + index * 3, height: 16 + index * 3, borderRadius: "50%", border: `4px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.07}} />)}</> : null}
       {hint.visual.supportingAsset ? <CanvasImage src={staticFile(hint.visual.supportingAsset)} style={{position: "absolute", left: 100, top: 80 + (1 - rise) * 220, width: 300, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: `drop-shadow(0 0 28px ${config.theme.progress})`, transform: `scale(${0.92 + rise * 0.08})`}} /> : null}
-      <div style={{position: "absolute", left: answerLeft, top: answerTop, opacity: 0.25 + equip * 0.75, transform: `rotate(${-18 + equip * 8}deg) scale(${0.9 + equip * 0.1})`}}><MysteryObject config={config} size={280} progress={0.14} reaction={equip} /></div>
+      <div style={{position: "absolute", left: answerLeft, top: answerTop, opacity: 0.25 + equip * 0.75, transform: `rotate(${-18 + equip * 8}deg) scale(${0.9 + equip * 0.1})`}}><MysteryObject config={config} size={280} reaction={equip} /></div>
     </div>
   );
 };

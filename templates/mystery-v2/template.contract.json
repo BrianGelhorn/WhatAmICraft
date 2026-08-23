@@ -40,7 +40,7 @@
     "contentStartFrame": 35,
     "maxContentStartFrame": 35,
     "visualBeats": [
-      {"id": "question", "from": 0, "description": "question, category, urgency and exact silhouette are visible"},
+      {"id": "question", "from": 0, "description": "question, category, urgency and generic category silhouette are visible"},
       {"id": "rule", "from": 12, "description": "three-hints rule and global tension become prominent"},
       {"id": "first-hint", "from": 35, "description": "first configured hint begins before 1.2 seconds"}
     ]

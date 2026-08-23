@@ -56,8 +56,11 @@ def validate_episode(episode: dict) -> None:
         require_text(answer.get(key), f"answer.{key}", 200)
     project_asset(answer["image"], "answer.image")
     project_asset(answer["silhouette"], "answer.silhouette")
-    if answer["image"] != answer["silhouette"]:
-        raise RuntimeError("answer.silhouette debe usar la forma exacta de answer.image")
+    expected_silhouette = f"images/guess-types/hidden/{answer['category'].title()}.png"
+    if answer["silhouette"] != expected_silhouette:
+        raise RuntimeError(f"answer.silhouette debe usar la silueta genérica de la categoría: {expected_silhouette}")
+    if answer["image"] == answer["silhouette"]:
+        raise RuntimeError("answer.silhouette no puede revelar la forma exacta de answer.image")
     project_asset(episode.get("background"), "background")
     hooks = episode.get("hookOptions", {})
     if len(hooks) < 5:

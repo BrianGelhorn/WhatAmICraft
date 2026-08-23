@@ -12,7 +12,7 @@
         "text": "TRIDENT",
         "category": "WEAPON",
         "image": "mc-assets/item-assets/TRIDENT.png",
-        "silhouette": "mc-assets/item-assets/TRIDENT.png"
+        "silhouette": "images/guess-types/hidden/Weapon.png"
       },
       "background": "images/template-layers/background.png",
       "hookOptions": {
