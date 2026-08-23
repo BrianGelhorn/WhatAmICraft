@@ -24,7 +24,7 @@ for variant in VARIANTS:
     assert scenes[0]["from"] == 0
     assert all(right["from"] == left["from"] + left["durationInFrames"] for left, right in zip(scenes, scenes[1:]))
     assert scenes[-1]["from"] + scenes[-1]["durationInFrames"] == timeline["durationInFrames"]
-    assert config["hook"]["question"] and timeline["hints"][0]["from"] <= 35
+    assert config["hook"]["question"] and config["hook"]["emphasis"] and timeline["hints"][0]["from"] <= 35
     assert config["renderMode"] == "final" and timeline["durationInFrames"] == expected_frames[variant]
     assert timeline["cta"]["durationInFrames"] >= {"fast": 60, "balanced": 75, "comment_bait": 90}[variant]
     assert timeline["reveal"]["durationInFrames"] >= 66
@@ -70,10 +70,13 @@ assert "activeTiming.startFrame" in component and "config.cta.prompt" in compone
 assert 'config.renderMode === "preview"' in component
 assert episode["hints"][1]["visual"]["supportingAsset"].endswith("/ZOMBIE.png")
 assert [hint["visual"]["scene"] for hint in episode["hints"]] == ["item-state", "item-versus-entity", "entity-holds-answer"]
+assert episode["hints"][0]["voiceText"] == "Loses durability. Won't stack."
+assert "wears down" not in episode["hints"][0]["voiceText"].lower()
 for decorative_primitive in ("finalFlash", "const sweep", "const scan", "borderRight:", "width: `${progress * 100}%`"):
     assert decorative_primitive not in component
 assert "ItemVersusEntityVisual config={config} hint={hint}" in component
 assert "return <MysteryObject config={config} size={340}" not in component
+assert "config.hook.emphasis" in component and "DURABILITY ↓" in component and "const wear =" not in component
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryVideo"' in root and "fps={30}" in root and "width={1080}" in root and "height={1920}" in root
@@ -85,6 +88,10 @@ assert 'audio/mystery-v2/voice-cache/' in producer and '"voiceSignature": signat
 bad_silhouette = deepcopy(episode)
 bad_silhouette["answer"]["silhouette"] = "mc-assets/entity-assets/flat/ARROW.png"
 rejected(bad_silhouette, "forma exacta")
+
+missing_hook_emphasis = deepcopy(episode)
+del missing_hook_emphasis["hookOptions"]["question-first"]["emphasisText"]
+rejected(missing_hook_emphasis, "emphasisText")
 
 late_hint = deepcopy(episode)
 late_hint["variants"]["balanced"]["timeline"]["hook"] = 36
