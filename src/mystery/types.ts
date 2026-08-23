@@ -51,7 +51,7 @@ export type MysteryVideoConfig = {
   hypothesis: string;
   answer: {id: string; text: string; category: string; image: string; silhouette: string};
   background: string;
-  hook: {question: string; ruleText: string; showBrandMark: boolean};
+  hook: {question: string; emphasis: string; ruleText: string; showBrandMark: boolean};
   hints: [MysteryHint, MysteryHint, MysteryHint];
   countdown: {displayText: string; values: number[]};
   reveal: {preRevealText: string; answerText: string};

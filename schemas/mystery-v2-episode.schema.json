@@ -15,6 +15,7 @@
       "required": ["displayText", "voiceText"],
       "properties": {
         "displayText": {"type": "string", "minLength": 1, "maxLength": 56},
+        "emphasisText": {"type": "string", "minLength": 1, "maxLength": 28},
         "promptText": {"type": "string", "minLength": 1, "maxLength": 56},
         "voiceText": {"type": "string", "minLength": 1, "maxLength": 120},
         "options": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "string", "pattern": "^[123]$"}}

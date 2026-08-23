@@ -17,23 +17,28 @@
       "background": "images/template-layers/background.png",
       "hookOptions": {
         "question-first": {
-          "displayText": "CAN YOU NAME IT?",
+          "displayText": "CAN YOU",
+          "emphasisText": "NAME IT?",
           "voiceText": "Name it."
         },
         "difficulty-challenge": {
-          "displayText": "CAN YOU GET IT IN 1 HINT?",
+          "displayText": "CAN YOU GET IT IN",
+          "emphasisText": "1 HINT?",
           "voiceText": "Get it in one."
         },
         "category-visible": {
-          "displayText": "NAME THIS MINECRAFT WEAPON",
+          "displayText": "NAME THIS",
+          "emphasisText": "MINECRAFT WEAPON",
           "voiceText": "Name this weapon."
         },
         "timer-challenge": {
-          "displayText": "NAME IT BEFORE TIME RUNS OUT",
+          "displayText": "NAME IT BEFORE",
+          "emphasisText": "TIME RUNS OUT",
           "voiceText": "Name it now."
         },
         "three-hints": {
-          "displayText": "3 HINTS. DON'T WASTE THEM.",
+          "displayText": "3 HINTS",
+          "emphasisText": "DON'T WASTE THEM",
           "voiceText": "Three hints. Don't waste them."
         }
       },
@@ -41,10 +46,10 @@
       "hints": [
         {
           "id": "durability",
-          "voiceText": "It wears down and won't stack.",
-          "displayText": "LOSES DURABILITY · NO STACKING",
-          "fragments": ["LOSES DURABILITY", "NO STACKING"],
-          "emphasisWords": ["DURABILITY", "STACKING"],
+          "voiceText": "Loses durability. Won't stack.",
+          "displayText": "DURABILITY GOES DOWN · STACK LIMIT: 1",
+          "fragments": ["DURABILITY GOES DOWN", "STACK LIMIT: 1"],
+          "emphasisWords": ["DURABILITY", "ONE"],
           "visual": {
             "scene": "item-state"
           },

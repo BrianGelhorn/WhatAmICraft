@@ -60,6 +60,7 @@ def validate_episode(episode: dict) -> None:
         raise RuntimeError("hookOptions requiere al menos 5 hooks configurables")
     for hook_id, hook in hooks.items():
         require_text(hook.get("displayText"), f"hookOptions.{hook_id}.displayText", 40)
+        require_text(hook.get("emphasisText"), f"hookOptions.{hook_id}.emphasisText", 28)
         require_text(hook.get("voiceText"), f"hookOptions.{hook_id}.voiceText", 80)
     hints = episode.get("hints", [])
     if len(hints) != 3:
@@ -181,7 +182,7 @@ def selected_config(episode: dict, variant_name: str, render_mode: str = "final"
         "hypothesis": variant["hypothesis"],
         "answer": deepcopy(episode["answer"]),
         "background": episode["background"],
-        "hook": {"question": hook["displayText"], "ruleText": episode["ruleText"], "showBrandMark": False},
+        "hook": {"question": hook["displayText"], "emphasis": hook["emphasisText"], "ruleText": episode["ruleText"], "showBrandMark": False},
         "hints": deepcopy(episode["hints"]),
         "countdown": {"displayText": episode["countdown"]["displayText"], "values": episode["countdown"]["values"]},
         "reveal": {"preRevealText": episode["reveal"]["preRevealText"], "answerText": episode["reveal"]["answerText"]},

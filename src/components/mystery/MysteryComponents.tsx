@@ -79,8 +79,11 @@ export const MysteryObject: React.FC<{
 };
 
 export const HookQuestion: React.FC<{config: MysteryVideoConfig}> = ({config}) => (
-  <div style={{width: 930, color: config.theme.text, fontSize: fittedFontSize(config.hook.question, 82, 62, 22), lineHeight: 1.02, textAlign: "center", overflowWrap: "anywhere", textShadow: `0 8px 0 #02040A, 0 0 26px ${config.theme.accent}55`}}>
-    {config.hook.question}
+  <div style={{width: 930, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textAlign: "center", overflowWrap: "anywhere"}}>
+    <div style={{color: config.theme.muted, fontSize: fittedFontSize(config.hook.question, 48, 38, 18), letterSpacing: 7, textShadow: "0 6px 0 #02040A"}}>{config.hook.question}</div>
+    <div style={{color: config.theme.text, fontSize: fittedFontSize(config.hook.emphasis, 128, 82, 12), lineHeight: 0.95, textShadow: `0 11px 0 #02040A, 0 0 34px ${config.theme.accent}88`}}>
+      {config.hook.emphasis}
+    </div>
   </div>
 );
 
@@ -111,7 +114,7 @@ export const HintHeader: React.FC<{config: MysteryVideoConfig; index: number}> =
 
 export const HintKeyword: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; durationInFrames: number}> = ({config, hint, durationInFrames}) => {
   const frame = useCurrentFrame();
-  const switchFrame = Math.floor(durationInFrames * 0.46);
+  const switchFrame = Math.floor(durationInFrames * 0.58);
   return (
     <div style={{position: "relative", width: 940, height: 150, borderRadius: 34, border: `3px solid ${config.theme.accent}45`, background: `${config.theme.mystery}B8`, boxShadow: "0 14px 30px rgba(0,0,0,.28)"}}>
       {hint.fragments.map((fragment, index) => {
@@ -128,18 +131,18 @@ export const HintText = HintKeyword;
 
 export const ItemStateVisual: React.FC<{config: MysteryVideoConfig; duration: number}> = ({config, duration}) => {
   const frame = useCurrentFrame();
-  const secondPhase = interpolate(frame, [duration * 0.42, duration * 0.56], [0, 1], ease);
-  const wear = interpolate(frame, [8, duration * 0.42], [0, 1], ease);
+  const secondPhase = interpolate(frame, [duration * 0.54, duration * 0.64], [0, 1], ease);
+  const durability = interpolate(frame, [8, duration * 0.42], [220, 72], ease);
+  const slotEntry = interpolate(frame, [0, 9], [0, 1], ease);
   return (
     <div style={{position: "relative", width: 780, height: 520}}>
-      <div style={{position: "absolute", left: 240, top: 20, opacity: 1 - secondPhase, transform: `translateX(${Math.sin(frame * 1.8) * wear * 5}px)`}}>
-        <MysteryObject config={config} size={300} reaction={wear * 0.45} />
-        {[0, 1, 2].map((index) => <div key={index} style={{position: "absolute", left: 118 + index * 36, top: 120 + index * 42, width: 11, height: 52, background: config.theme.urgency, transform: `rotate(${34 + index * 14}deg) scaleY(${wear})`, transformOrigin: "top", opacity: wear, boxShadow: "0 5px 0 #02040A"}} />)}
-        {[0, 1, 2, 3].map((index) => <div key={index} style={{position: "absolute", left: 130 + index * 38, top: 210 + wear * (95 + index * 18), width: 14 + index * 2, height: 14 + index * 2, background: index % 2 ? config.theme.urgency : config.theme.accent, opacity: wear * (1 - secondPhase)}} />)}
-      </div>
-      <div style={{position: "absolute", left: 228, top: 25, width: 324, height: 324, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 42, border: "10px solid #8892A8", background: "linear-gradient(145deg, #3B455A, #252C3D)", boxShadow: "inset 0 0 0 8px #171D2B, 0 16px 0 #02040A, 0 0 30px rgba(255,209,102,.2)", opacity: secondPhase, transform: `scale(${0.86 + secondPhase * 0.14}) rotate(${(1 - secondPhase) * -4}deg)`}}>
+      <div style={{position: "absolute", left: 255, top: 5, width: 270, textAlign: "center", color: secondPhase > 0.5 ? config.theme.accent : config.theme.urgency, fontSize: 29, letterSpacing: 3, opacity: slotEntry, textShadow: "0 5px 0 #02040A"}}>{secondPhase > 0.5 ? "STACK LIMIT" : "DURABILITY ↓"}</div>
+      <div style={{position: "absolute", left: 228, top: 60, width: 324, height: 324, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 42, border: "10px solid #8892A8", background: "linear-gradient(145deg, #3B455A, #252C3D)", boxShadow: "inset 0 0 0 8px #171D2B, 0 16px 0 #02040A, 0 0 30px rgba(255,209,102,.2)", opacity: slotEntry, transform: `scale(${0.9 + slotEntry * 0.1})`}}>
         <MysteryObject config={config} size={250} reaction={0.2} />
-        <div style={{position: "absolute", right: 15, bottom: 12, width: 66, height: 66, display: "grid", placeItems: "center", borderRadius: 22, background: `${config.theme.mystery}E8`, color: config.theme.text, fontSize: 48, textShadow: "0 5px 0 #000", boxShadow: "0 7px 0 #02040A"}}>1</div>
+        <div style={{position: "absolute", left: 30, bottom: 20, width: 232, height: 25, padding: 4, borderRadius: 10, background: "#111827", border: "4px solid #02040A", opacity: 1 - secondPhase}}>
+          <div style={{width: durability, height: "100%", borderRadius: 5, background: durability > 135 ? config.theme.answer : config.theme.urgency, boxShadow: `0 0 12px ${durability > 135 ? config.theme.answer : config.theme.urgency}`}} />
+        </div>
+        <div style={{position: "absolute", right: 15, bottom: 12, width: 66, height: 66, display: "grid", placeItems: "center", borderRadius: 22, background: `${config.theme.mystery}E8`, color: config.theme.text, fontSize: 48, textShadow: "0 5px 0 #000", boxShadow: "0 7px 0 #02040A", opacity: secondPhase, transform: `scale(${0.8 + secondPhase * 0.2})`}}>1</div>
       </div>
     </div>
   );
@@ -147,7 +150,7 @@ export const ItemStateVisual: React.FC<{config: MysteryVideoConfig; duration: nu
 
 export const ItemVersusEntityVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
-  const secondPhase = interpolate(frame, [duration * 0.42, duration * 0.56], [0, 1], ease);
+  const secondPhase = interpolate(frame, [duration * 0.54, duration * 0.64], [0, 1], ease);
   const meleeStrike = interpolate(frame, [8, 24], [0, 1], ease);
   const thrownStrike = interpolate(frame, [duration * 0.52, duration * 0.82], [0, 1], ease);
   const meleeImpact = interpolate(frame, [18, 23, 31], [0, 1, 0], clamp);

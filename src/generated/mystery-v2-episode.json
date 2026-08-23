@@ -17,22 +17,23 @@
   },
   "background": "images/template-layers/background.png",
   "hook": {
-    "question": "CAN YOU NAME IT?",
+    "question": "CAN YOU",
+    "emphasis": "NAME IT?",
     "ruleText": "3 HINTS · 1 ANSWER",
     "showBrandMark": false
   },
   "hints": [
     {
       "id": "durability",
-      "voiceText": "It wears down and won't stack.",
-      "displayText": "LOSES DURABILITY · NO STACKING",
+      "voiceText": "Loses durability. Won't stack.",
+      "displayText": "DURABILITY GOES DOWN · STACK LIMIT: 1",
       "fragments": [
-        "LOSES DURABILITY",
-        "NO STACKING"
+        "DURABILITY GOES DOWN",
+        "STACK LIMIT: 1"
       ],
       "emphasisWords": [
         "DURABILITY",
-        "STACKING"
+        "ONE"
       ],
       "visual": {
         "scene": "item-state"
