@@ -1,0 +1,31 @@
+{
+  "$schema": "../schemas/quiz-copy-hook-experiments.schema.json",
+  "schema_version": 1,
+  "format": "minecraft-quiz-copy-hook-experiments",
+  "variants": [
+    {
+      "id": "challenge-v1",
+      "status": "draft",
+      "copy": {
+        "title": "GUESS IT IN 3 SECONDS",
+        "handoff": "COMMENT YOUR GUESS",
+        "revealCta": "DID YOU GET IT? COMMENT BELOW"
+      },
+      "timing": {
+        "contentStartFrame": 150,
+        "hookTitleFromFrame": 18,
+        "handoffFromFrame": 66
+      },
+      "audio": {
+        "requiresRegeneration": true,
+        "hookText": "Can you guess this item in three seconds?",
+        "handoffText": "Comment your guess before the reveal."
+      },
+      "successCriteria": {
+        "minimumVideosPerPlatform": 10,
+        "minimumHours": 48,
+        "primaryMetric": "threeSecondRetention"
+      }
+    }
+  ]
+}

@@ -135,6 +135,7 @@ jobs:
           python scripts/ci/prepare_media_fixtures.py
           python -m py_compile scripts/produce_quiz_copy.py scripts/thumbnails.py scripts/template_artifacts.py scripts/template_release.py
           PYTHONPATH=scripts python scripts/test_quiz_copy_validation.py
+          python scripts/test_quiz_copy_hook_experiments.py
           PYTHONPATH=scripts python scripts/test_automatic_rendering.py
           PYTHONPATH=scripts python scripts/test_template_artifacts.py
           PYTHONPATH=scripts python scripts/test_thumbnails.py

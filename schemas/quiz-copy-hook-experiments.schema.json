@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "format", "variants"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"const": 1},
+    "format": {"const": "minecraft-quiz-copy-hook-experiments"},
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/variant"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "variant": {
+      "type": "object",
+      "required": ["id", "status", "copy", "timing", "audio", "successCriteria"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "status": {"enum": ["draft", "ready", "active", "retired"]},
+        "copy": {
+          "type": "object",
+          "required": ["title", "handoff", "revealCta"],
+          "properties": {
+            "title": {"type": "string", "minLength": 1, "maxLength": 24},
+            "handoff": {"type": "string", "minLength": 1, "maxLength": 28},
+            "revealCta": {"type": "string", "minLength": 1, "maxLength": 40}
+          },
+          "additionalProperties": false
+        },
+        "timing": {
+          "type": "object",
+          "required": ["contentStartFrame", "hookTitleFromFrame", "handoffFromFrame"],
+          "properties": {
+            "contentStartFrame": {"type": "integer", "minimum": 1},
+            "hookTitleFromFrame": {"type": "integer", "minimum": 0},
+            "handoffFromFrame": {"type": "integer", "minimum": 0}
+          },
+          "additionalProperties": false
+        },
+        "audio": {
+          "type": "object",
+          "required": ["requiresRegeneration", "hookText", "handoffText"],
+          "properties": {
+            "requiresRegeneration": {"const": true},
+            "hookText": {"type": "string", "minLength": 1, "maxLength": 160},
+            "handoffText": {"type": "string", "minLength": 1, "maxLength": 160}
+          },
+          "additionalProperties": false
+        },
+        "successCriteria": {
+          "type": "object",
+          "required": ["minimumVideosPerPlatform", "minimumHours", "primaryMetric"],
+          "properties": {
+            "minimumVideosPerPlatform": {"type": "integer", "minimum": 1},
+            "minimumHours": {"type": "integer", "minimum": 24},
+            "primaryMetric": {"enum": ["threeSecondRetention", "averageWatchTime", "engagementRate"]}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
