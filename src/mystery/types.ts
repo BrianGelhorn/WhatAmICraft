@@ -1,9 +1,14 @@
 export type MysteryVariant = "fast" | "balanced" | "comment_bait";
 export type MysteryRenderMode = "preview" | "final";
 export type VisualIntensity = "low" | "medium" | "high";
-export type HintVisualScene = "item-state" | "item-versus-entity" | "entity-holds-answer";
+export type HintVisualPrefab = "inventory-properties" | "item-entity-interaction" | "entity-equipment";
+export type HintVisualStep =
+  | {type: "durability"; label: string; from: number}
+  | {type: "stack-limit"; label: string; value: string; from: number}
+  | {type: "melee" | "ranged" | "holds-answer"; from: number};
 export type HintVisualRecipe = {
-  scene: HintVisualScene;
+  prefab: HintVisualPrefab;
+  steps: HintVisualStep[];
   supportingAsset?: string;
   environment?: "default" | "water";
 };

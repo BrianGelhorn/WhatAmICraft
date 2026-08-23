@@ -20,8 +20,12 @@ BANK_PATH = ROOT / "data/mystery-v2-episodes.json"
 GENERATED_PATH = ROOT / "src/generated/mystery-v2-episode.json"
 FPS = 30
 VARIANTS = ("fast", "balanced", "comment_bait")
-VISUAL_SCENES_REQUIRING_ASSET = {"item-versus-entity", "entity-holds-answer"}
-VISUAL_SCENES = {"item-state", *VISUAL_SCENES_REQUIRING_ASSET}
+VISUAL_PREFAB_STEPS = {
+    "inventory-properties": {"durability", "stack-limit"},
+    "item-entity-interaction": {"melee", "ranged"},
+    "entity-equipment": {"holds-answer"},
+}
+VISUAL_PREFABS_REQUIRING_ASSET = {"item-entity-interaction", "entity-equipment"}
 
 
 def read_json(path: Path):
@@ -71,12 +75,30 @@ def validate_episode(episode: dict) -> None:
         if not 1 <= len(hint.get("fragments", [])) <= 2:
             raise RuntimeError(f"hints[{index}].fragments requiere 1 o 2 fragmentos")
         visual = hint.get("visual", {})
-        scene = visual.get("scene")
-        if scene not in VISUAL_SCENES:
-            raise RuntimeError(f"hints[{index}].visual.scene no tiene una receta implementada")
+        prefab = visual.get("prefab")
+        if prefab not in VISUAL_PREFAB_STEPS:
+            raise RuntimeError(f"hints[{index}].visual.prefab no tiene un prefabricado implementado")
+        steps = visual.get("steps", [])
+        if not 1 <= len(steps) <= 2:
+            raise RuntimeError(f"hints[{index}].visual.steps requiere 1 o 2 pasos")
+        if len(steps) != len(hint["fragments"]):
+            raise RuntimeError(f"hints[{index}].visual.steps debe coincidir con la cantidad de fragments")
+        starts = [step.get("from") for step in steps]
+        if starts[0] != 0 or any(not isinstance(value, (int, float)) or not 0 <= value <= 0.9 for value in starts):
+            raise RuntimeError(f"hints[{index}].visual.steps debe empezar en 0 y usar from entre 0 y 0.9")
+        if starts != sorted(set(starts)):
+            raise RuntimeError(f"hints[{index}].visual.steps debe tener from únicos y ascendentes")
+        step_types = [step.get("type") for step in steps]
+        if len(step_types) != len(set(step_types)) or any(step_type not in VISUAL_PREFAB_STEPS[prefab] for step_type in step_types):
+            raise RuntimeError(f"hints[{index}].visual.steps no es compatible con {prefab}")
+        for step_index, step in enumerate(steps):
+            if step["type"] in {"durability", "stack-limit"}:
+                require_text(step.get("label"), f"hints[{index}].visual.steps[{step_index}].label", 24)
+            if step["type"] == "stack-limit":
+                require_text(step.get("value"), f"hints[{index}].visual.steps[{step_index}].value", 4)
         supporting_asset = visual.get("supportingAsset")
-        if scene in VISUAL_SCENES_REQUIRING_ASSET and not supporting_asset:
-            raise RuntimeError(f"hints[{index}].visual.supportingAsset es obligatorio para {scene}")
+        if prefab in VISUAL_PREFABS_REQUIRING_ASSET and not supporting_asset:
+            raise RuntimeError(f"hints[{index}].visual.supportingAsset es obligatorio para {prefab}")
         if supporting_asset:
             project_asset(supporting_asset, f"hints[{index}].visual.supportingAsset")
         if visual.get("environment", "default") not in {"default", "water"}:
@@ -411,7 +433,7 @@ def main() -> int:
     args = parser.parse_args()
     load_env_local()
     bank = read_json(BANK_PATH)
-    if bank.get("format") != "mystery-v2":
+    if bank.get("schema_version") != 2 or bank.get("format") != "mystery-v2":
         raise RuntimeError("Banco Mystery V2 inválido")
     episode = next((item for item in bank["episodes"] if item["id"] == args.episode), None)
     if episode is None:

@@ -114,7 +114,7 @@ export const HintHeader: React.FC<{config: MysteryVideoConfig; index: number}> =
 
 export const HintKeyword: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; durationInFrames: number}> = ({config, hint, durationInFrames}) => {
   const frame = useCurrentFrame();
-  const switchFrame = Math.floor(durationInFrames * 0.58);
+  const switchFrame = Math.floor(durationInFrames * (hint.visual.steps[1]?.from ?? 1));
   return (
     <div style={{position: "relative", width: 940, height: 150, borderRadius: 34, border: `3px solid ${config.theme.accent}45`, background: `${config.theme.mystery}B8`, boxShadow: "0 14px 30px rgba(0,0,0,.28)"}}>
       {hint.fragments.map((fragment, index) => {
@@ -129,53 +129,69 @@ export const HintKeyword: React.FC<{config: MysteryVideoConfig; hint: MysteryHin
 
 export const HintText = HintKeyword;
 
-export const ItemStateVisual: React.FC<{config: MysteryVideoConfig; duration: number}> = ({config, duration}) => {
+const stepFrame = (duration: number, from: number) => Math.floor(duration * from);
+
+export const InventoryPropertiesPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
-  const secondPhase = interpolate(frame, [duration * 0.54, duration * 0.64], [0, 1], ease);
-  const durability = interpolate(frame, [8, duration * 0.42], [220, 72], ease);
+  const [firstStep, secondStep] = hint.visual.steps;
+  const switchAt = secondStep ? stepFrame(duration, secondStep.from) : duration;
+  const secondPhase = secondStep ? interpolate(frame, [switchAt - 3, switchAt + 5], [0, 1], ease) : 0;
+  const activeStep = secondStep && secondPhase > 0.5 ? secondStep : firstStep;
+  const durabilityStep = hint.visual.steps.find((step) => step.type === "durability");
+  const stackStep = hint.visual.steps.find((step) => step.type === "stack-limit");
+  const durabilityStart = durabilityStep ? stepFrame(duration, durabilityStep.from) : 0;
+  const durability = interpolate(frame, [durabilityStart + 8, durabilityStart + duration * 0.42], [220, 72], ease);
+  const durabilityOpacity = (firstStep.type === "durability" ? 1 - secondPhase : 0) + (secondStep?.type === "durability" ? secondPhase : 0);
+  const stackOpacity = (firstStep.type === "stack-limit" ? 1 - secondPhase : 0) + (secondStep?.type === "stack-limit" ? secondPhase : 0);
   const slotEntry = interpolate(frame, [0, 9], [0, 1], ease);
   return (
     <div style={{position: "relative", width: 780, height: 520}}>
-      <div style={{position: "absolute", left: 255, top: 5, width: 270, textAlign: "center", color: secondPhase > 0.5 ? config.theme.accent : config.theme.urgency, fontSize: 29, letterSpacing: 3, opacity: slotEntry, textShadow: "0 5px 0 #02040A"}}>{secondPhase > 0.5 ? "STACK LIMIT" : "DURABILITY ↓"}</div>
+      <div style={{position: "absolute", left: 230, top: 5, width: 320, textAlign: "center", color: activeStep.type === "stack-limit" ? config.theme.accent : config.theme.urgency, fontSize: 29, letterSpacing: 3, opacity: slotEntry, textShadow: "0 5px 0 #02040A"}}>{"label" in activeStep ? activeStep.label : ""}</div>
       <div style={{position: "absolute", left: 228, top: 60, width: 324, height: 324, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 42, border: "10px solid #8892A8", background: "linear-gradient(145deg, #3B455A, #252C3D)", boxShadow: "inset 0 0 0 8px #171D2B, 0 16px 0 #02040A, 0 0 30px rgba(255,209,102,.2)", opacity: slotEntry, transform: `scale(${0.9 + slotEntry * 0.1})`}}>
         <MysteryObject config={config} size={250} reaction={0.2} />
-        <div style={{position: "absolute", left: 30, bottom: 20, width: 232, height: 25, padding: 4, borderRadius: 10, background: "#111827", border: "4px solid #02040A", opacity: 1 - secondPhase}}>
+        <div style={{position: "absolute", left: 30, bottom: 20, width: 232, height: 25, padding: 4, borderRadius: 10, background: "#111827", border: "4px solid #02040A", opacity: durabilityOpacity}}>
           <div style={{width: durability, height: "100%", borderRadius: 5, background: durability > 135 ? config.theme.answer : config.theme.urgency, boxShadow: `0 0 12px ${durability > 135 ? config.theme.answer : config.theme.urgency}`}} />
         </div>
-        <div style={{position: "absolute", right: 15, bottom: 12, width: 66, height: 66, display: "grid", placeItems: "center", borderRadius: 22, background: `${config.theme.mystery}E8`, color: config.theme.text, fontSize: 48, textShadow: "0 5px 0 #000", boxShadow: "0 7px 0 #02040A", opacity: secondPhase, transform: `scale(${0.8 + secondPhase * 0.2})`}}>1</div>
+        {stackStep?.type === "stack-limit" ? <div style={{position: "absolute", right: 15, bottom: 12, width: 66, height: 66, display: "grid", placeItems: "center", borderRadius: 22, background: `${config.theme.mystery}E8`, color: config.theme.text, fontSize: 48, textShadow: "0 5px 0 #000", boxShadow: "0 7px 0 #02040A", opacity: stackOpacity, transform: `scale(${0.8 + stackOpacity * 0.2})`}}>{stackStep.value}</div> : null}
       </div>
     </div>
   );
 };
 
-export const ItemVersusEntityVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
+export const ItemEntityInteractionPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
-  const secondPhase = interpolate(frame, [duration * 0.54, duration * 0.64], [0, 1], ease);
-  const meleeStrike = interpolate(frame, [8, 24], [0, 1], ease);
-  const thrownStrike = interpolate(frame, [duration * 0.52, duration * 0.82], [0, 1], ease);
-  const meleeImpact = interpolate(frame, [18, 23, 31], [0, 1, 0], clamp);
-  const rangedImpact = interpolate(frame, [duration * 0.76, duration * 0.82, duration * 0.92], [0, 1, 0], clamp);
-  const impact = Math.max(meleeImpact * (1 - secondPhase), rangedImpact * secondPhase);
+  const [firstStep, secondStep] = hint.visual.steps;
+  const switchAt = secondStep ? stepFrame(duration, secondStep.from) : duration;
+  const secondPhase = secondStep ? interpolate(frame, [switchAt - 3, switchAt + 5], [0, 1], ease) : 0;
+  const opacityFor = (type: "melee" | "ranged") => (firstStep.type === type ? 1 - secondPhase : 0) + (secondStep?.type === type ? secondPhase : 0);
+  const meleeStart = stepFrame(duration, hint.visual.steps.find((step) => step.type === "melee")?.from ?? 0);
+  const rangedStart = stepFrame(duration, hint.visual.steps.find((step) => step.type === "ranged")?.from ?? 0);
+  const meleeStrike = interpolate(frame, [meleeStart + 8, meleeStart + 24], [0, 1], ease);
+  const thrownStrike = interpolate(frame, [rangedStart - 5, rangedStart + 19], [0, 1], ease);
+  const meleeImpact = interpolate(frame, [meleeStart + 18, meleeStart + 23, meleeStart + 31], [0, 1, 0], clamp);
+  const rangedImpact = interpolate(frame, [rangedStart + 14, rangedStart + 19, rangedStart + 27], [0, 1, 0], clamp);
+  const impact = Math.max(meleeImpact * opacityFor("melee"), rangedImpact * opacityFor("ranged"));
   return (
     <div style={{position: "relative", width: 850, height: 520}}>
       {hint.visual.supportingAsset ? <CanvasImage src={staticFile(hint.visual.supportingAsset)} style={{position: "absolute", right: 65 + impact * 10, top: 90, width: 270, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: `drop-shadow(0 12px 0 #02040A) drop-shadow(0 0 ${impact * 28}px ${config.theme.urgency})`, transform: `rotate(${impact * 5}deg) scale(${1 - impact * 0.04})`}} /> : null}
-      <div style={{position: "absolute", left: 65 + meleeStrike * 250, top: 115, opacity: 1 - secondPhase, transform: `rotate(${meleeStrike * -16}deg)`}}><MysteryObject config={config} size={260} reaction={meleeStrike * 0.5} /></div>
-      <div style={{position: "absolute", left: 20 + thrownStrike * 465, top: 150 - Math.sin(thrownStrike * Math.PI) * 105, opacity: secondPhase, transform: `rotate(${thrownStrike * 16 - 8}deg)`}}><MysteryObject config={config} size={220} reaction={thrownStrike * 0.35} /></div>
+      <div style={{position: "absolute", left: 65 + meleeStrike * 250, top: 115, opacity: opacityFor("melee"), transform: `rotate(${meleeStrike * -16}deg)`}}><MysteryObject config={config} size={260} reaction={meleeStrike * 0.5} /></div>
+      <div style={{position: "absolute", left: 20 + thrownStrike * 465, top: 150 - Math.sin(thrownStrike * Math.PI) * 105, opacity: opacityFor("ranged"), transform: `rotate(${thrownStrike * 16 - 8}deg)`}}><MysteryObject config={config} size={220} reaction={thrownStrike * 0.35} /></div>
       {[0, 1, 2, 3].map((index) => <div key={index} style={{position: "absolute", left: 590 + Math.cos(index * 1.7) * impact * 80, top: 235 + Math.sin(index * 1.7) * impact * 90, width: 18 + index * 3, height: 18 + index * 3, borderRadius: 6, background: index % 2 ? config.theme.accent : config.theme.urgency, opacity: impact, transform: `rotate(${index * 25}deg)`}} />)}
     </div>
   );
 };
 
-export const EntityHoldsAnswerVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
+export const EntityEquipmentPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
-  const rise = interpolate(frame, [8, 28], [0, 1], ease);
-  const equip = interpolate(frame, [duration * 0.34, duration * 0.64], [0, 1], ease);
+  const start = stepFrame(duration, hint.visual.steps[0].from);
+  const rise = interpolate(frame, [start + 8, start + 28], [0, 1], ease);
+  const equip = interpolate(frame, [start + duration * 0.34, start + duration * 0.64], [0, 1], ease);
   const answerLeft = interpolate(equip, [0, 1], [535, 290]);
   const answerTop = interpolate(equip, [0, 1], [115, 150]);
   return (
     <div style={{position: "relative", width: 850, height: 540, overflow: "hidden"}}>
-      {[0, 1, 2].map((index) => <div key={index} style={{position: "absolute", left: -80 + index * 35, top: 400 + index * 28 + Math.sin((frame + index * 9) / 7) * 10, width: 980, height: 90, borderRadius: "50%", border: `5px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.09}} />)}
-      {[0, 1, 2, 3, 4].map((index) => <div key={index} style={{position: "absolute", left: 100 + index * 74, top: 360 - ((frame * (2 + index * 0.15) + index * 75) % 250), width: 16 + index * 3, height: 16 + index * 3, borderRadius: "50%", border: `4px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.07}} />)}
+      {hint.visual.environment === "water" ? <>{[0, 1, 2].map((index) => <div key={`wave-${index}`} style={{position: "absolute", left: -80 + index * 35, top: 400 + index * 28 + Math.sin((frame + index * 9) / 7) * 10, width: 980, height: 90, borderRadius: "50%", border: `5px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.09}} />)}
+      {[0, 1, 2, 3, 4].map((index) => <div key={`bubble-${index}`} style={{position: "absolute", left: 100 + index * 74, top: 360 - ((frame * (2 + index * 0.15) + index * 75) % 250), width: 16 + index * 3, height: 16 + index * 3, borderRadius: "50%", border: `4px solid ${config.theme.progress}`, opacity: 0.18 + index * 0.07}} />)}</> : null}
       {hint.visual.supportingAsset ? <CanvasImage src={staticFile(hint.visual.supportingAsset)} style={{position: "absolute", left: 100, top: 80 + (1 - rise) * 220, width: 300, height: 340, objectFit: "contain", imageRendering: "pixelated", filter: `drop-shadow(0 0 28px ${config.theme.progress})`, transform: `scale(${0.92 + rise * 0.08})`}} /> : null}
       <div style={{position: "absolute", left: answerLeft, top: answerTop, opacity: 0.25 + equip * 0.75, transform: `rotate(${-18 + equip * 8}deg) scale(${0.9 + equip * 0.1})`}}><MysteryObject config={config} size={280} progress={0.14} reaction={equip} /></div>
     </div>
@@ -183,10 +199,10 @@ export const EntityHoldsAnswerVisual: React.FC<{config: MysteryVideoConfig; hint
 };
 
 export const HintVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; durationInFrames: number}> = ({config, hint, durationInFrames}) => {
-  if (hint.visual.scene === "item-state") return <ItemStateVisual config={config} duration={durationInFrames} />;
-  if (hint.visual.scene === "item-versus-entity") return <ItemVersusEntityVisual config={config} hint={hint} duration={durationInFrames} />;
-  if (hint.visual.scene === "entity-holds-answer") return <EntityHoldsAnswerVisual config={config} hint={hint} duration={durationInFrames} />;
-  throw new Error(`Unsupported mystery visual recipe: ${hint.visual.scene}`);
+  if (hint.visual.prefab === "inventory-properties") return <InventoryPropertiesPrefab config={config} hint={hint} duration={durationInFrames} />;
+  if (hint.visual.prefab === "item-entity-interaction") return <ItemEntityInteractionPrefab config={config} hint={hint} duration={durationInFrames} />;
+  if (hint.visual.prefab === "entity-equipment") return <EntityEquipmentPrefab config={config} hint={hint} duration={durationInFrames} />;
+  throw new Error(`Unsupported mystery visual prefab: ${hint.visual.prefab}`);
 };
 
 export const HintScene: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; index: number; durationInFrames: number}> = ({config, hint, index, durationInFrames}) => {

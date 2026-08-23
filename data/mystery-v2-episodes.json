@@ -1,6 +1,6 @@
 {
   "$schema": "../schemas/mystery-v2-episode.schema.json",
-  "schema_version": 1,
+  "schema_version": 2,
   "format": "mystery-v2",
   "episodes": [
     {
@@ -51,7 +51,11 @@
           "fragments": ["DURABILITY GOES DOWN", "STACK LIMIT: 1"],
           "emphasisWords": ["DURABILITY", "ONE"],
           "visual": {
-            "scene": "item-state"
+            "prefab": "inventory-properties",
+            "steps": [
+              {"type": "durability", "label": "DURABILITY ↓", "from": 0},
+              {"type": "stack-limit", "label": "STACK LIMIT", "value": "1", "from": 0.58}
+            ]
           },
           "difficulty": "hard"
         },
@@ -62,7 +66,11 @@
           "fragments": ["MELEE", "RANGED"],
           "emphasisWords": ["MELEE", "RANGED"],
           "visual": {
-            "scene": "item-versus-entity",
+            "prefab": "item-entity-interaction",
+            "steps": [
+              {"type": "melee", "from": 0},
+              {"type": "ranged", "from": 0.58}
+            ],
             "supportingAsset": "mc-assets/entity-assets/flat/ZOMBIE.png"
           },
           "difficulty": "medium"
@@ -74,7 +82,10 @@
           "fragments": ["CARRIED BY A DROWNED"],
           "emphasisWords": ["DROWNED"],
           "visual": {
-            "scene": "entity-holds-answer",
+            "prefab": "entity-equipment",
+            "steps": [
+              {"type": "holds-answer", "from": 0}
+            ],
             "supportingAsset": "mc-assets/entity-assets/flat/DROWNED.png",
             "environment": "water"
           },

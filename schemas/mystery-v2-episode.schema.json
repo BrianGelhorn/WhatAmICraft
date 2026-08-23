@@ -4,7 +4,7 @@
   "required": ["schema_version", "format", "episodes"],
   "properties": {
     "$schema": {"type": "string"},
-    "schema_version": {"const": 1},
+    "schema_version": {"const": 2},
     "format": {"const": "mystery-v2"},
     "episodes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/episode"}}
   },
@@ -72,9 +72,25 @@
               "emphasisWords": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1, "maxLength": 18}},
               "visual": {
                 "type": "object",
-                "required": ["scene"],
+                "required": ["prefab", "steps"],
                 "properties": {
-                  "scene": {"enum": ["item-state", "item-versus-entity", "entity-holds-answer"]},
+                  "prefab": {"enum": ["inventory-properties", "item-entity-interaction", "entity-equipment"]},
+                  "steps": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "items": {
+                      "type": "object",
+                      "required": ["type", "from"],
+                      "properties": {
+                        "type": {"enum": ["durability", "stack-limit", "melee", "ranged", "holds-answer"]},
+                        "label": {"type": "string", "minLength": 1, "maxLength": 24},
+                        "value": {"type": "string", "minLength": 1, "maxLength": 4},
+                        "from": {"type": "number", "minimum": 0, "maximum": 0.9}
+                      },
+                      "additionalProperties": false
+                    }
+                  },
                   "supportingAsset": {"type": "string", "minLength": 1},
                   "environment": {"enum": ["default", "water"]}
                 },
