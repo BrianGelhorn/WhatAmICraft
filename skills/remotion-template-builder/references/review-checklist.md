@@ -11,6 +11,16 @@
 - The answer is absent two frames before reveal.
 - The reveal and explanation fit without being covered.
 
+## Retention pass
+
+- The first frame already communicates the challenge, category, and answer-coherent silhouette.
+- The question starts by frame 24 and useful content starts by frame 45 at 30 fps.
+- Each clue has entry, emphasis, and exit states; no meaningful visual gap exceeds 75 frames.
+- The countdown accelerates tension before the reveal instead of arriving as a late standalone block.
+- The reveal uses the same target identity as the silhouette, answer text, and spoken answer.
+- The CTA asks for a number/choice, remains visible for at least 45 frames, and bridges cleanly to frame 0.
+- The selected `fast`, `balanced`, `hard_mode`, or `comment_bait` variant changes data/timing, not component ownership.
+
 ## Audio pass
 
 - Review audio only after the silent visual pass is stable.
