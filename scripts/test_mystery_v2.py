@@ -68,6 +68,10 @@ assert "NEXT CLUE" not in component and "×64" not in component and "YOUR TURN" 
 assert "SAFE_TOP = 170" in component and "SAFE_BOTTOM = 1600" in component
 assert "activeTiming.startFrame" in component and "config.cta.prompt" in component
 assert 'config.renderMode === "preview"' in component
+assert episode["hints"][1]["visualAsset"].endswith("/ZOMBIE.png")
+for decorative_primitive in ("finalFlash", "const sweep", "const scan", "borderRight:", "width: `${progress * 100}%`"):
+    assert decorative_primitive not in component
+assert "CombatRangeVisual config={config} hint={hint}" in component
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryVideo"' in root and "fps={30}" in root and "width={1080}" in root and "height={1920}" in root
