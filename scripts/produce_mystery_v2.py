@@ -24,6 +24,7 @@ VARIANTS = ("fast", "balanced", "comment_bait")
 VISUAL_PREFAB_STEPS = {
     "durability-loss": {"durability"},
     "stack-limit": {"stack-limit"},
+    "enchantment-glint": {"enchantment"},
     "inventory-properties": {"durability", "stack-limit"},
     "item-entity-interaction": {"melee", "ranged"},
     "entity-equipment": {"holds-answer"},

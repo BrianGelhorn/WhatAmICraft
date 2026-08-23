@@ -1,6 +1,7 @@
 import {CanvasImage, staticFile, useCurrentFrame} from "remotion";
 import catalog from "../../generated/mystery-v2-visual-prefabs.json";
 import {DurabilityLossVisual} from "./DurabilityLossVisual";
+import {EnchantmentGlintVisual} from "./EnchantmentGlintVisual";
 import {StackLimitVisual} from "./StackLimitVisual";
 
 export type MysteryPrefabRecord = (typeof catalog.prefabs)[number];
@@ -55,7 +56,7 @@ const ScenarioVisual: React.FC<{prefab: MysteryPrefabRecord}> = ({prefab}) => {
     case "stack-limit": return <div style={center}><StackLimitVisual assetSrc={a} stackValue="16" accentColor={colors.cyan} /></div>;
     case "charge-level": return <div style={center}><div style={{position: "absolute", width: 185, height: 185, borderRadius: "50%", background: `conic-gradient(${colors.cyan} ${p * 360}deg,#26324C 0)`, boxShadow: `0 0 28px ${colors.cyan}55`}} /><div style={{position: "absolute", width: 150, height: 150, borderRadius: "50%", background: colors.surface}} /><Asset src={a} size={125} style={{zIndex: 2, transform: `scale(${0.9 + p * 0.1})`}} /></div>;
     case "cooldown": return <div style={center}><Asset src={a} size={150} style={{opacity: 0.45 + p * 0.55}} /><div style={{position: "absolute", width: 184, height: 184, borderRadius: "50%", border: `9px solid ${colors.orange}`, borderTopColor: "transparent", transform: `rotate(${p * 320}deg)`}} /><div style={{position: "absolute", bottom: 18, color: colors.orange, fontSize: 24}}>{p > 0.75 ? "READY" : "WAIT"}</div></div>;
-    case "enchantment-glint": return <div style={center}><Asset src={b} size={86} style={{position: "absolute", left: 72, top: 85, opacity: 0.8}} /><Asset src={a} size={165} style={{filter: `drop-shadow(0 10px 0 #02040A) drop-shadow(0 0 ${15 + p * 30}px #B46BFF) hue-rotate(${p * 120}deg)`}} />{[0, 1, 2].map((i) => <div key={i} style={{position: "absolute", left: 230 + Math.cos(i * 2.1) * (55 + p * 25), top: 120 + Math.sin(i * 2.1) * (55 + p * 25), color: colors.gold, fontSize: 28, opacity: p}}>✦</div>)}</div>;
+    case "enchantment-glint": return <div style={center}><EnchantmentGlintVisual assetSrc={a} supportingAsset={b} size={180} accentColor="#B46BFF" /></div>;
     case "consumable-bites": return <div style={center}>
       <Asset src={a} size={158} style={{position: "absolute", top: 25, transform: `scale(${1 - p * 0.14}) rotate(${p * -7}deg)`}} />
       {[0, 1, 2].map((i) => <div key={i} style={{position: "absolute", left: 268 + i * 20, top: 58 + i * 24, width: 27, height: 27, borderRadius: "50%", background: colors.surface, opacity: p > i * 0.22 ? 1 : 0}} />)}

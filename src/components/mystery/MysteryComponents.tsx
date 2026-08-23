@@ -11,6 +11,7 @@ import {
 } from "remotion";
 import type {MysteryHint, MysteryVideoConfig, VoiceSegment} from "../../mystery/types";
 import {DurabilityLossVisual} from "./DurabilityLossVisual";
+import {EnchantmentGlintVisual} from "./EnchantmentGlintVisual";
 import {StackLimitVisual} from "./StackLimitVisual";
 
 const clamp = {extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const};
@@ -151,6 +152,16 @@ export const StackLimitPrefab: React.FC<{config: MysteryVideoConfig; hint: Myste
   );
 };
 
+export const EnchantmentGlintPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint}> = ({config, hint}) => {
+  const step = hint.visual.steps.find((candidate) => candidate.type === "enchantment");
+  return (
+    <div style={{position: "relative", width: 780, height: 520}}>
+      <div style={{position: "absolute", left: 160, top: 5, width: 460, textAlign: "center", color: "#B46BFF", fontSize: 29, letterSpacing: 3, textShadow: "0 5px 0 #02040A"}}>{step && "label" in step ? step.label : "ENCHANTABLE"}</div>
+      <div style={{position: "absolute", left: 150, top: 75}}><EnchantmentGlintVisual assetSrc={config.answer.silhouette} supportingAsset={hint.visual.supportingAsset} size={330} accentColor="#B46BFF" conceal /></div>
+    </div>
+  );
+};
+
 export const InventoryPropertiesPrefab: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; duration: number}> = ({config, hint, duration}) => {
   const frame = useCurrentFrame();
   const [firstStep, secondStep] = hint.visual.steps;
@@ -221,6 +232,7 @@ export const EntityEquipmentPrefab: React.FC<{config: MysteryVideoConfig; hint: 
 export const HintVisual: React.FC<{config: MysteryVideoConfig; hint: MysteryHint; durationInFrames: number}> = ({config, hint, durationInFrames}) => {
   if (hint.visual.prefab === "durability-loss") return <DurabilityLossPrefab config={config} hint={hint} />;
   if (hint.visual.prefab === "stack-limit") return <StackLimitPrefab config={config} hint={hint} />;
+  if (hint.visual.prefab === "enchantment-glint") return <EnchantmentGlintPrefab config={config} hint={hint} />;
   if (hint.visual.prefab === "inventory-properties") return <InventoryPropertiesPrefab config={config} hint={hint} duration={durationInFrames} />;
   if (hint.visual.prefab === "item-entity-interaction") return <ItemEntityInteractionPrefab config={config} hint={hint} duration={durationInFrames} />;
   if (hint.visual.prefab === "entity-equipment") return <EntityEquipmentPrefab config={config} hint={hint} duration={durationInFrames} />;

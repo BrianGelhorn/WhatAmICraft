@@ -92,8 +92,8 @@
       "id": "enchantment-glint",
       "title": "PUEDE ENCANTARSE",
       "role": "property-state",
-      "status": "draft",
-      "description": "Brillo encantado recorre el objeto.",
+      "status": "approved",
+      "description": "Brillo controlado y libro de encantamiento para propiedades enchantable reutilizables.",
       "relations": [
         "enchantable",
         "enchantment"
