@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from copy import deepcopy
-from pathlib import Path
 
 from produce_mystery_v2 import BANK_PATH, ROOT, VARIANTS, read_json, selected_config, validate_episode, voice_specs
 
@@ -24,26 +23,63 @@ for variant in VARIANTS:
     assert scenes[0]["from"] == 0
     assert all(right["from"] == left["from"] + left["durationInFrames"] for left, right in zip(scenes, scenes[1:]))
     assert scenes[-1]["from"] + scenes[-1]["durationInFrames"] == timeline["durationInFrames"]
-    assert config["hook"]["question"] and timeline["hints"][0]["from"] <= 45
-    assert timeline["cta"]["durationInFrames"] >= 45
-    assert timeline["reveal"]["durationInFrames"] >= 60
+    assert config["hook"]["question"] and timeline["hints"][0]["from"] <= 35
+    assert timeline["cta"]["durationInFrames"] >= {"fast": 60, "balanced": 75, "comment_bait": 90}[variant]
+    assert timeline["reveal"]["durationInFrames"] >= 66
     assert config["answer"]["image"] == config["answer"]["silhouette"]
-    assert len(config["hints"]) == 3 and all(2 <= len(hint["fragments"]) <= 3 for hint in config["hints"])
+    assert config["reveal"]["answerText"].lower() == config["answer"]["text"].lower()
+    assert len(config["hints"]) == 3 and all(1 <= len(hint["fragments"]) <= 2 for hint in config["hints"])
+    assert config["cta"]["options"] == ["1", "2", "3"]
+    assert not any(token in config["cta"]["text"].upper() for token in ("YES", "NO", "DID YOU GET", "YOUR TURN", "TYPE ONE"))
+    if variant == "comment_bait":
+        assert config["cta"]["text"] == "COMMENT 1, 2, OR 3"
+    beats = config["retentionBeats"]
+    assert beats[0]["frame"] == 0 and beats[-1]["frame"] == timeline["durationInFrames"] - 1
+    assert max(right["frame"] - left["frame"] for left, right in zip(beats, beats[1:])) <= 45
     specs = voice_specs(episode, config)
-    assert specs[0]["from"] == 0
+    assert specs[0]["from"] <= 5
     assert all(spec["from"] < spec["sceneEnd"] for spec in specs)
+    assert next(spec for spec in specs if spec["id"] == "countdown")["maxTempo"] == 1.6
 
 component = (ROOT / "src/components/mystery/MysteryComponents.tsx").read_text(encoding="utf-8")
-for name in ("HookScene", "MysteryObject", "HintScene", "ProgressMeter", "CountdownScene", "RevealScene", "CTAScene", "CaptionRenderer", "AudioTimeline", "LoopBridge", "SafeZoneOverlay", "RetentionDebugOverlay"):
+for name in (
+    "HookScene", "HookQuestion", "MysteryObject", "CategoryBadge", "GlobalProgress", "HintScene",
+    "HintHeader", "HintKeyword", "HintVisual", "DurabilityVisual", "CombatRangeVisual", "DrownedVisual",
+    "CountdownScene", "RevealTransform", "RevealAnswer", "CommentCTA", "CaptionRenderer", "AudioTimeline",
+    "MusicDucker", "LoopBridge", "SafeZoneOverlay", "DebugTimeline",
+):
     assert f"export const {name}" in component
 assert "Math.random(" not in component and "transition:" not in component
+assert "NEXT CLUE" not in component and "×64" not in component and "YOUR TURN" not in component
+assert "SAFE_TOP = 170" in component and "SAFE_BOTTOM = 1600" in component
+
+root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
+assert 'id="MysteryVideo"' in root and "fps={30}" in root and "width={1080}" in root and "height={1920}" in root
+producer = (ROOT / "scripts/produce_mystery_v2.py").read_text(encoding="utf-8")
+assert '"maxTempo": 1.6' in producer and '"-af", f"atempo=' in producer
 
 bad_silhouette = deepcopy(episode)
 bad_silhouette["answer"]["silhouette"] = "mc-assets/entity-assets/flat/ARROW.png"
 rejected(bad_silhouette, "forma exacta")
 
 late_hint = deepcopy(episode)
-late_hint["variants"]["balanced"]["timeline"]["hook"] = 46
-rejected(late_hint, "frame 46")
+late_hint["variants"]["balanced"]["timeline"]["hook"] = 36
+rejected(late_hint, "antes de 1.20s")
 
-print("ok: mystery-v2 retention and generation contract")
+short_cta = deepcopy(episode)
+short_cta["variants"]["comment_bait"]["timeline"]["cta"] = 89
+rejected(short_cta, "CTA requiere")
+
+duplicate_hint = deepcopy(episode)
+duplicate_hint["hints"][1]["voiceText"] = duplicate_hint["hints"][0]["voiceText"]
+rejected(duplicate_hint, "pistas repetidas")
+
+wrong_countdown = deepcopy(episode)
+wrong_countdown["countdown"]["voiceText"] = "Three. One. Two."
+rejected(wrong_countdown, "números visibles")
+
+contradictory_cta = deepcopy(episode)
+contradictory_cta["ctaOptions"]["hint-count"]["displayText"] = "DID YOU GET IT?"
+rejected(contradictory_cta, "CTA contradictorio")
+
+print("ok: mystery-v2 retention, audio, CTA and generation contract")
