@@ -5,6 +5,7 @@ import json
 import math
 import os
 import re
+import shutil
 import subprocess
 from copy import deepcopy
 from pathlib import Path
@@ -100,6 +101,7 @@ def validate_episode(episode: dict) -> None:
         if timeline["reveal"] < 66:
             raise RuntimeError(f"{variant_name}: reveal requiere al menos 2.2s")
         cta = episode["ctaOptions"][variant["ctaVariant"]]
+        require_text(cta.get("promptText"), f"{variant_name}: CTA prompt", 56)
         forbidden = ("YES", "NO", "DID YOU GET", "YOUR TURN", "TYPE ONE")
         if any(token in cta["displayText"].upper() for token in forbidden) or cta.get("options") != ["1", "2", "3"]:
             raise RuntimeError(f"{variant_name}: CTA contradictorio; usa una única respuesta numérica 1/2/3")
@@ -107,7 +109,7 @@ def validate_episode(episode: dict) -> None:
             raise RuntimeError("comment_bait debe usar exactamente 'COMMENT 1, 2, OR 3'")
         duration = timeline["hook"] + sum(timeline["hints"]) + timeline["countdown"] + timeline["reveal"] + timeline["cta"] + timeline["loop"]
         seconds = duration / FPS
-        limits = {"fast": (14, 16), "balanced": (17, 20), "comment_bait": (16, 19)}[variant_name]
+        limits = {"fast": (15.5, 16), "balanced": (16, 17), "comment_bait": (16.5, 17)}[variant_name]
         if not limits[0] <= seconds <= limits[1]:
             raise RuntimeError(f"{variant_name}: duración {seconds:.1f}s fuera de {limits[0]}–{limits[1]}s")
     music = episode.get("audio", {}).get("music", {})
@@ -153,7 +155,7 @@ def build_retention_beats(timeline: dict) -> list[dict]:
     return [{"id": name, "frame": frame} for name, frame in sorted(beats, key=lambda item: item[1]) if frame < timeline["durationInFrames"]]
 
 
-def selected_config(episode: dict, variant_name: str) -> dict:
+def selected_config(episode: dict, variant_name: str, render_mode: str = "final") -> dict:
     variant = episode["variants"][variant_name]
     hook = episode["hookOptions"][variant["hookVariant"]]
     cta = episode["ctaOptions"][variant["ctaVariant"]]
@@ -163,6 +165,7 @@ def selected_config(episode: dict, variant_name: str) -> dict:
         "format": "mystery-v2",
         "language": episode["language"],
         "variant": variant_name,
+        "renderMode": render_mode,
         "hookVariant": variant["hookVariant"],
         "ctaVariant": variant["ctaVariant"],
         "visualIntensity": variant["visualIntensity"],
@@ -173,7 +176,7 @@ def selected_config(episode: dict, variant_name: str) -> dict:
         "hints": deepcopy(episode["hints"]),
         "countdown": {"displayText": episode["countdown"]["displayText"], "values": episode["countdown"]["values"]},
         "reveal": {"preRevealText": episode["reveal"]["preRevealText"], "answerText": episode["reveal"]["answerText"]},
-        "cta": {"text": cta["displayText"], "options": cta["options"]},
+        "cta": {"text": cta["displayText"], "prompt": cta["promptText"], "options": cta["options"]},
         "timeline": timeline,
         "retentionBeats": build_retention_beats(timeline),
         "theme": deepcopy(episode["theme"]),
@@ -195,19 +198,33 @@ def voice_specs(episode: dict, config: dict) -> list[dict]:
             for index, hint in enumerate(episode["hints"])
         ],
         {"id": "countdown", "text": episode["countdown"]["voiceText"], "from": timeline["countdown"]["from"] + 2, "sceneEnd": timeline["countdown"]["from"] + timeline["countdown"]["durationInFrames"], "emphasisWords": [], "maxTempo": 1.6},
-        {"id": "reveal", "text": episode["reveal"]["voiceText"], "from": timeline["reveal"]["from"] + 5, "sceneEnd": timeline["reveal"]["from"] + timeline["reveal"]["durationInFrames"], "emphasisWords": [episode["answer"]["text"]]},
+        {
+            "id": "reveal", "text": episode["reveal"]["voiceText"],
+            "from": timeline["reveal"]["from"] + 5,
+            "sceneStart": timeline["reveal"]["from"],
+            "sceneEnd": timeline["reveal"]["from"] + timeline["reveal"]["durationInFrames"],
+            "alignWord": episode["answer"]["text"],
+            "alignFrame": timeline["reveal"]["from"] + 24,
+            "emphasisWords": [episode["answer"]["text"]],
+        },
         {"id": "cta", "text": cta["voiceText"], "from": timeline["cta"]["from"] + 4, "sceneEnd": timeline["cta"]["from"] + timeline["cta"]["durationInFrames"], "emphasisWords": cta["options"]},
     ]
 
 
-def audio_signature(episode: dict, config: dict, spec: dict) -> str:
+def audio_signature(episode: dict, spec: dict) -> str:
     payload = {
         "text": spec["text"],
         "voice": episode["voiceGeneration"],
-        "variant": config["variant"],
+        "version": 4,
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+
+def pacing_signature(signature: str, spec: dict) -> str:
+    payload = {
+        "voiceSignature": signature,
         "sceneFrames": spec["sceneEnd"] - spec["from"],
         "maxTempo": spec.get("maxTempo", 1),
-        "version": 3,
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
@@ -227,6 +244,11 @@ def word_timings(alignment: dict, absolute_from: int) -> list[dict]:
     return words
 
 
+def first_normalized_word(value: str) -> str:
+    words = re.findall(r"[a-z0-9]+", value.lower())
+    return words[0] if words else ""
+
+
 def paced_audio(source: Path, signature: str, tempo: float) -> Path:
     destination = source.with_name(f"{source.stem}-{signature[:12]}-paced.m4a")
     if destination.is_file():
@@ -244,12 +266,11 @@ def paced_audio(source: Path, signature: str, tempo: float) -> Path:
     return destination
 
 
-def generate_voice(episode: dict, config: dict, spec: dict, force: bool) -> dict:
-    base = f"audio/mystery-v2/{episode['id']}/{config['variant']}"
-    raw_src = f"{base}/{spec['id']}.mp3"
-    manifest_path = public_path(f"{base}/{spec['id']}.json")
+def generate_voice(episode: dict, spec: dict, force: bool) -> dict:
+    signature = audio_signature(episode, spec)
+    raw_src = f"audio/mystery-v2/voice-cache/{signature}.mp3"
+    manifest_path = public_path(f"audio/mystery-v2/voice-cache/{signature}.json")
     raw_path = public_path(raw_src)
-    signature = audio_signature(episode, config, spec)
     cached = read_json(manifest_path) if manifest_path.exists() else None
     if not force and cached and cached.get("signature") == signature and raw_path.is_file():
         alignment = cached["alignment"]
@@ -270,7 +291,7 @@ def generate_voice(episode: dict, config: dict, spec: dict, force: bool) -> dict
     if tempo > 1:
         if tempo > spec.get("maxTempo", 1):
             raise RuntimeError(f"Voz {spec['id']} dura {duration_seconds:.2f}s y su escena permite {available_frames / FPS:.2f}s; acorta el copy")
-        audio_source = paced_audio(raw_path, signature, tempo)
+        audio_source = paced_audio(raw_path, pacing_signature(signature, spec), tempo)
         alignment["character_start_times_seconds"] = [value / tempo for value in alignment["character_start_times_seconds"]]
         alignment["character_end_times_seconds"] = [value / tempo for value in alignment["character_end_times_seconds"]]
     normalization = episode["audio"]["normalization"]
@@ -279,21 +300,30 @@ def generate_voice(episode: dict, config: dict, spec: dict, force: bool) -> dict
         "truePeakDb": normalization["voiceTruePeakDb"],
         "loudnessRange": normalization["voiceLoudnessRange"],
     }, False)
+    segment_from = spec["from"]
+    if spec.get("alignWord"):
+        target = first_normalized_word(spec["alignWord"])
+        aligned_word = next((word for word in word_timings(alignment, 0) if first_normalized_word(word["word"]) == target), None)
+        if not aligned_word:
+            raise RuntimeError(f"Voz {spec['id']} no contiene la palabra de alineación {spec['alignWord']}")
+        segment_from = spec["alignFrame"] - aligned_word["startFrame"]
+        if segment_from < spec["sceneStart"]:
+            raise RuntimeError(f"Voz {spec['id']} necesita comenzar antes de su escena para alinear {spec['alignWord']}")
     duration = math.ceil(alignment["character_end_times_seconds"][-1] * FPS)
-    end = spec["from"] + duration
+    end = segment_from + duration
     if end > spec["sceneEnd"]:
-        available = (spec["sceneEnd"] - spec["from"]) / FPS
+        available = (spec["sceneEnd"] - segment_from) / FPS
         actual = duration / FPS
         raise RuntimeError(f"Voz {spec['id']} dura {actual:.2f}s y su escena permite {available:.2f}s; acorta el copy")
     return {
         "id": spec["id"], "text": spec["text"], "audioSrc": normalized,
-        "start": spec["from"], "end": end, "emphasisWords": spec["emphasisWords"],
-        "words": word_timings(alignment, spec["from"]),
+        "start": segment_from, "end": end, "emphasisWords": spec["emphasisWords"],
+        "words": word_timings(alignment, segment_from),
     }
 
 
 def complete_audio(episode: dict, config: dict, force: bool) -> None:
-    segments = [generate_voice(episode, config, spec, force) for spec in voice_specs(episode, config)]
+    segments = [generate_voice(episode, spec, force) for spec in voice_specs(episode, config)]
     for left, right in zip(segments, segments[1:]):
         if left["end"] > right["start"]:
             raise RuntimeError(f"Voces solapadas: {left['id']} termina en {left['end']} y {right['id']} empieza en {right['start']}")
@@ -314,22 +344,45 @@ def complete_audio(episode: dict, config: dict, force: bool) -> None:
         effects.append({"id": f"hint-{index + 1}-hit", **tick, "from": scene["from"], "visualEvent": f"hint-{index + 1}-entry", "maxOffsetFrames": 0})
         effects.append({"id": f"hint-{index + 1}-shift", **tick, "from": scene["from"] + scene["durationInFrames"] // 2, "visualEvent": f"hint-{index + 1}-keyword", "maxOffsetFrames": 1})
     effects.extend({"id": f"countdown-{value}", **tick, "from": countdown_words[index]["startFrame"], "visualEvent": f"countdown-{index}", "maxOffsetFrames": 0} for index, value in enumerate(config["countdown"]["values"]))
-    effects.append({"id": "answer-reveal", **reveal, "from": config["timeline"]["reveal"]["from"] + 24, "visualEvent": "reveal-light", "maxOffsetFrames": 1})
+    reveal_segment = next(segment for segment in segments if segment["id"] == "reveal")
+    answer_word = next(word for word in reveal_segment["words"] if first_normalized_word(word["word"]) == first_normalized_word(episode["answer"]["text"]))
+    effects.append({"id": "answer-reveal", **reveal, "from": answer_word["startFrame"], "visualEvent": "reveal-light", "maxOffsetFrames": 0})
     config["voice"] = {"status": "complete", "segments": segments}
     config["audio"] = {"status": "complete", "music": music, "effects": effects}
 
 
+def render_path(config: dict) -> Path:
+    suffix = "-preview" if config["renderMode"] == "preview" else ""
+    return ROOT / f"out/previews/{config['id']}-{config['variant']}{suffix}.mp4"
+
+
 def render(config: dict) -> Path:
-    stem = f"{config['id']}-{config['variant']}"
-    output = ROOT / f"out/previews/{stem}.mp4"
+    output = render_path(config)
+    stem = output.stem
     props = render_props_path(stem, "video")
     write_json(props, {"config": config})
     output.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run([
+    command = [
         "node", "node_modules/@remotion/cli/remotion-cli.js", "render", "MysteryVideo", str(output),
         f"--props={props.relative_to(ROOT).as_posix()}",
         f"--frames=0-{config['timeline']['durationInFrames'] - 1}", "--concurrency=1",
-    ], cwd=ROOT, check=True, timeout=1800)
+    ]
+    if config["renderMode"] == "preview":
+        command.append("--scale=0.5")
+    subprocess.run(command, cwd=ROOT, check=True, timeout=1800)
+    return output
+
+
+def contact_sheet(video: Path) -> Path:
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise RuntimeError("Contact sheet requiere ffmpeg en PATH")
+    output = video.with_name(f"{video.stem}-contact.png")
+    subprocess.run([
+        ffmpeg, "-y", "-loglevel", "error", "-i", str(video),
+        "-vf", "fps=0.5,scale=270:480,tile=3x3:padding=8:margin=8",
+        "-frames:v", "1", str(output),
+    ], cwd=ROOT, check=True, timeout=180)
     return output
 
 
@@ -342,6 +395,8 @@ def main() -> int:
     parser.add_argument("--generate-audio", action="store_true")
     parser.add_argument("--force-audio", action="store_true")
     parser.add_argument("--render", action="store_true")
+    parser.add_argument("--preview", action="store_true", help="Render silencioso 540x960 con efectos reducidos")
+    parser.add_argument("--contact-sheet", action="store_true", help="Crear mosaico QA desde el render")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     load_env_local()
@@ -353,21 +408,28 @@ def main() -> int:
         raise RuntimeError(f"Episodio inexistente: {args.episode}")
     validate_episode(episode)
     variants = VARIANTS if args.all_variants else (args.variant,)
+    render_requested = args.render or args.preview
     with production_lock():
         for variant in variants:
-            config = selected_config(episode, variant)
+            config = selected_config(episode, variant, "preview" if args.preview else "final")
             if args.generate_audio:
                 complete_audio(episode, config, args.force_audio)
-            elif args.render and not args.visual_only:
+            elif render_requested and not (args.visual_only or args.preview):
                 raise RuntimeError("Usa --generate-audio para un render final o --visual-only para revisar diseño")
             if args.dry_run:
                 print(f"ok: {episode['id']} {variant} {config['timeline']['durationInFrames'] / FPS:.1f}s")
                 continue
             write_json(GENERATED_PATH, config)
             print(f"config: {GENERATED_PATH.relative_to(ROOT)} ({variant})")
-            if args.render:
+            output = render_path(config)
+            if render_requested:
                 output = render(config)
                 print(f"render: {output.relative_to(ROOT)}")
+            if args.contact_sheet:
+                if not output.is_file():
+                    raise RuntimeError(f"No existe {output.relative_to(ROOT)}; usa --render o --preview primero")
+                sheet = contact_sheet(output)
+                print(f"contact-sheet: {sheet.relative_to(ROOT)}")
     return 0
 
 
