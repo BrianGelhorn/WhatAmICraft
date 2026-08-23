@@ -3,10 +3,11 @@
   "format": "mystery-v2",
   "language": "en",
   "variant": "balanced",
+  "renderMode": "final",
   "hookVariant": "question-first",
   "ctaVariant": "hint-count",
   "visualIntensity": "medium",
-  "hypothesis": "A 17.9 second pace balances comprehension and completion.",
+  "hypothesis": "A 16.5 second pace balances comprehension and completion.",
   "answer": {
     "id": "trident",
     "text": "TRIDENT",
@@ -16,7 +17,7 @@
   },
   "background": "images/template-layers/background.png",
   "hook": {
-    "question": "CAN YOU NAME THIS WEAPON?",
+    "question": "CAN YOU NAME IT?",
     "ruleText": "3 HINTS · 1 ANSWER",
     "showBrandMark": false
   },
@@ -81,6 +82,7 @@
   },
   "cta": {
     "text": "COMMENT 1, 2, OR 3",
+    "prompt": "HOW MANY HINTS DID YOU NEED?",
     "options": [
       "1",
       "2",
@@ -88,7 +90,7 @@
     ]
   },
   "timeline": {
-    "durationInFrames": 542,
+    "durationInFrames": 495,
     "hook": {
       "from": 0,
       "durationInFrames": 35
@@ -96,32 +98,32 @@
     "hints": [
       {
         "from": 35,
-        "durationInFrames": 90
+        "durationInFrames": 78
       },
       {
-        "from": 125,
-        "durationInFrames": 87
+        "from": 113,
+        "durationInFrames": 78
       },
       {
-        "from": 212,
-        "durationInFrames": 87
+        "from": 191,
+        "durationInFrames": 78
       }
     ],
     "countdown": {
-      "from": 299,
-      "durationInFrames": 60
+      "from": 269,
+      "durationInFrames": 54
     },
     "reveal": {
-      "from": 359,
-      "durationInFrames": 78
+      "from": 323,
+      "durationInFrames": 72
     },
     "cta": {
-      "from": 437,
-      "durationInFrames": 93
+      "from": 395,
+      "durationInFrames": 90
     },
     "loop": {
-      "from": 530,
-      "durationInFrames": 12
+      "from": 485,
+      "durationInFrames": 10
     }
   },
   "retentionBeats": [
@@ -147,103 +149,103 @@
     },
     {
       "id": "hint-1-keyword",
-      "frame": 80
+      "frame": 74
     },
     {
       "id": "hint-1-exit",
-      "frame": 113
+      "frame": 101
     },
     {
       "id": "hint-2-entry",
-      "frame": 125
+      "frame": 113
     },
     {
       "id": "hint-2-visual",
-      "frame": 143
+      "frame": 131
     },
     {
       "id": "hint-2-keyword",
-      "frame": 168
+      "frame": 152
     },
     {
       "id": "hint-2-exit",
-      "frame": 200
+      "frame": 179
     },
     {
       "id": "hint-3-entry",
-      "frame": 212
+      "frame": 191
     },
     {
       "id": "hint-3-visual",
-      "frame": 230
+      "frame": 209
     },
     {
       "id": "hint-3-keyword",
-      "frame": 255
+      "frame": 230
     },
     {
       "id": "hint-3-exit",
-      "frame": 287
+      "frame": 257
     },
     {
       "id": "countdown-0",
-      "frame": 299
+      "frame": 269
     },
     {
       "id": "countdown-1",
-      "frame": 319
+      "frame": 287
     },
     {
       "id": "countdown-2",
-      "frame": 339
+      "frame": 305
     },
     {
       "id": "reveal-shake",
-      "frame": 359
+      "frame": 323
     },
     {
       "id": "reveal-line",
-      "frame": 369
+      "frame": 333
     },
     {
       "id": "reveal-light",
-      "frame": 383
+      "frame": 347
     },
     {
       "id": "reveal-answer",
-      "frame": 397
+      "frame": 361
     },
     {
       "id": "reveal-payoff",
-      "frame": 415
+      "frame": 379
     },
     {
       "id": "cta-question",
-      "frame": 437
+      "frame": 395
     },
     {
       "id": "cta-one",
-      "frame": 449
+      "frame": 407
     },
     {
       "id": "cta-two",
-      "frame": 461
+      "frame": 419
     },
     {
       "id": "cta-three",
-      "frame": 473
+      "frame": 431
     },
     {
       "id": "cta-pulse",
-      "frame": 491
+      "frame": 449
     },
     {
       "id": "loop-start",
-      "frame": 530
+      "frame": 485
     },
     {
       "id": "loop-hook",
-      "frame": 541
+      "frame": 494
     }
   ],
   "theme": {

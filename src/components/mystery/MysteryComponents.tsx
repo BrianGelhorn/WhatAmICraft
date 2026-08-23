@@ -15,6 +15,8 @@ const clamp = {extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as c
 const ease = {...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1)};
 const SAFE_TOP = 170;
 const SAFE_BOTTOM = 1600;
+const fittedFontSize = (text: string, maximum: number, minimum: number, comfortableLength: number) =>
+  Math.max(minimum, Math.min(maximum, Math.floor(maximum * comfortableLength / Math.max(comfortableLength, text.length))));
 
 export const CategoryBadge: React.FC<{config: MysteryVideoConfig}> = ({config}) => (
   <div style={{
@@ -53,8 +55,10 @@ export const MysteryObject: React.FC<{
   const frame = useCurrentFrame();
   const intensity = config.visualIntensity === "high" ? 1 : config.visualIntensity === "medium" ? 0.65 : 0.35;
   const pulse = 1 + Math.sin(frame / 7) * 0.014 * intensity + reaction * 0.035;
+  const sway = Math.sin(frame / 13) * 2.4 * intensity;
+  const drift = Math.sin(frame / 9) * 3 * intensity;
   return (
-    <div style={{position: "relative", width: size, height: size, transform: `scale(${pulse})`}}>
+    <div style={{position: "relative", width: size, height: size, transform: `translateX(${drift}px) rotate(${sway}deg) scale(${pulse})`}}>
       <CanvasImage
         name="Exact answer silhouette"
         src={staticFile(config.answer.silhouette)}
@@ -70,7 +74,7 @@ export const MysteryObject: React.FC<{
 };
 
 export const HookQuestion: React.FC<{config: MysteryVideoConfig}> = ({config}) => (
-  <div style={{width: 930, color: config.theme.text, fontSize: config.hook.question.length > 27 ? 72 : 82, lineHeight: 1.02, textAlign: "center", textShadow: `0 8px 0 #02040A, 0 0 26px ${config.theme.accent}55`}}>
+  <div style={{width: 930, color: config.theme.text, fontSize: fittedFontSize(config.hook.question, 82, 62, 22), lineHeight: 1.02, textAlign: "center", overflowWrap: "anywhere", textShadow: `0 8px 0 #02040A, 0 0 26px ${config.theme.accent}55`}}>
     {config.hook.question}
   </div>
 );
@@ -80,6 +84,7 @@ export const HookScene: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
   const {fps} = useVideoConfig();
   const impact = spring({frame, fps, config: {damping: 15, stiffness: 220, mass: 0.45}});
   const ring = interpolate(frame, [0, config.timeline.hook.durationInFrames - 1], [1.08, 0.96], ease);
+  const scan = interpolate(frame, [0, config.timeline.hook.durationInFrames - 1], [10, 590], clamp);
   return (
     <AbsoluteFill name="Hook scene" style={{alignItems: "center"}}>
       <div style={{position: "absolute", top: 188}}><CategoryBadge config={config} /></div>
@@ -87,6 +92,7 @@ export const HookScene: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
       <div style={{position: "absolute", top: 540, width: 610, height: 610, display: "grid", placeItems: "center"}}>
         <div style={{position: "absolute", inset: 18, borderRadius: "50%", border: `5px solid ${config.theme.accent}`, opacity: 0.76, transform: `scale(${ring})`, boxShadow: `0 0 60px ${config.theme.accent}55`}} />
         <MysteryObject config={config} size={520} reaction={Math.sin(frame / 4) * 0.2 + 0.2} />
+        <div style={{position: "absolute", left: 48, top: scan, width: 514, height: 3, background: config.theme.accent, opacity: 0.26, boxShadow: `0 0 18px ${config.theme.accent}`}} />
       </div>
       <div style={{position: "absolute", top: 1238, padding: "13px 26px", borderRadius: 14, background: config.theme.urgency, color: "#10131C", fontSize: 34, letterSpacing: 3, boxShadow: "0 10px 0 rgba(0,0,0,.42)"}}>{config.hook.ruleText}</div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={frame} /></div>
@@ -109,7 +115,7 @@ export const HintKeyword: React.FC<{config: MysteryVideoConfig; hint: MysteryHin
         const enter = index === 0 ? 2 : switchFrame;
         const leave = index === hint.fragments.length - 1 ? durationInFrames : switchFrame + 4;
         const opacity = interpolate(frame, [enter, enter + 7, leave - 6, leave], [0, 1, 1, 0], ease);
-        return <div key={fragment} style={{position: "absolute", inset: 0, display: "grid", placeItems: "center", color: index === hint.fragments.length - 1 ? config.theme.accent : config.theme.text, fontSize: fragment.length > 20 ? 58 : 72, lineHeight: 1, textAlign: "center", textShadow: "0 8px 0 #02040A", opacity, transform: `translateY(${(1 - opacity) * 24}px) scale(${0.94 + opacity * 0.06})`}}>{fragment}</div>;
+        return <div key={fragment} style={{position: "absolute", inset: 0, display: "grid", placeItems: "center", color: index === hint.fragments.length - 1 ? config.theme.accent : config.theme.text, fontSize: fittedFontSize(fragment, 72, 54, 18), lineHeight: 1, textAlign: "center", overflowWrap: "anywhere", textShadow: "0 8px 0 #02040A", opacity, transform: `translateY(${(1 - opacity) * 24}px) scale(${0.94 + opacity * 0.06})`}}>{fragment}</div>;
       })}
     </div>
   );
@@ -191,17 +197,26 @@ export const CountdownScene: React.FC<{config: MysteryVideoConfig}> = ({config})
   const scene = config.timeline.countdown;
   const absoluteFrame = scene.from + frame;
   const voice = config.voice.segments.find((segment) => segment.id === "countdown");
-  const spokenNumbers = voice?.words.filter((word) => word.startFrame <= absoluteFrame).map((word) => normalizedWord(word.word)).filter((word) => ["three", "two", "one", "3", "2", "1"].includes(word)) ?? [];
-  const spoken = spokenNumbers[spokenNumbers.length - 1];
-  const fallback = config.countdown.values[Math.min(2, Math.floor(frame / (scene.durationInFrames / 3)))];
-  const value = spoken ? ({three: 3, two: 2, one: 1, "3": 3, "2": 2, "1": 1} as const)[spoken as "three" | "two" | "one" | "3" | "2" | "1"] : voice ? "" : fallback;
+  const numberWords = voice?.words.filter((word) => ["three", "two", "one", "3", "2", "1"].includes(normalizedWord(word.word))) ?? [];
+  const spokenWords = numberWords.filter((word) => word.startFrame <= absoluteFrame);
+  const activeTiming = spokenWords[spokenWords.length - 1];
   const step = scene.durationInFrames / 3;
-  const local = frame % step;
-  const scale = interpolate(local, [0, 5, step - 1], [0.72, 1.08, 0.92], ease);
+  const fallbackIndex = Math.min(2, Math.floor(frame / step));
+  const activeIndex = activeTiming ? numberWords.indexOf(activeTiming) : fallbackIndex;
+  const spoken = activeTiming ? normalizedWord(activeTiming.word) : "";
+  const fallback = config.countdown.values[fallbackIndex];
+  const value = spoken ? ({three: 3, two: 2, one: 1, "3": 3, "2": 2, "1": 1} as const)[spoken as "three" | "two" | "one" | "3" | "2" | "1"] : voice ? "" : fallback;
+  const nextStart = numberWords[activeIndex + 1]?.startFrame ?? scene.from + scene.durationInFrames;
+  const local = activeTiming ? absoluteFrame - activeTiming.startFrame : frame % step;
+  const activeDuration = activeTiming ? Math.max(8, nextStart - activeTiming.startFrame) : step;
+  const scale = interpolate(local, [0, 5, activeDuration - 1], [0.8, 1.15, 0.96], ease);
+  const numberColor = [config.theme.progress, config.theme.accent, config.theme.urgency][activeIndex] ?? config.theme.urgency;
+  const finalFlash = value === 1 ? interpolate(local, [0, 2, 5], [0, 0.72, 0], clamp) : 0;
   return (
     <AbsoluteFill name="Countdown" style={{alignItems: "center", background: `radial-gradient(circle at 50% 48%, ${config.theme.urgency}52, transparent 64%)`}}>
+      <AbsoluteFill style={{background: config.theme.text, opacity: finalFlash}} />
       <div style={{position: "absolute", top: 260, color: config.theme.text, fontSize: 62, textShadow: "0 8px 0 #02040A"}}>{config.countdown.displayText}</div>
-      <div style={{position: "absolute", top: 500, color: config.theme.urgency, fontSize: 330, textShadow: `0 18px 0 #02040A, 0 0 60px ${config.theme.urgency}`, transform: `scale(${scale})`}}>{value}</div>
+      <div style={{position: "absolute", top: 500, color: numberColor, fontSize: 330, textShadow: `0 18px 0 #02040A, 0 0 60px ${numberColor}`, transform: `scale(${scale})`}}>{value}</div>
       <div style={{position: "absolute", top: 1020}}><MysteryObject config={config} size={320} reaction={0.8} /></div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={absoluteFrame} /></div>
     </AbsoluteFill>
@@ -210,7 +225,7 @@ export const CountdownScene: React.FC<{config: MysteryVideoConfig}> = ({config})
 
 export const RevealTransform: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
   const frame = useCurrentFrame();
-  const reveal = interpolate(frame, [18, 42], [0, 1], ease);
+  const reveal = interpolate(frame, [24, 42], [0, 1], ease);
   const shake = frame < 18 ? Math.sin(frame * 2.6) * interpolate(frame, [0, 18], [1, 9], clamp) : 0;
   const sweep = interpolate(frame, [10, 34], [0, 1], ease);
   return (
@@ -218,17 +233,17 @@ export const RevealTransform: React.FC<{config: MysteryVideoConfig}> = ({config}
       <div style={{position: "absolute", inset: 45, borderRadius: "50%", border: `6px solid ${config.theme.answer}`, opacity: 0.35 + reveal * 0.65, transform: `scale(${0.8 + reveal * 0.2})`, boxShadow: `0 0 ${40 + reveal * 60}px ${config.theme.answer}88`}} />
       <MysteryObject config={config} size={550} progress={reveal} reaction={reveal} />
       <div style={{position: "absolute", left: `${sweep * 100}%`, top: 60, width: 10, height: 580, background: config.theme.text, opacity: frame < 38 ? 0.8 : 0, boxShadow: `0 0 40px 18px ${config.theme.answer}`}} />
-      {[0, 1, 2, 3, 4, 5].map((index) => <div key={index} style={{position: "absolute", width: 16, height: 16, background: index % 2 ? config.theme.accent : config.theme.answer, left: 342 + Math.cos(index) * reveal * 300, top: 342 + Math.sin(index) * reveal * 300, opacity: reveal}} />)}
+      {(config.renderMode === "preview" ? [0, 2, 4] : [0, 1, 2, 3, 4, 5]).map((index) => <div key={index} style={{position: "absolute", width: 16, height: 16, background: index % 2 ? config.theme.accent : config.theme.answer, left: 342 + Math.cos(index) * reveal * 300, top: 342 + Math.sin(index) * reveal * 300, opacity: reveal}} />)}
     </div>
   );
 };
 
 export const RevealAnswer: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
   const frame = useCurrentFrame();
-  const answer = interpolate(frame, [36, 48], [0, 1], ease);
+  const answer = interpolate(frame, [30, 39], [0, 1], ease);
   return (
     <>
-      <div style={{position: "absolute", top: 205, color: config.theme.accent, fontSize: 36, letterSpacing: 6, opacity: interpolate(frame, [4, 12, 34, 40], [0, 1, 1, 0], clamp)}}>{config.reveal.preRevealText}</div>
+      <div style={{position: "absolute", top: 205, color: config.theme.accent, fontSize: 36, letterSpacing: 6, opacity: interpolate(frame, [4, 12, 22, 26], [0, 1, 1, 0], clamp)}}>{config.reveal.preRevealText}</div>
       <div style={{position: "absolute", top: 1220, color: config.theme.answer, fontSize: 116, textShadow: "0 10px 0 #02040A", opacity: answer, transform: `scale(${0.88 + answer * 0.12})`}}>{config.reveal.answerText}</div>
     </>
   );
@@ -236,8 +251,10 @@ export const RevealAnswer: React.FC<{config: MysteryVideoConfig}> = ({config}) =
 
 export const RevealScene: React.FC<{config: MysteryVideoConfig}> = ({config}) => {
   const frame = useCurrentFrame();
+  const flash = interpolate(frame, [22, 24, 27], [0, 0.88, 0], clamp);
   return (
     <AbsoluteFill name="Reveal" style={{alignItems: "center", background: `radial-gradient(circle at 50% 48%, ${config.theme.answer}48, transparent 64%)`}}>
+      <AbsoluteFill style={{background: config.theme.text, opacity: flash}} />
       <RevealAnswer config={config} />
       <div style={{position: "absolute", top: 390}}><RevealTransform config={config} /></div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={config.timeline.reveal.from + frame} /></div>
@@ -260,8 +277,9 @@ export const CommentCTA: React.FC<{config: MysteryVideoConfig}> = ({config}) => 
   return (
     <AbsoluteFill name="Comment CTA" style={{alignItems: "center"}}>
       <div style={{position: "absolute", top: 305}}><MysteryObject config={config} progress={1} size={420} reaction={0.35} /></div>
-      <div style={{position: "absolute", top: 790, width: 930, color: config.theme.text, fontSize: 68, lineHeight: 1.04, textAlign: "center", textShadow: "0 8px 0 #02040A"}}>{config.cta.text}</div>
+      <div style={{position: "absolute", top: 790, width: 930, color: config.theme.text, fontSize: fittedFontSize(config.cta.text, 68, 52, 22), lineHeight: 1.04, textAlign: "center", overflowWrap: "anywhere", textShadow: "0 8px 0 #02040A"}}>{config.cta.text}</div>
       <div style={{position: "absolute", top: 1015}}><NumberOptions config={config} frame={frame} /></div>
+      <div style={{position: "absolute", top: 1210, width: 900, color: config.theme.muted, fontFamily: config.theme.bodyFont, fontSize: fittedFontSize(config.cta.prompt, 34, 27, 32), letterSpacing: 2, textAlign: "center"}}>{config.cta.prompt}</div>
       <div style={{position: "absolute", top: 1392}}><GlobalProgress config={config} absoluteFrame={config.timeline.cta.from + frame} /></div>
     </AbsoluteFill>
   );
@@ -286,7 +304,7 @@ export const LoopBridge: React.FC<{config: MysteryVideoConfig}> = ({config}) => 
       <div style={{position: "absolute", top: 790, width: 930, color: config.theme.text, fontSize: 68, textAlign: "center", opacity: 1 - progress}}>{config.cta.text}</div>
       <div style={{position: "absolute", top: 1015}}><NumberOptions config={config} frame={50} opacity={1 - progress} /></div>
       <div style={{position: "absolute", top: 1238, padding: "13px 26px", borderRadius: 14, background: config.theme.urgency, color: "#10131C", fontSize: 34, letterSpacing: 3, opacity: progress}}>{config.hook.ruleText}</div>
-      <div style={{position: "absolute", top: 1392, opacity: progress}}><GlobalProgress config={config} absoluteFrame={Math.floor(progress * config.timeline.hook.durationInFrames)} /></div>
+      <div style={{position: "absolute", top: 1392, opacity: progress}}><GlobalProgress config={config} absoluteFrame={Math.floor((1 - progress) * Math.max(0, config.timeline.loop.from - 1))} /></div>
     </AbsoluteFill>
   );
 };

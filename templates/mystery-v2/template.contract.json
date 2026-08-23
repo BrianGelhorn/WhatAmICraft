@@ -2,7 +2,7 @@
   "template": "mystery-v2",
   "compositionId": "MysteryVideo",
   "fps": 30,
-  "durationInFrames": 542,
+  "durationInFrames": 495,
   "automation": {
     "format": "mystery-v2",
     "inputPath": "data/mystery-v2-episodes.json",
@@ -27,6 +27,7 @@
     "generatedFields": [
       "hook",
       "cta",
+      "renderMode",
       "timeline",
       "voice.segments[]",
       "voice.segments[].words[]",
@@ -52,13 +53,13 @@
   },
   "scenes": [
     {"id": "hook", "from": 0, "durationInFrames": 35},
-    {"id": "hint-1", "from": 35, "durationInFrames": 90},
-    {"id": "hint-2", "from": 125, "durationInFrames": 87},
-    {"id": "hint-3", "from": 212, "durationInFrames": 87},
-    {"id": "countdown", "from": 299, "durationInFrames": 60},
-    {"id": "reveal", "from": 359, "durationInFrames": 78},
-    {"id": "cta", "from": 437, "durationInFrames": 93},
-    {"id": "loop", "from": 530, "durationInFrames": 12}
+    {"id": "hint-1", "from": 35, "durationInFrames": 78},
+    {"id": "hint-2", "from": 113, "durationInFrames": 78},
+    {"id": "hint-3", "from": 191, "durationInFrames": 78},
+    {"id": "countdown", "from": 269, "durationInFrames": 54},
+    {"id": "reveal", "from": 323, "durationInFrames": 72},
+    {"id": "cta", "from": 395, "durationInFrames": 90},
+    {"id": "loop", "from": 485, "durationInFrames": 10}
   ],
   "animationPolicy": {
     "allowed": ["fade", "translate", "scale", "rotate"],

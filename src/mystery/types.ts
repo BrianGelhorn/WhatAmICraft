@@ -1,4 +1,5 @@
 export type MysteryVariant = "fast" | "balanced" | "comment_bait";
+export type MysteryRenderMode = "preview" | "final";
 export type VisualIntensity = "low" | "medium" | "high";
 export type HintVisualType = "durability" | "combat" | "mob" | "recipe" | "generic";
 
@@ -39,6 +40,7 @@ export type MysteryVideoConfig = {
   format: "mystery-v2";
   language: string;
   variant: MysteryVariant;
+  renderMode: MysteryRenderMode;
   hookVariant: string;
   ctaVariant: string;
   visualIntensity: VisualIntensity;
@@ -49,7 +51,7 @@ export type MysteryVideoConfig = {
   hints: [MysteryHint, MysteryHint, MysteryHint];
   countdown: {displayText: string; values: number[]};
   reveal: {preRevealText: string; answerText: string};
-  cta: {text: string; options: string[]};
+  cta: {text: string; prompt: string; options: string[]};
   timeline: MysteryTimeline;
   retentionBeats: Array<{id: string; frame: number}>;
   theme: {

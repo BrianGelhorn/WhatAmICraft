@@ -17,7 +17,7 @@
       "background": "images/template-layers/background.png",
       "hookOptions": {
         "question-first": {
-          "displayText": "CAN YOU NAME THIS WEAPON?",
+          "displayText": "CAN YOU NAME IT?",
           "voiceText": "Name it."
         },
         "difficulty-challenge": {
@@ -82,11 +82,13 @@
       "ctaOptions": {
         "hint-count": {
           "displayText": "COMMENT 1, 2, OR 3",
+          "promptText": "HOW MANY HINTS DID YOU NEED?",
           "voiceText": "How many hints did you need?",
           "options": ["1", "2", "3"]
         },
         "score": {
           "displayText": "COMMENT YOUR SCORE: 1, 2, OR 3",
+          "promptText": "WHAT SCORE DID YOU GET?",
           "voiceText": "Comment your score.",
           "options": ["1", "2", "3"]
         }
@@ -96,28 +98,28 @@
           "hookVariant": "timer-challenge",
           "ctaVariant": "hint-count",
           "visualIntensity": "high",
-          "hypothesis": "A 15 second challenge increases completion rate.",
+          "hypothesis": "A 15.5 second challenge increases completion rate.",
           "timeline": {
             "hook": 35,
-            "hints": [75, 75, 75],
-            "countdown": 60,
-            "reveal": 75,
-            "cta": 69,
-            "loop": 9
+            "hints": [72, 72, 72],
+            "countdown": 54,
+            "reveal": 72,
+            "cta": 78,
+            "loop": 10
           }
         },
         "balanced": {
           "hookVariant": "question-first",
           "ctaVariant": "hint-count",
           "visualIntensity": "medium",
-          "hypothesis": "A 17.9 second pace balances comprehension and completion.",
+          "hypothesis": "A 16.5 second pace balances comprehension and completion.",
           "timeline": {
             "hook": 35,
-            "hints": [90, 87, 87],
-            "countdown": 60,
-            "reveal": 78,
-            "cta": 93,
-            "loop": 12
+            "hints": [78, 78, 78],
+            "countdown": 54,
+            "reveal": 72,
+            "cta": 90,
+            "loop": 10
           }
         },
         "comment_bait": {
@@ -128,8 +130,8 @@
           "timeline": {
             "hook": 35,
             "hints": [81, 78, 78],
-            "countdown": 60,
-            "reveal": 75,
+            "countdown": 54,
+            "reveal": 72,
             "cta": 96,
             "loop": 12
           }
