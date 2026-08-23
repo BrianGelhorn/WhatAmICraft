@@ -58,7 +58,7 @@ assert all(item["answer"]["id"] != "crossbow" for item in read_json(BANK_PATH)["
 component = (ROOT / "src/components/mystery/MysteryComponents.tsx").read_text(encoding="utf-8")
 for name in (
     "HookScene", "HookQuestion", "MysteryObject", "CategoryBadge", "GlobalProgress", "HintScene",
-    "HintHeader", "HintKeyword", "HintVisual", "ItemStateVisual", "ItemVersusEntityVisual", "EntityHoldsAnswerVisual",
+    "HintHeader", "HintKeyword", "HintVisual", "InventoryPropertiesPrefab", "ItemEntityInteractionPrefab", "EntityEquipmentPrefab",
     "CountdownScene", "RevealTransform", "RevealAnswer", "CommentCTA", "CaptionRenderer", "AudioTimeline",
     "MusicDucker", "LoopBridge", "SafeZoneOverlay", "DebugTimeline",
 ):
@@ -69,14 +69,18 @@ assert "SAFE_TOP = 170" in component and "SAFE_BOTTOM = 1600" in component
 assert "activeTiming.startFrame" in component and "config.cta.prompt" in component
 assert 'config.renderMode === "preview"' in component
 assert episode["hints"][1]["visual"]["supportingAsset"].endswith("/ZOMBIE.png")
-assert [hint["visual"]["scene"] for hint in episode["hints"]] == ["item-state", "item-versus-entity", "entity-holds-answer"]
+assert [hint["visual"]["prefab"] for hint in episode["hints"]] == ["inventory-properties", "item-entity-interaction", "entity-equipment"]
+assert [[step["type"] for step in hint["visual"]["steps"]] for hint in episode["hints"]] == [["durability", "stack-limit"], ["melee", "ranged"], ["holds-answer"]]
 assert episode["hints"][0]["voiceText"] == "Loses durability. Won't stack."
 assert "wears down" not in episode["hints"][0]["voiceText"].lower()
 for decorative_primitive in ("finalFlash", "const sweep", "const scan", "borderRight:", "width: `${progress * 100}%`"):
     assert decorative_primitive not in component
-assert "ItemVersusEntityVisual config={config} hint={hint}" in component
+assert "ItemEntityInteractionPrefab config={config} hint={hint}" in component
 assert "return <MysteryObject config={config} size={340}" not in component
-assert "config.hook.emphasis" in component and "DURABILITY ↓" in component and "const wear =" not in component
+assert "config.hook.emphasis" in component and "activeStep.label" in component and "const wear =" not in component
+
+schema = read_json(ROOT / "schemas/mystery-v2-episode.schema.json")
+assert schema["properties"]["schema_version"]["const"] == 2
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryVideo"' in root and "fps={30}" in root and "width={1080}" in root and "height={1920}" in root
@@ -114,8 +118,28 @@ contradictory_cta["ctaOptions"]["hint-count"]["displayText"] = "DID YOU GET IT?"
 rejected(contradictory_cta, "CTA contradictorio")
 
 unknown_visual = deepcopy(episode)
-unknown_visual["hints"][0]["visual"]["scene"] = "generic"
-rejected(unknown_visual, "receta implementada")
+unknown_visual["hints"][0]["visual"]["prefab"] = "generic"
+rejected(unknown_visual, "prefabricado implementado")
+
+wrong_prefab_step = deepcopy(episode)
+wrong_prefab_step["hints"][0]["visual"]["steps"][0]["type"] = "melee"
+rejected(wrong_prefab_step, "no es compatible")
+
+late_first_step = deepcopy(episode)
+late_first_step["hints"][0]["visual"]["steps"][0]["from"] = 0.1
+rejected(late_first_step, "debe empezar en 0")
+
+duplicate_step_time = deepcopy(episode)
+duplicate_step_time["hints"][0]["visual"]["steps"][1]["from"] = 0
+rejected(duplicate_step_time, "únicos y ascendentes")
+
+missing_stack_value = deepcopy(episode)
+del missing_stack_value["hints"][0]["visual"]["steps"][1]["value"]
+rejected(missing_stack_value, ".value")
+
+fragment_step_mismatch = deepcopy(episode)
+fragment_step_mismatch["hints"][0]["fragments"] = fragment_step_mismatch["hints"][0]["fragments"][:1]
+rejected(fragment_step_mismatch, "cantidad de fragments")
 
 missing_supporting_asset = deepcopy(episode)
 del missing_supporting_asset["hints"][1]["visual"]["supportingAsset"]
