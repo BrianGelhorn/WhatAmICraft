@@ -32,6 +32,10 @@ assert "useCurrentFrame() % 84" in durability
 assert "breakPieces" in durability and "clipPath" in durability
 assert "<DurabilityLossVisual assetSrc={a}" in component
 assert "<EnchantmentGlintVisual assetSrc={a}" in component
+assert "<CooldownVisual assetSrc={a}" in component
+cooldown = (ROOT / "src/components/mystery/CooldownVisual.tsx").read_text(encoding="utf-8")
+assert 'label = ready ? "READY" : inUse ? "USE!" : "WAIT"' in cooldown
+assert "conic-gradient" in cooldown and "progress * 100" in cooldown
 
 root = (ROOT / "src/Root.tsx").read_text(encoding="utf-8")
 assert 'id="MysteryPrefabGallery"' in root and "width={3840}" in root and "height={2160}" in root
