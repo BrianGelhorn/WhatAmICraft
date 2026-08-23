@@ -10,7 +10,7 @@
       "title": "PIERDE DURABILIDAD",
       "role": "property-state",
       "status": "draft",
-      "description": "La barra baja en escalones cada vez más rápidos hasta que el objeto se rompe.",
+      "description": "Impactos acelerados bajan la barra por escalones hasta romper el objeto.",
       "relations": [
         "durability",
         "wear",
