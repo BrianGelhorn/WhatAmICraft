@@ -69,6 +69,7 @@ services:
     environment:
       <<: *publishing-environment
       DASHBOARD_PORT: 8787
+      JOB_OWNER: dashboard
       CLUES_API_URL: http://clues-api:8790
       ANALYTICS_API_URL: http://analytics-api:8791
       MONITOR_API_URL: http://monitor:8792
@@ -138,6 +139,7 @@ services:
     environment:
       <<: *publishing-environment
       PUBLISH_QUEUE_INTERVAL: ${PUBLISH_QUEUE_INTERVAL:-30}
+      JOB_OWNER: publisher-worker
       ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
       ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
       REMOTION_CONCURRENCY: ${REMOTION_CONCURRENCY:-1}
