@@ -47,6 +47,17 @@ if [ -d "$release_dir/data/new-clues-20260815" ]; then
     "$app_dir/data/new-clues-20260815/"
 fi
 
+# Trigger the Debian automount before Docker creates bind mounts into it.
+video_path="${VIDEO_STORAGE_PATH:-/srv/minecraft-videos/episodes}"
+for attempt in $(seq 1 36); do
+  [ -d "$video_path" ] && break
+  sleep 5
+done
+[ -d "$video_path" ] || {
+  echo "Production video storage is unavailable: $video_path" >&2
+  exit 1
+}
+
 sudo -n /usr/local/sbin/whatamicraft-up
 
 for attempt in $(seq 1 60); do

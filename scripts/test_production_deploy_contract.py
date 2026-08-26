@@ -25,6 +25,7 @@ def main() -> None:
     assert "push:" in staging and "- main" in staging
     assert '"$GITHUB_WORKSPACE/scripts/backup_state.py" --quiet' in script
     assert '--root "$app_dir" --backup-dir "$app_dir/backups/ops"' in script
+    assert "video storage" in script and "/srv/minecraft-videos/episodes" in script
     for required in (
         "archive --format=tar",
         "rsync -a --delete",
