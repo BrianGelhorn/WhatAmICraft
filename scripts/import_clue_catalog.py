@@ -8,6 +8,8 @@ import json
 import re
 from pathlib import Path
 
+from clues_api import NEW_TARGET_EDITION, NEW_TARGET_VERSION
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIR = ROOT / "data/new-clues-20260815"
@@ -103,6 +105,8 @@ def main() -> None:
             raise RuntimeError(f"El objetivo ya fue usado: {target_id}")
         if target_id in existing_targets:
             continue
+        if source["target"].get("edition") != NEW_TARGET_EDITION or source["target"].get("version") != NEW_TARGET_VERSION:
+            raise RuntimeError("Las nuevas pistas deben usar Minecraft Java 26.1")
         episode_id = next_episode_id(existing_ids)
         episode = build_episode(template, episode_id, source)
         episodes.append(episode)

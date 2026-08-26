@@ -15,6 +15,8 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET_ID = re.compile(r"^[a-z0-9]+(?:[_-][a-z0-9]+)*$")
+NEW_TARGET_EDITION = "java"
+NEW_TARGET_VERSION = "26.1"
 
 
 class CatalogError(ValueError):
@@ -201,7 +203,10 @@ class ClueCatalog:
 
     def upload(self, value: dict) -> dict:
         value = self.validate_upload(value)
-        target_id = value["episode"]["target"]["id"]
+        target = value["episode"]["target"]
+        if target["edition"] != NEW_TARGET_EDITION or target["version"] != NEW_TARGET_VERSION:
+            raise CatalogError("Las nuevas cargas deben usar Minecraft Java 26.1")
+        target_id = target["id"]
         with self._write_lock:
             if target_id in self._used() or any(item["id"] == target_id for item in self.records()):
                 raise FileExistsError(target_id)

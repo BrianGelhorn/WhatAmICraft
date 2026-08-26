@@ -30,7 +30,7 @@ def call(base: str, path: str, method: str = "GET", value: dict | None = None) -
 def upload_fixture() -> dict:
     return {
         "episode": {
-            "target": {"id": "ci_clue", "display_name": "CI Clue", "edition": "java", "version": "1.21.5", "kind": "item", "family": "test item"},
+            "target": {"id": "ci_clue", "display_name": "CI Clue", "edition": "java", "version": "26.1", "kind": "item", "family": "test item"},
             "mode": "open_answer",
             "difficulty": "medium",
             "clue_count": 3,
@@ -116,6 +116,10 @@ def main() -> None:
         invalid["episode"]["clue_count"] = 2
         invalid_status, _ = call(base, "/api/clues", "POST", invalid)
         assert invalid_status == 400
+        legacy = upload_fixture()
+        legacy["episode"]["target"]["version"] = "1.21.5"
+        legacy_status, legacy_body = call(base, "/api/clues", "POST", legacy)
+        assert legacy_status == 400 and "Java 26.1" in legacy_body["error"]
     finally:
         server.shutdown()
         thread.join(timeout=5)

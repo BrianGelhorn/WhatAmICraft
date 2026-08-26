@@ -104,7 +104,7 @@ def refresh() -> dict:
     result = {
         "schema_version": 1,
         "edition": bank.get("episodes", [{}])[0].get("answer", {}).get("edition", "java"),
-        "version": bank.get("episodes", [{}])[0].get("answer", {}).get("version", "1.21.5"),
+        "version": bank.get("episodes", [{}])[0].get("answer", {}).get("version", "26.1"),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "target_ids": [item["id"] for item in targets],
         "targets": targets,
