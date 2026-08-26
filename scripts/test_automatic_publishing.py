@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import json
+import os
 import shutil
 import sys
 from datetime import datetime, timezone
@@ -15,6 +17,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import publish  # noqa: E402
 import publish_worker as worker  # noqa: E402
+import job_status  # noqa: E402
 from template_artifacts import release_version, render_props_path, write_artifact  # noqa: E402
 
 
@@ -55,8 +58,38 @@ def check_generation_lane_guard() -> None:
         shutil.rmtree(fixture, ignore_errors=True)
 
 
+def check_stale_generation_job_recovery() -> None:
+    fixture = ROOT / "out/test-job-status"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    generation = fixture / "generation.json"
+    main = fixture / "main.json"
+    job = {"status": "running", "source": "automatic", "pid": 999999, "owner": "", "lines": []}
+    generation.write_text(json.dumps(job), encoding="utf-8")
+    main.write_text(json.dumps({**job, "source": "manual"}), encoding="utf-8")
+    original_paths = job_status.JOB_PATHS
+    original_owner = os.environ.get("JOB_OWNER")
+    original_alive = job_status._process_alive
+    try:
+        job_status.JOB_PATHS = {"main": main, "generation": generation, "publishing": fixture / "publishing.json"}
+        os.environ["JOB_OWNER"] = "publisher-worker"
+        job_status._process_alive = lambda _pid: False
+        assert job_status.read_job("generation")["status"] == "failed"
+        assert json.loads(generation.read_text(encoding="utf-8"))["status"] == "failed"
+        assert job_status.read_job("main")["status"] == "running"
+    finally:
+        job_status.JOB_PATHS = original_paths
+        job_status._process_alive = original_alive
+        if original_owner is None:
+            os.environ.pop("JOB_OWNER", None)
+        else:
+            os.environ["JOB_OWNER"] = original_owner
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
 def main() -> None:
     check_generation_lane_guard()
+    check_stale_generation_job_recovery()
     fixture = ROOT / "out/test-automatic-publishing"
     shutil.rmtree(fixture, ignore_errors=True)
     output = fixture / "out/episodes"
