@@ -10,6 +10,7 @@ JOB_PATHS = {
     "generation": ROOT / "out/current-generation-job.json",
     "publishing": ROOT / "out/current-publishing-job.json",
 }
+LEGACY_OWNERS = {"automatic": "publisher-worker", "manual": "dashboard"}
 
 
 def _now() -> str:
@@ -36,13 +37,12 @@ def _read_job(lane: str) -> dict:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
         job = {**_default(), **value}
-        if (
-            job["status"] == "running"
-            and job["pid"]
-            and job.get("owner")
-            and job.get("owner") == os.getenv("JOB_OWNER")
-            and not _process_alive(job["pid"])
-        ):
+        current_owner = os.getenv("JOB_OWNER")
+        owned = current_owner and (
+            job.get("owner") == current_owner
+            or (not job.get("owner") and LEGACY_OWNERS.get(job.get("source")) == current_owner)
+        )
+        if job["status"] == "running" and job["pid"] and owned and not _process_alive(job["pid"]):
             job.update({
                 "status": "failed",
                 "returnCode": -1,
