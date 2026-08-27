@@ -966,7 +966,7 @@
     function renderDiagnostics() {
       if (!diagnostics) return;
       const c = diagnostics.counts, d = diagnostics.disk, db = diagnostics.database;
-      const failingStates = new Set(['failed', 'stopped', 'unhealthy', 'missing']);
+      const failingStates = new Set(['failed', 'stopped', 'unhealthy', 'missing', 'unknown']);
       const healthy = diagnostics.internet && !diagnostics.services.some(service => failingStates.has(service.state));
       $('live-status').classList.toggle('bad', !healthy);
       $('live-status-text').textContent = healthy ? 'Sistema operativo' : 'Revisar sistema';
