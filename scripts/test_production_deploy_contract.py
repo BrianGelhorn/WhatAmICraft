@@ -29,6 +29,7 @@ def main() -> None:
     assert "DEPLOY_DRAIN_TIMEOUT_SECONDS" in script
     assert "release_marker" in script and "DEPLOY_SHA" in script
     assert "active-template-version" in script and "previous_release" in script
+    assert "video storage" in script and "/srv/minecraft-videos/episodes" in script
     for required in (
         "archive --format=tar",
         "rsync -a --delete",
@@ -37,6 +38,9 @@ def main() -> None:
         "--exclude=/.env",
         "sudo -n /usr/local/sbin/whatamicraft-up",
         "127.0.0.1:8787/health",
+        "docker-disk-cleanup.service",
+        "docker-disk-cleanup.timer",
+        "systemctl --user daemon-reload",
     ):
         assert required in script, required
     assert "ssh " not in script and "scp " not in script
