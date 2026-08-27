@@ -9,7 +9,7 @@
     "@elevenlabs/elevenlabs-js": "^2.64.0",
     "@remotion/captions": "4.0.512",
     "@remotion/cli": "4.0.512",
-    "@remotion/media": "4.0.512",
+    "@remotion/media": "4.0.516",
     "dotenv": "^17.4.2",
     "minecraft-data": "^3.113.2",
     "react": "19.2.8",
