@@ -792,7 +792,7 @@
     }
 
     function videoBucket(episode) {
-      if (episode.platforms.length) return 'published';
+      if (episode.platforms.length || (episode.historicalPlatforms || []).length) return 'published';
       if (episode.queueStatus === 'pending') return 'queued';
       if (!episode.hasVideo) return 'generate';
       return 'attention';
@@ -817,7 +817,8 @@
       });
       $('video-result-count').textContent = `${visible.length} ${visible.length === 1 ? 'resultado' : 'resultados'}`;
       $('video-inventory').innerHTML = visible.map(episode => {
-        const published = episode.platforms.length > 0;
+        const publishedPlatforms = episode.platforms.length ? episode.platforms : (episode.historicalPlatforms || []);
+        const published = publishedPlatforms.length > 0;
         const canApprove = episode.hasVideo && !episode.needsReview && !episode.queueStatus && !published;
         const secondary = episode.hasVideo ? `
           <details class="row-menu"><summary>Más</summary><div class="row-menu-content">
@@ -829,9 +830,9 @@
           <td><div class="episode-cell"><strong>${escapeHtml(episode.id)}</strong><small>${escapeHtml(episode.formatLabel)}</small></div></td>
           <td><div class="episode-cell"><strong>${escapeHtml(episode.target)}</strong><small>${escapeHtml(episode.kind)}</small></div></td>
           <td><span class="status ${statusClass(episode)}">${escapeHtml(episode.status)}</span></td>
-          <td class="hide-mobile published">${published ? episode.platforms.map(escapeHtml).join(' · ') : '—'}</td>
+          <td class="hide-mobile published">${published ? publishedPlatforms.map(escapeHtml).join(' · ') : '—'}</td>
           <td><div class="row-actions">
-            ${episode.hasVideo ? '<button data-action="inspect">Ver</button>' : `<button class="primary" data-action="generate" ${jobRunning ? 'disabled' : ''}>Generar</button>`}
+            ${episode.hasVideo ? '<button data-action="inspect">Ver</button>' : published ? '<span class="hint">Histórico</span>' : `<button class="primary" data-action="generate" ${jobRunning ? 'disabled' : ''}>Generar</button>`}
             ${canApprove ? '<button class="primary" data-action="approve">Aprobar</button>' : ''}
             ${episode.queueStatus ? '<button data-action="unqueue">Quitar de cola</button>' : ''}
             ${secondary}
