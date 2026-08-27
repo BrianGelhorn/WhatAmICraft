@@ -24,6 +24,80 @@ def fail(errors: list[str], message: str) -> None:
     errors.append(message)
 
 
+def validate_retention(retention: object, manifest: dict, intro: dict, audio: dict, errors: list[str]) -> None:
+    if not isinstance(retention, dict):
+        fail(errors, "retention must be an object")
+        return
+
+    variants = {"fast", "balanced", "hard_mode", "comment_bait"}
+    if retention.get("variant") not in variants:
+        fail(errors, "retention.variant must be fast, balanced, hard_mode, or comment_bait")
+    declared_variants = retention.get("variants")
+    if not isinstance(declared_variants, list) or not variants.issubset(declared_variants):
+        fail(errors, "retention.variants must declare fast, balanced, hard_mode, and comment_bait")
+
+    duration_range = retention.get("durationRangeInFrames")
+    duration = manifest.get("durationInFrames")
+    if (
+        not isinstance(duration_range, list)
+        or len(duration_range) != 2
+        or not all(isinstance(value, int) for value in duration_range)
+        or duration_range[0] <= 0
+        or duration_range[0] > duration_range[1]
+        or not isinstance(duration, int)
+        or not duration_range[0] <= duration <= duration_range[1]
+    ):
+        fail(errors, "retention.durationRangeInFrames must contain the manifest duration")
+
+    question_limit = retention.get("questionMaxStartFrame")
+    if not isinstance(question_limit, int) or question_limit < 0:
+        fail(errors, "retention.questionMaxStartFrame must be a non-negative integer")
+    else:
+        question_cues = [
+            cue for cue in audio.get("cues", [])
+            if cue.get("role") == "voice" and cue.get("visualEvent") == "question-visible"
+        ]
+        if audio.get("status") == "complete" and (
+            not question_cues or not isinstance(question_cues[0].get("from"), int)
+            or question_cues[0]["from"] > question_limit
+        ):
+            fail(errors, "retention requires a question voice cue at or before questionMaxStartFrame")
+
+    max_gap = retention.get("maxVisualGapFrames")
+    beats = intro.get("visualBeats", [])
+    beat_frames = [beat.get("from") for beat in beats if isinstance(beat, dict)]
+    if not isinstance(max_gap, int) or max_gap <= 0 or not beat_frames or beat_frames[0] != 0:
+        fail(errors, "retention.maxVisualGapFrames and intro.visualBeats from frame 0 are required")
+    elif (
+        any(not isinstance(frame, int) or frame < 0 for frame in beat_frames)
+        or any(current < previous or current - previous > max_gap for previous, current in zip(beat_frames, beat_frames[1:]))
+        or not isinstance(duration, int)
+        or duration - beat_frames[-1] > max_gap
+    ):
+        fail(errors, "retention visual beats exceed maxVisualGapFrames")
+
+    answer_asset = retention.get("answerAsset")
+    silhouette_asset = retention.get("silhouetteAsset")
+    if (
+        not isinstance(answer_asset, str) or not answer_asset or BAD_SOURCE.match(answer_asset)
+        or not isinstance(silhouette_asset, str) or not silhouette_asset or BAD_SOURCE.match(silhouette_asset)
+    ):
+        fail(errors, "retention answerAsset and silhouetteAsset must be local declared paths")
+
+    cta = retention.get("cta")
+    if (
+        not isinstance(cta, dict)
+        or not isinstance(cta.get("from"), int)
+        or not isinstance(cta.get("durationInFrames"), int)
+        or cta["from"] < 0
+        or cta["durationInFrames"] < 45
+        or not isinstance(duration, int)
+        or cta["from"] + cta["durationInFrames"] > duration
+        or cta.get("quantified") is not True
+    ):
+        fail(errors, "retention.cta must be quantified, last at least 45 frames, and fit the composition")
+
+
 def validate(manifest_path: Path, root: Path, source_dir: Path) -> list[str]:
     errors: list[str] = []
     try:
@@ -51,6 +125,9 @@ def validate(manifest_path: Path, root: Path, source_dir: Path) -> list[str]:
         fail(errors, f"intro.contentStartFrame debe iniciar el contenido antes de {max_content_start} frames")
     if isinstance(content_start, int) and isinstance(hook_duration, int) and isinstance(handoff_duration, int) and content_start > hook_duration + handoff_duration:
         fail(errors, "intro.contentStartFrame ocurre después del hook y el pase definidos")
+
+    if "retention" in manifest:
+        validate_retention(manifest["retention"], manifest, intro, manifest.get("audio", {}), errors)
 
     automation = manifest.get("automation", {})
     required_automation = ("format", "inputPath", "schemaPath", "producer", "generatedConfigPath", "editableFields", "generatedFields")

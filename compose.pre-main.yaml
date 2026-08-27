@@ -1,0 +1,129 @@
+x-app-build: &app-build
+  context: .
+  dockerfile: Dockerfile
+
+services:
+  dashboard:
+    image: whatamicraft-pre-main:local
+    build: *app-build
+    entrypoint: ["python3", "dashboard/app.py"]
+    restart: unless-stopped
+    environment:
+      DASHBOARD_PORT: 8787
+      CLUES_API_URL: http://clues-api:8790
+      ANALYTICS_API_URL: http://analytics-api:8791
+      MONITOR_API_URL: http://monitor:8792
+      PUBLIC_VIDEO_BASE_URL: http://127.0.0.1:8088
+      YOUTUBE_PRIVACY_STATUS: private
+      YOUTUBE_CATEGORY_ID: 20
+      ELEVENLABS_VOICE_ID: ""
+      ELEVENLABS_MODEL: eleven_v3
+      REMOTION_CONCURRENCY: "1"
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_REVIEW_CHAT_ID: ""
+      YOUTUBE_CLIENT_ID: ""
+      YOUTUBE_CLIENT_SECRET: ""
+      YOUTUBE_REFRESH_TOKEN: ""
+      TIKTOK_ACCESS_TOKEN: ""
+      TIKTOK_CLIENT_KEY: ""
+      TIKTOK_CLIENT_SECRET: ""
+      INSTAGRAM_ACCESS_TOKEN: ""
+      INSTAGRAM_USER_ID: ""
+      META_ACCESS_TOKEN: ""
+      FACEBOOK_PAGE_ID: ""
+    ports:
+      - "127.0.0.1:8878:8787"
+    volumes:
+      - ./staging/runtime/pre-main/data:/app/data
+      - ./staging/runtime/pre-main/out:/app/out
+      - ./staging/runtime/pre-main/backups:/app/backups
+    depends_on:
+      - clues-api
+      - analytics-api
+      - monitor
+
+  clues-api:
+    image: whatamicraft-pre-main:local
+    build: *app-build
+    entrypoint: ["python3", "scripts/clues_api.py"]
+    restart: unless-stopped
+    environment:
+      CLUES_PORT: 8790
+      CLUES_SOURCE_DIR: /app/data/new-clues-20260815
+      CLUES_UPLOAD_DIR: /app/data/clues/inbox
+      CLUES_USED_TARGETS_PATH: /app/data/used-targets.json
+    volumes:
+      - ./staging/runtime/pre-main/data:/app/data
+
+  analytics-api:
+    image: whatamicraft-pre-main:local
+    build: *app-build
+    entrypoint: ["python3", "scripts/analytics_service.py"]
+    restart: unless-stopped
+    environment:
+      ANALYTICS_PORT: 8791
+      ANALYTICS_TRENDS_URL: ${ANALYTICS_TRENDS_URL:-}
+      ANALYTICS_TRENDS_TOKEN: ${ANALYTICS_TRENDS_TOKEN:-}
+    volumes:
+      - ./staging/runtime/pre-main/data:/app/data
+      - ./staging/runtime/pre-main/out:/app/out
+      - ./staging/runtime/pre-main/backups:/app/backups
+
+  backup-rollback:
+    image: whatamicraft-pre-main:local
+    build: *app-build
+    entrypoint: ["python3", "scripts/backup_service.py"]
+    restart: unless-stopped
+    environment:
+      BACKUP_PORT: 8793
+      BACKUP_DIR: /app/backups/ops
+      BACKUP_KEEP: 14
+      BACKUP_INTERVAL_SECONDS: 86400
+      BACKUP_ADMIN_TOKEN: pre-main-local-only
+    volumes:
+      - ./staging/runtime/pre-main/data:/app/data
+      - ./staging/runtime/pre-main/out:/app/out
+      - ./staging/runtime/pre-main/backups:/app/backups
+
+  monitor:
+    image: whatamicraft-pre-main:local
+    build: *app-build
+    entrypoint: ["python3", "scripts/monitor_service.py"]
+    restart: unless-stopped
+    environment:
+      MONITOR_PORT: 8792
+      MONITOR_DASHBOARD_URL: http://dashboard:8787
+      MONITOR_CLUES_URL: http://clues-api:8790
+      MONITOR_ANALYTICS_URL: http://analytics-api:8791
+      MONITOR_BACKUP_URL: http://backup-rollback:8793
+      MONITOR_MEDIA_URL: http://media
+      MONITOR_EVENTS_PATH: /app/out/monitor/events.jsonl
+      MONITOR_INTERVAL_SECONDS: 60
+    volumes:
+      - ./staging/runtime/pre-main/out:/app/out
+
+  media:
+    image: whatamicraft-pre-main-media:local
+    build:
+      context: .
+      dockerfile: Dockerfile.media
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8098:80"
+    volumes:
+      - ./staging/runtime/pre-main/out/episodes:/mnt/out/episodes:ro
+      - ./staging/runtime/pre-main/out/thumbnails:/mnt/out/thumbnails:ro
+
+  producer:
+    image: whatamicraft-pre-main:local
+    build: *app-build
+    environment:
+      ELEVENLABS_VOICE_ID: ""
+      ELEVENLABS_MODEL: eleven_v3
+      REMOTION_CONCURRENCY: "1"
+      TELEGRAM_BOT_TOKEN: ""
+      TELEGRAM_REVIEW_CHAT_ID: ""
+    volumes:
+      - ./staging/runtime/pre-main/data:/app/data
+      - ./staging/runtime/pre-main/out:/app/out
+      - ./public/audio:/app/public/audio:ro

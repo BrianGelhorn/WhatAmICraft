@@ -13,9 +13,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import analytics_service  # noqa: E402
 
 
-def call(base: str, path: str, method: str = "GET") -> tuple[int, dict]:
+def call(base: str, path: str, method: str = "GET", payload: dict | None = None) -> tuple[int, dict]:
+    body = json.dumps(payload).encode() if payload is not None else None
     try:
-        with urlopen(Request(f"{base}{path}", method=method), timeout=5) as response:
+        with urlopen(Request(f"{base}{path}", data=body, headers={"Content-Type": "application/json"} if body else {}, method=method), timeout=5) as response:
             return response.status, json.loads(response.read() or b"{}")
     except Exception as error:
         if hasattr(error, "code"):
@@ -35,6 +36,10 @@ def main() -> None:
     analytics_service.analytics.write_exports = lambda: expected  # type: ignore[assignment]
     analytics_service.analytics.sync_all = lambda: sync_calls.append("synced")  # type: ignore[assignment]
     analytics_service.state_db.load_flag = lambda *_args: {"youtube": {"synced": 1}}  # type: ignore[assignment]
+    analytics_service.state_db.set_analytics_recommendation_status = lambda recommendation_id, status: {"id": recommendation_id, "status": status}  # type: ignore[assignment]
+    analytics_service.state_db.create_analytics_experiment = lambda recommendation_id, minimum_videos: {"id": "exp:" + recommendation_id, "minimumVideos": minimum_videos}  # type: ignore[assignment]
+    analytics_service.analytics.import_trend_signals = lambda payload: payload.get("signals", [])  # type: ignore[assignment]
+    analytics_service.analytics.sync_trend_signals = lambda: {"configured": True, "synced": 2, "error": None}  # type: ignore[assignment]
     server = analytics_service.make_server("127.0.0.1", 0, service)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -51,6 +56,14 @@ def main() -> None:
                 break
             time.sleep(0.01)
         assert sync_calls == ["synced"] and service.sync_status()["status"] == "completed"
+        recommendation_status, recommendation = call(base, "/api/analytics/recommendation", "POST", {"id": "fixture", "status": "applied"})
+        assert recommendation_status == 200 and recommendation["recommendation"]["status"] == "applied"
+        started_status, started = call(base, "/api/analytics/recommendation", "POST", {"id": "fixture", "status": "applied", "startExperiment": True, "minimumVideos": 4})
+        assert started_status == 200 and started["experiment"]["minimumVideos"] == 4
+        trend_status, trends = call(base, "/api/analytics/trends", "POST", {"signals": []})
+        assert trend_status == 200 and trends["signals"] == []
+        trend_sync_status, trend_sync = call(base, "/api/analytics/trends/sync", "POST", {})
+        assert trend_sync_status == 200 and trend_sync["sync"]["synced"] == 2
         invalid_status, _ = call(base, "/api/analytics/unknown")
         assert invalid_status == 404
     finally:

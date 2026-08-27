@@ -23,9 +23,11 @@ def wanted_files(root: Path = ROOT) -> list[Path]:
         "package-lock.json",
         "remotion.config.ts",
         "tsconfig.json",
+        ".release-version",
         "data/**/*",
         "out/*.json",
         "out/*.sqlite3",
+        "out/.active-template-version",
         "src/generated/*",
     ]
     files: list[Path] = []

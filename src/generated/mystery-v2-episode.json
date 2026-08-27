@@ -1,0 +1,317 @@
+{
+  "id": "mystery-trident-v2",
+  "format": "mystery-v2",
+  "language": "en",
+  "variant": "balanced",
+  "renderMode": "final",
+  "hookVariant": "question-first",
+  "ctaVariant": "hint-count",
+  "visualIntensity": "medium",
+  "hypothesis": "A 16.5 second pace balances comprehension and completion.",
+  "answer": {
+    "id": "trident",
+    "text": "TRIDENT",
+    "category": "WEAPON",
+    "image": "mc-assets/item-assets/TRIDENT.png",
+    "silhouette": "images/guess-types/hidden/Weapon.png"
+  },
+  "background": "images/template-layers/background.png",
+  "hook": {
+    "question": "CAN YOU",
+    "emphasis": "NAME IT?",
+    "ruleText": "3 HINTS · 1 ANSWER",
+    "showBrandMark": false
+  },
+  "hints": [
+    {
+      "id": "durability",
+      "voiceText": "Loses durability. Won't stack.",
+      "displayText": "DURABILITY GOES DOWN · STACK LIMIT: 1",
+      "fragments": [
+        "DURABILITY GOES DOWN",
+        "STACK LIMIT: 1"
+      ],
+      "emphasisWords": [
+        "DURABILITY",
+        "ONE"
+      ],
+      "visual": {
+        "prefab": "inventory-properties",
+        "steps": [
+          {
+            "type": "durability",
+            "label": "DURABILITY ↓",
+            "from": 0
+          },
+          {
+            "type": "stack-limit",
+            "label": "STACK LIMIT",
+            "value": "1",
+            "from": 0.58
+          }
+        ]
+      },
+      "difficulty": "hard"
+    },
+    {
+      "id": "combat",
+      "voiceText": "It hits up close or at range.",
+      "displayText": "MELEE · RANGED",
+      "fragments": [
+        "MELEE",
+        "RANGED"
+      ],
+      "emphasisWords": [
+        "MELEE",
+        "RANGED"
+      ],
+      "visual": {
+        "prefab": "item-entity-interaction",
+        "steps": [
+          {
+            "type": "melee",
+            "from": 0
+          },
+          {
+            "type": "ranged",
+            "from": 0.58
+          }
+        ],
+        "supportingAsset": "mc-assets/entity-assets/flat/ZOMBIE.png"
+      },
+      "difficulty": "medium"
+    },
+    {
+      "id": "drowned",
+      "voiceText": "A drowned can carry it.",
+      "displayText": "CARRIED BY A DROWNED",
+      "fragments": [
+        "CARRIED BY A DROWNED"
+      ],
+      "emphasisWords": [
+        "DROWNED"
+      ],
+      "visual": {
+        "prefab": "entity-equipment",
+        "steps": [
+          {
+            "type": "holds-answer",
+            "from": 0
+          }
+        ],
+        "supportingAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+        "environment": "water"
+      },
+      "difficulty": "easy"
+    }
+  ],
+  "countdown": {
+    "displayText": "LOCK IT IN",
+    "values": [
+      3,
+      2,
+      1
+    ]
+  },
+  "reveal": {
+    "preRevealText": "THE ANSWER IS…",
+    "answerText": "TRIDENT"
+  },
+  "cta": {
+    "text": "COMMENT 1, 2, OR 3",
+    "prompt": "HOW MANY HINTS DID YOU NEED?",
+    "options": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  "timeline": {
+    "durationInFrames": 495,
+    "hook": {
+      "from": 0,
+      "durationInFrames": 35
+    },
+    "hints": [
+      {
+        "from": 35,
+        "durationInFrames": 78
+      },
+      {
+        "from": 113,
+        "durationInFrames": 78
+      },
+      {
+        "from": 191,
+        "durationInFrames": 78
+      }
+    ],
+    "countdown": {
+      "from": 269,
+      "durationInFrames": 54
+    },
+    "reveal": {
+      "from": 323,
+      "durationInFrames": 72
+    },
+    "cta": {
+      "from": 395,
+      "durationInFrames": 90
+    },
+    "loop": {
+      "from": 485,
+      "durationInFrames": 10
+    }
+  },
+  "retentionBeats": [
+    {
+      "id": "hook-impact",
+      "frame": 0
+    },
+    {
+      "id": "hook-rule",
+      "frame": 12
+    },
+    {
+      "id": "hook-pulse",
+      "frame": 24
+    },
+    {
+      "id": "hint-1-entry",
+      "frame": 35
+    },
+    {
+      "id": "hint-1-visual",
+      "frame": 53
+    },
+    {
+      "id": "hint-1-keyword",
+      "frame": 74
+    },
+    {
+      "id": "hint-1-exit",
+      "frame": 101
+    },
+    {
+      "id": "hint-2-entry",
+      "frame": 113
+    },
+    {
+      "id": "hint-2-visual",
+      "frame": 131
+    },
+    {
+      "id": "hint-2-keyword",
+      "frame": 152
+    },
+    {
+      "id": "hint-2-exit",
+      "frame": 179
+    },
+    {
+      "id": "hint-3-entry",
+      "frame": 191
+    },
+    {
+      "id": "hint-3-visual",
+      "frame": 209
+    },
+    {
+      "id": "hint-3-keyword",
+      "frame": 230
+    },
+    {
+      "id": "hint-3-exit",
+      "frame": 257
+    },
+    {
+      "id": "countdown-0",
+      "frame": 269
+    },
+    {
+      "id": "countdown-1",
+      "frame": 287
+    },
+    {
+      "id": "countdown-2",
+      "frame": 305
+    },
+    {
+      "id": "reveal-shake",
+      "frame": 323
+    },
+    {
+      "id": "reveal-line",
+      "frame": 333
+    },
+    {
+      "id": "reveal-light",
+      "frame": 347
+    },
+    {
+      "id": "reveal-answer",
+      "frame": 361
+    },
+    {
+      "id": "reveal-payoff",
+      "frame": 379
+    },
+    {
+      "id": "cta-question",
+      "frame": 395
+    },
+    {
+      "id": "cta-one",
+      "frame": 407
+    },
+    {
+      "id": "cta-two",
+      "frame": 419
+    },
+    {
+      "id": "cta-three",
+      "frame": 431
+    },
+    {
+      "id": "cta-pulse",
+      "frame": 449
+    },
+    {
+      "id": "loop-start",
+      "frame": 485
+    },
+    {
+      "id": "loop-hook",
+      "frame": 494
+    }
+  ],
+  "theme": {
+    "mystery": "#070B1A",
+    "surface": "#10172B",
+    "progress": "#2DE2E6",
+    "accent": "#FFD166",
+    "urgency": "#FF6B35",
+    "answer": "#6BFF95",
+    "text": "#FFFFFF",
+    "muted": "#A8B3CF",
+    "titleFont": "Minecraft",
+    "bodyFont": "Minecraft",
+    "outlinePx": 6,
+    "cardRadius": 34
+  },
+  "voice": {
+    "status": "pending",
+    "segments": []
+  },
+  "audio": {
+    "status": "pending",
+    "effects": []
+  },
+  "debug": {
+    "showSafeZones": false,
+    "showSceneBoundaries": false,
+    "showTimestampLabels": false,
+    "showVoiceSegments": false,
+    "showRetentionMarkers": false
+  }
+}

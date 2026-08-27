@@ -1,0 +1,7 @@
+[Unit]
+Description=Conservative Docker disk cleanup
+ConditionPathExists=/var/run/docker.sock
+
+[Service]
+Type=oneshot
+ExecStart=/home/brian/MinecraftQuizGuesser/scripts/linux/docker-disk-cleanup.sh

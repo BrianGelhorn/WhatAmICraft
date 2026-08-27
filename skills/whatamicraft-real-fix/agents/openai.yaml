@@ -1,0 +1,5 @@
+interface:
+  display_name: "WhatAmICraft Real Fixes"
+  short_description: "Root-cause fixes, never test theater"
+  default_prompt: "Use $whatamicraft-real-fix to diagnose and repair this WhatAmICraft error with a real production fix and a regression test."
+

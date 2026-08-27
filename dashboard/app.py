@@ -34,6 +34,7 @@ from review.storage import (  # noqa: E402
 )
 from analytics import build_snapshot, sync_all, write_exports  # noqa: E402
 from analytics_client import AnalyticsApiError, request_json as analytics_request, request_text as analytics_text  # noqa: E402
+import state_db  # noqa: E402
 from clues_client import CluesApiError, request_json as clues_request  # noqa: E402
 from monitor_client import MonitorApiError, request_json as monitor_request  # noqa: E402
 from publishing import PUBLISHERS  # noqa: E402
@@ -366,8 +367,19 @@ def analytics_snapshot() -> dict:
             "schemaVersion": 1,
             "generatedAt": now,
             "summary": {"videos": 0, "views": 0, "engagements": 0, "engagementRateByViews": None},
+            "externalSummary": {"videos": 0, "views": 0, "engagements": 0},
             "platforms": [{"platform": platform, "videos": 0, "views": 0, "engagements": 0, "error": message} for platform in ("youtube", "tiktok", "instagram", "facebook")],
+            "series": [],
+            "cohorts": [],
+            "quality": [],
+            "trends": [],
+            "trendSignals": [],
+            "trendSync": {"configured": False, "synced": 0, "error": None},
+            "experiments": [],
+            "alerts": [],
+            "recommendations": [],
             "videos": [],
+            "externalVideos": [],
             "observations": [f"Analytics no disponible: {message}"],
             "definitions": {},
             "limitations": [],
@@ -540,8 +552,10 @@ def _terminate_process(process: subprocess.Popen | None, pid: int | None = None)
     target = process.pid if process else pid
     if not target:
         return
+    group_signalled = False
     try:
         os.killpg(target, signal.SIGTERM)
+        group_signalled = True
     except (AttributeError, ProcessLookupError, PermissionError):
         try:
             if process and process.poll() is None:
@@ -554,10 +568,18 @@ def _terminate_process(process: subprocess.Popen | None, pid: int | None = None)
         try:
             process.wait(timeout=2)
         except subprocess.TimeoutExpired:
+            pass
+        if group_signalled:
             try:
                 os.killpg(target, signal.SIGKILL)
             except (AttributeError, ProcessLookupError, PermissionError):
-                process.kill()
+                if process.poll() is None:
+                    process.kill()
+    elif group_signalled:
+        try:
+            os.killpg(target, signal.SIGKILL)
+        except (AttributeError, ProcessLookupError, PermissionError):
+            return
 
 
 def cancel_active_job(lane: str | None = None) -> None:
@@ -754,6 +776,36 @@ def start_analytics_sync() -> None:
     threading.Thread(target=run, daemon=True).start()
 
 
+def update_analytics_recommendation(payload: dict) -> dict:
+    if ANALYTICS_API_URL:
+        status, result = analytics_request("/api/analytics/recommendation", method="POST", payload=payload)
+        if status != HTTPStatus.OK:
+            raise RuntimeError(result.get("error", "El servicio de analytics rechazó la decisión"))
+        return result
+    experiment = None
+    if payload.get("status") == "applied" and payload.get("startExperiment"):
+        experiment = state_db.create_analytics_experiment(str(payload.get("id", "")), int(payload.get("minimumVideos", 3)))
+    return {"ok": True, "recommendation": state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", ""))), "experiment": experiment}
+
+
+def import_analytics_trends(payload: object) -> dict:
+    if ANALYTICS_API_URL:
+        status, result = analytics_request("/api/analytics/trends", method="POST", payload=payload if isinstance(payload, dict) else {"signals": payload})
+        if status != HTTPStatus.OK:
+            raise RuntimeError(result.get("error", "El servicio de analytics rechazó las señales"))
+        return result
+    return {"ok": True, "signals": analytics.import_trend_signals(payload)}
+
+
+def sync_analytics_trends() -> dict:
+    if ANALYTICS_API_URL:
+        status, result = analytics_request("/api/analytics/trends/sync", method="POST", payload={})
+        if status != HTTPStatus.OK:
+            raise RuntimeError(result.get("error", "El servicio de analytics rechazó la sincronización de tendencias"))
+        return result
+    return {"ok": True, "sync": analytics.sync_trend_signals()}
+
+
 def analytics_scheduler() -> None:
     while True:
         start_analytics_sync()
@@ -814,12 +866,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"ok": True, "service": "dashboard"})
         elif path == "/api/state":
             self.send_json(dashboard_state())
-        elif path == "/api/clues":
+        elif path in {"/api/clues", "/api/clue-prefabs"}:
             if not os.getenv("CLUES_API_URL"):
                 self.send_json({"ok": False, "error": "La API de pistas no está configurada"}, HTTPStatus.SERVICE_UNAVAILABLE)
             else:
                 try:
-                    status, result = clues_request(f"/api/clues?{urlparse(self.path).query}" if urlparse(self.path).query else "/api/clues")
+                    target = f"{path}?{urlparse(self.path).query}" if urlparse(self.path).query else path
+                    status, result = clues_request(target)
                     self.send_json(result, status)
                 except CluesApiError:
                     self.send_json({"ok": False, "error": "La API de pistas no responde"}, HTTPStatus.BAD_GATEWAY)
@@ -939,6 +992,15 @@ class Handler(BaseHTTPRequestHandler):
                 disconnect_tiktok()
             elif path == "/api/analytics/sync":
                 start_analytics_sync()
+            elif path == "/api/analytics/recommendation":
+                self.send_json(update_analytics_recommendation(payload))
+                return
+            elif path == "/api/analytics/trends":
+                self.send_json(import_analytics_trends(payload))
+                return
+            elif path == "/api/analytics/trends/sync":
+                self.send_json(sync_analytics_trends())
+                return
             elif path in {"/api/monitor/check", "/api/monitor/events"}:
                 if not MONITOR_API_URL:
                     raise RuntimeError("El servicio de monitoreo no está configurado")
