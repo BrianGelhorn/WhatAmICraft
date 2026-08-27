@@ -34,6 +34,9 @@ def main() -> None:
         "--exclude=/.env",
         "sudo -n /usr/local/sbin/whatamicraft-up",
         "127.0.0.1:8787/health",
+        "docker-disk-cleanup.service",
+        "docker-disk-cleanup.timer",
+        "systemctl --user daemon-reload",
     ):
         assert required in script, required
     assert "ssh " not in script and "scp " not in script
