@@ -11,7 +11,7 @@
     "@remotion/cli": "4.0.512",
     "@remotion/media": "4.0.512",
     "dotenv": "^17.4.2",
-    "minecraft-data": "^3.112.0",
+    "minecraft-data": "^3.113.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "remotion": "4.0.512"
@@ -22,7 +22,7 @@
     "@types/web": "0.0.166",
     "eslint": "9.19.0",
     "prettier": "3.8.1",
-    "typescript": "6.0.3"
+    "typescript": "5.9.3"
   },
   "overrides": {
     "eslint": "9.19.0"
