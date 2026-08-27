@@ -110,7 +110,29 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"ok": False, "error": "No se pudo consultar analytics"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def do_POST(self) -> None:
-        if urlparse(self.path).path != "/api/analytics/sync":
+        path = urlparse(self.path).path
+        if path == "/api/analytics/trends/sync":
+            self.send_json({"ok": True, "sync": analytics.sync_trend_signals()})
+            return
+        if path == "/api/analytics/trends":
+            try:
+                payload = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))) or b"{}")
+                self.send_json({"ok": True, "signals": analytics.import_trend_signals(payload)})
+            except ValueError as error:
+                self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
+            return
+        if path == "/api/analytics/recommendation":
+            try:
+                payload = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))) or b"{}")
+                experiment = None
+                if payload.get("status") == "applied" and payload.get("startExperiment"):
+                    experiment = state_db.create_analytics_experiment(str(payload.get("id", "")), int(payload.get("minimumVideos", 3)))
+                recommendation = state_db.set_analytics_recommendation_status(str(payload.get("id", "")), str(payload.get("status", "")))
+                self.send_json({"ok": True, "recommendation": recommendation, "experiment": experiment})
+            except ValueError as error:
+                self.send_json({"ok": False, "error": str(error)}, HTTPStatus.CONFLICT)
+            return
+        if path != "/api/analytics/sync":
             self.send_json({"ok": False, "error": "Ruta no encontrada"}, HTTPStatus.NOT_FOUND)
             return
         try:

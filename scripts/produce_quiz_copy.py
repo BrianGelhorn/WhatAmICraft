@@ -12,14 +12,14 @@ from copy import deepcopy
 from pathlib import Path
 
 from production_common import load_env_local, production_lock, speech_with_timestamps, write_json
-from thumbnails import copy_thumbnail_config, render_thumbnails as render_official_thumbnails, write_config as write_thumbnail_config
+from template_artifacts import artifact_path, render_props_path, write_artifact
+from thumbnails import copy_thumbnail_config, render_thumbnails as render_official_thumbnails
 from music_library import CLIP_DURATION_SECONDS, original_starts, ready_clips_for_template
 from video_formats import with_target_kind
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
 GENERATED_PATH = ROOT / "src/generated/quiz-copy-episode.json"
-CONTRACT_PATH = ROOT / "templates/quiz-copy/template.contract.json"
 FPS = 30
 VOICE_AUDIO_VERSION = "current-text-v2"
 MUSIC_EXTENSIONS = {".aac", ".flac", ".m4a", ".mp3", ".ogg", ".opus", ".wav"}
@@ -644,132 +644,13 @@ def build_config(episode: dict, manifest: dict, music: dict, normalized: dict[st
     return result
 
 
-def update_contract(config: dict) -> None:
-    contract = read_json(CONTRACT_PATH)
-    timeline = config["timeline"]
-    reveal_from = (
-        timeline["contentStartFrame"]
-        + len(config["clues"]) * timeline["hintDurationInFrames"]
-    )
-    visual_events = {
-        "hook": "question-visible",
-        "handoff": "three-hints-card-visible",
-        "reveal": "spoken-answer-matches-final-icon-and-text",
-    }
-    voice_cues = []
-    for voice in config["audio"]["voices"]:
-        cue = {
-            "id": f"voice-{voice['id']}",
-            "role": "voice",
-            "src": voice["publicSrc"],
-            "from": voice["from"],
-            "durationInFrames": voice["durationInFrames"],
-            "volume": voice["volume"],
-            "visualEvent": visual_events.get(voice["id"], f"{voice['id']}-card-visible"),
-            "maxOffsetFrames": 0,
-        }
-        for key in ("playbackRate", "fadeOutFrames"):
-            if key in voice:
-                cue[key] = voice[key]
-        voice_cues.append(cue)
-
-    roulette = config["audio"]["roulette"]
-    music = config["audio"]["music"]
-    effects = config["audio"]["effects"]
-    contract["durationInFrames"] = config["durationInFrames"]
-    contract["intro"]["hookDurationFrames"] = timeline["contentStartFrame"]
-    contract["intro"]["contentStartFrame"] = timeline["contentStartFrame"]
-    contract["intro"]["maxContentStartFrame"] = timeline["contentStartFrame"]
-    contract["intro"]["visualBeats"] = [
-        {
-            "id": "mystery-impact",
-            "from": 0,
-            "description": f"horizontal reel locks on the black {config['answer']['guessType'].lower()} silhouette and type label by frame {timeline['reelStopFrame']}; answer details stay hidden until reveal",
-        },
-        {
-            "id": "first-hint",
-            "from": timeline["contentStartFrame"],
-            "description": "first configured clue",
-        },
-    ]
-    contract["audio"]["allowedSources"] = list(
-        dict.fromkeys(
-            [music["publicSrc"], roulette["publicSrc"], *[effect["publicSrc"] for effect in effects], *[voice["publicSrc"] for voice in config["audio"]["voices"]]],
-        ),
-    )
-    contract["audio"]["normalization"] = deepcopy(config["audio"]["normalization"])
-    contract["audio"]["cues"] = [
-        {
-            "id": "music-background",
-            "role": "music",
-            "src": music["publicSrc"],
-            "from": music["from"],
-            "durationInFrames": music["durationInFrames"],
-            "volume": music["volume"],
-            "visualEvent": "full-video-background-bed",
-            "maxOffsetFrames": 0,
-        },
-        *voice_cues,
-        {
-            "id": "sfx-roulette-ticks-unified",
-            "role": "sfx",
-            "src": roulette["publicSrc"],
-            "from": roulette["from"],
-            "durationInFrames": roulette["durationInFrames"],
-            "volume": roulette["volume"],
-            "visualEvent": "each-reel-item-crossing-and-final-selection",
-            "maxOffsetFrames": 0,
-        },
-        *[
-            {
-                "id": f"sfx-{effect['id']}",
-                "role": "sfx",
-                "src": effect["publicSrc"],
-                "from": effect["from"],
-                "durationInFrames": effect["durationInFrames"],
-                "volume": effect["volume"],
-                "visualEvent": (
-                    "roulette-selection"
-                    if effect["id"] == "roulette-select-bell"
-                    else "countdown-number-change"
-                    if effect["id"].startswith("countdown-")
-                    else "answer-icon-appears"
-                ),
-                "maxOffsetFrames": 0,
-            }
-            for effect in effects
-        ],
-    ]
-    contract["scenes"] = [
-        {"id": "hook", "from": 0, "durationInFrames": timeline["contentStartFrame"]},
-        *[
-            {
-                "id": f"hint-{index + 1}",
-                "from": timeline["contentStartFrame"] + index * timeline["hintDurationInFrames"],
-                "durationInFrames": timeline["hintDurationInFrames"],
-            }
-            for index in range(len(config["clues"]))
-        ],
-        {
-            "id": "reveal",
-            "from": reveal_from,
-            "durationInFrames": timeline["revealDurationInFrames"],
-        },
-    ]
-    contract["thumbnail"] = {
-        "generatedConfigPath": "src/generated/thumbnail-config.json",
-        "platforms": {
-            "vertical": {"compositionId": "ThumbnailVertical", "width": 1080, "height": 1920, "variant": config["thumbnail"]["platforms"]["vertical"]},
-        },
-        "outputDir": config["thumbnail"]["outputDir"],
-    }
-    contract["animationPolicy"]["maxScale"] = 1.12
-    write_json(CONTRACT_PATH, contract)
-
-
-def render(episode: dict) -> None:
+def render(episode: dict, config: dict | None = None) -> Path:
     output = ROOT / f"out/episodes/{episode['id']}-{episode['answer']['id']}.mp4"
     output.parent.mkdir(parents=True, exist_ok=True)
+    config = config or read_json(GENERATED_PATH)
+    props_path = render_props_path(output.stem, "video")
+    write_json(props_path, {"config": config})
+    artifact_path(output).unlink(missing_ok=True)
     subprocess.run(
         [
             "node",
@@ -777,16 +658,18 @@ def render(episode: dict) -> None:
             "render",
             "QuizCapasCopy",
             str(output),
+            f"--props={props_path.relative_to(ROOT).as_posix()}",
             f"--concurrency={os.getenv('REMOTION_CONCURRENCY', '1')}",
         ],
         cwd=ROOT,
         check=True,
         timeout=int(os.getenv("REMOTION_RENDER_TIMEOUT_SECONDS", "1800")),
     )
+    return output
 
 
-def render_thumbnails(episode: dict) -> None:
-    render_official_thumbnails(
+def render_thumbnails(episode: dict) -> list[Path]:
+    return render_official_thumbnails(
         copy_thumbnail_config(episode),
         f"{episode['id']}-{episode['answer']['id']}",
     )
@@ -819,7 +702,6 @@ def main() -> int:
         validate_episode(episode)
         with production_lock():
             if args.thumbnails_only:
-                write_thumbnail_config(copy_thumbnail_config(episode))
                 if not args.dry_run:
                     render_thumbnails(episode)
                 continue
@@ -834,15 +716,22 @@ def main() -> int:
                     f"{music['trackCount']} music tracks, {len(episode['thumbnail']['platforms'])} thumbnails)",
                 )
                 continue
-            write_json(GENERATED_PATH, config)
-            write_thumbnail_config(copy_thumbnail_config(episode))
-            update_contract(config)
-            print(f"config: {GENERATED_PATH.relative_to(ROOT)}")
+            stem = f"{episode['id']}-{episode['answer']['id']}"
+            print(f"config: {render_props_path(stem, 'video').relative_to(ROOT)}")
             print(f"music: {music['sourceName']} -> {music['publicSrc']}")
+            output = None
+            thumbnail_outputs = []
             if args.render or args.force_render:
-                render(episode)
+                output = render(episode, config)
             if args.thumbnails or args.render or args.force_render:
-                render_thumbnails(episode)
+                thumbnail_outputs = render_thumbnails(episode)
+            if output is not None:
+                write_artifact(
+                    episode_id=episode["id"],
+                    video=output,
+                    config=config,
+                    thumbnail=thumbnail_outputs[0],
+                )
     return 0
 
 

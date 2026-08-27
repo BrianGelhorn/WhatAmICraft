@@ -42,8 +42,10 @@ def main() -> None:
         assert calls[0][calls[0].index("still") + 1] == "ThumbnailVertical"
         assert calls[0][calls[0].index("still") + 2] == str(expected)
         props_arg = next(argument for argument in calls[0] if argument.startswith("--props="))
-        props = json.loads(props_arg[len("--props="):])
-        assert props == {"variant": "silhouette"}
+        props_path = ROOT / props_arg[len("--props="):]
+        props = json.loads(props_path.read_text(encoding="utf-8"))
+        assert props == {"config": config, "variant": "silhouette"}
+        assert props_path.parent.parent == ROOT / "out/render-jobs"
     finally:
         thumbnails.subprocess.run = original_run
         thumbnails.write_config = original_write_config

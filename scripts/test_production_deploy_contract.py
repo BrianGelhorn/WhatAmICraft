@@ -25,6 +25,10 @@ def main() -> None:
     assert "push:" in staging and "- main" in staging
     assert '"$GITHUB_WORKSPACE/scripts/backup_state.py" --quiet' in script
     assert '--root "$app_dir" --backup-dir "$app_dir/backups/ops"' in script
+    assert "production.lock" in script and "publishing.lock" in script
+    assert "DEPLOY_DRAIN_TIMEOUT_SECONDS" in script
+    assert "release_marker" in script and "DEPLOY_SHA" in script
+    assert "active-template-version" in script and "previous_release" in script
     assert "video storage" in script and "/srv/minecraft-videos/episodes" in script
     for required in (
         "archive --format=tar",

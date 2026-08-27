@@ -107,6 +107,24 @@ def init(db_path: Path | None = None) -> None:
                 key TEXT PRIMARY KEY,
                 value_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS analytics_recommendations (
+                recommendation_id TEXT PRIMARY KEY,
+                payload_json TEXT NOT NULL,
+                status TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS analytics_experiments (
+                experiment_id TEXT PRIMARY KEY,
+                recommendation_id TEXT NOT NULL,
+                platform TEXT NOT NULL,
+                dimension TEXT NOT NULL,
+                variant_value TEXT NOT NULL,
+                minimum_videos INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
             CREATE TABLE IF NOT EXISTS meta (
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL
@@ -505,6 +523,126 @@ def save_flag(key: str, value, db_path: Path | None = None) -> None:
             "INSERT OR REPLACE INTO flags (key, value_json) VALUES (?, ?)",
             (key, json.dumps(value, ensure_ascii=False)),
         )
+
+
+def save_analytics_recommendation(recommendation: dict, db_path: Path | None = None) -> dict:
+    recommendation_id = str(recommendation["id"])
+    now = datetime.now(timezone.utc).isoformat()
+    init(db_path)
+    with _connect(db_path) as db:
+        current = db.execute(
+            "SELECT status, created_at FROM analytics_recommendations WHERE recommendation_id = ?",
+            (recommendation_id,),
+        ).fetchone()
+        status = current["status"] if current else "proposed"
+        created_at = current["created_at"] if current else now
+        db.execute(
+            """
+            INSERT OR REPLACE INTO analytics_recommendations
+            (recommendation_id, payload_json, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (recommendation_id, json.dumps(recommendation, ensure_ascii=False), status, created_at, now),
+        )
+    return {**recommendation, "status": status, "createdAt": created_at, "updatedAt": now}
+
+
+def set_analytics_recommendation_status(recommendation_id: str, status: str, db_path: Path | None = None) -> dict:
+    if status not in {"proposed", "applied", "dismissed"}:
+        raise ValueError("Estado de recomendación inválido")
+    init(db_path)
+    now = datetime.now(timezone.utc).isoformat()
+    with _connect(db_path) as db:
+        row = db.execute(
+            "SELECT payload_json, created_at FROM analytics_recommendations WHERE recommendation_id = ?",
+            (recommendation_id,),
+        ).fetchone()
+        if not row:
+            raise ValueError("Recomendación no encontrada")
+        db.execute(
+            "UPDATE analytics_recommendations SET status = ?, updated_at = ? WHERE recommendation_id = ?",
+            (status, now, recommendation_id),
+        )
+    return {**json.loads(row["payload_json"]), "status": status, "createdAt": row["created_at"], "updatedAt": now}
+
+
+def create_analytics_experiment(recommendation_id: str, minimum_videos: int = 3, db_path: Path | None = None) -> dict:
+    if minimum_videos < 1:
+        raise ValueError("El mínimo de videos debe ser mayor que cero")
+    init(db_path)
+    now = datetime.now(timezone.utc).isoformat()
+    with _connect(db_path) as db:
+        recommendation = db.execute(
+            "SELECT payload_json FROM analytics_recommendations WHERE recommendation_id = ?",
+            (recommendation_id,),
+        ).fetchone()
+        if not recommendation:
+            raise ValueError("Recomendación no encontrada")
+        payload = json.loads(recommendation["payload_json"])
+        if payload.get("dimension") == "trend":
+            raise ValueError("Una tendencia de plataforma no define una variante de experimento")
+        experiment_id = f"exp:{recommendation_id}"
+        current = db.execute(
+            "SELECT * FROM analytics_experiments WHERE experiment_id = ?",
+            (experiment_id,),
+        ).fetchone()
+        if current:
+            return {
+                "id": current["experiment_id"], "recommendationId": current["recommendation_id"],
+                "platform": current["platform"], "dimension": current["dimension"],
+                "variantValue": current["variant_value"], "minimumVideos": current["minimum_videos"],
+                "status": current["status"], "createdAt": current["created_at"], "updatedAt": current["updated_at"],
+            }
+        db.execute(
+            """
+            INSERT INTO analytics_experiments
+            (experiment_id, recommendation_id, platform, dimension, variant_value,
+             minimum_videos, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, 'running', ?, ?)
+            """,
+            (experiment_id, recommendation_id, payload["platform"], payload["dimension"], payload["value"], minimum_videos, now, now),
+        )
+    return {
+        "id": experiment_id, "recommendationId": recommendation_id, "platform": payload["platform"],
+        "dimension": payload["dimension"], "variantValue": payload["value"],
+        "minimumVideos": minimum_videos, "status": "running", "createdAt": now, "updatedAt": now,
+    }
+
+
+def analytics_experiments(db_path: Path | None = None) -> list[dict]:
+    init(db_path)
+    with _connect(db_path) as db:
+        rows = db.execute("SELECT * FROM analytics_experiments ORDER BY created_at DESC").fetchall()
+    return [
+        {
+            "id": row["experiment_id"], "recommendationId": row["recommendation_id"],
+            "platform": row["platform"], "dimension": row["dimension"],
+            "variantValue": row["variant_value"], "minimumVideos": row["minimum_videos"],
+            "status": row["status"], "createdAt": row["created_at"], "updatedAt": row["updated_at"],
+        }
+        for row in rows
+    ]
+
+
+def set_analytics_experiment_status(experiment_id: str, status: str, db_path: Path | None = None) -> dict:
+    if status not in {"running", "completed", "cancelled"}:
+        raise ValueError("Estado de experimento inválido")
+    init(db_path)
+    now = datetime.now(timezone.utc).isoformat()
+    with _connect(db_path) as db:
+        db.execute(
+            "UPDATE analytics_experiments SET status = ?, updated_at = ? WHERE experiment_id = ?",
+            (status, now, experiment_id),
+        )
+        row = db.execute("SELECT * FROM analytics_experiments WHERE experiment_id = ?", (experiment_id,)).fetchone()
+    if not row:
+        raise ValueError("Experimento no encontrado")
+    return {
+        "id": row["experiment_id"], "recommendationId": row["recommendation_id"],
+        "platform": row["platform"], "dimension": row["dimension"],
+        "variantValue": row["variant_value"], "minimumVideos": row["minimum_videos"],
+        "status": row["status"], "createdAt": row["created_at"], "updatedAt": row["updated_at"],
+    }
 
 
 def export_legacy_json(

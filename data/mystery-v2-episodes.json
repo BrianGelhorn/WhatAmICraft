@@ -1,0 +1,221 @@
+{
+  "$schema": "../schemas/mystery-v2-episode.schema.json",
+  "schema_version": 2,
+  "format": "mystery-v2",
+  "episodes": [
+    {
+      "id": "mystery-trident-v2",
+      "format": "mystery-v2",
+      "language": "en",
+      "answer": {
+        "id": "trident",
+        "text": "TRIDENT",
+        "category": "WEAPON",
+        "image": "mc-assets/item-assets/TRIDENT.png",
+        "silhouette": "images/guess-types/hidden/Weapon.png"
+      },
+      "background": "images/template-layers/background.png",
+      "hookOptions": {
+        "question-first": {
+          "displayText": "CAN YOU",
+          "emphasisText": "NAME IT?",
+          "voiceText": "Name it."
+        },
+        "difficulty-challenge": {
+          "displayText": "CAN YOU GET IT IN",
+          "emphasisText": "1 HINT?",
+          "voiceText": "Get it in one."
+        },
+        "category-visible": {
+          "displayText": "NAME THIS",
+          "emphasisText": "MINECRAFT WEAPON",
+          "voiceText": "Name this weapon."
+        },
+        "timer-challenge": {
+          "displayText": "NAME IT BEFORE",
+          "emphasisText": "TIME RUNS OUT",
+          "voiceText": "Name it now."
+        },
+        "three-hints": {
+          "displayText": "3 HINTS",
+          "emphasisText": "DON'T WASTE THEM",
+          "voiceText": "Three hints. Don't waste them."
+        }
+      },
+      "ruleText": "3 HINTS · 1 ANSWER",
+      "hints": [
+        {
+          "id": "durability",
+          "voiceText": "Loses durability. Won't stack.",
+          "displayText": "DURABILITY GOES DOWN · STACK LIMIT: 1",
+          "fragments": ["DURABILITY GOES DOWN", "STACK LIMIT: 1"],
+          "emphasisWords": ["DURABILITY", "ONE"],
+          "visual": {
+            "prefab": "inventory-properties",
+            "steps": [
+              {"type": "durability", "label": "DURABILITY ↓", "from": 0},
+              {"type": "stack-limit", "label": "STACK LIMIT", "value": "1", "from": 0.58}
+            ]
+          },
+          "difficulty": "hard"
+        },
+        {
+          "id": "combat",
+          "voiceText": "It hits up close or at range.",
+          "displayText": "MELEE · RANGED",
+          "fragments": ["MELEE", "RANGED"],
+          "emphasisWords": ["MELEE", "RANGED"],
+          "visual": {
+            "prefab": "item-entity-interaction",
+            "steps": [
+              {"type": "melee", "from": 0},
+              {"type": "ranged", "from": 0.58}
+            ],
+            "supportingAsset": "mc-assets/entity-assets/flat/ZOMBIE.png"
+          },
+          "difficulty": "medium"
+        },
+        {
+          "id": "drowned",
+          "voiceText": "A drowned can carry it.",
+          "displayText": "CARRIED BY A DROWNED",
+          "fragments": ["CARRIED BY A DROWNED"],
+          "emphasisWords": ["DROWNED"],
+          "visual": {
+            "prefab": "entity-equipment",
+            "steps": [
+              {"type": "holds-answer", "from": 0}
+            ],
+            "supportingAsset": "mc-assets/entity-assets/flat/DROWNED.png",
+            "environment": "water"
+          },
+          "difficulty": "easy"
+        }
+      ],
+      "countdown": {
+        "displayText": "LOCK IT IN",
+        "voiceText": "Three two one",
+        "values": [3, 2, 1]
+      },
+      "reveal": {
+        "preRevealText": "THE ANSWER IS…",
+        "answerText": "TRIDENT",
+        "voiceText": "It's the trident!"
+      },
+      "ctaOptions": {
+        "hint-count": {
+          "displayText": "COMMENT 1, 2, OR 3",
+          "promptText": "HOW MANY HINTS DID YOU NEED?",
+          "voiceText": "How many hints did you need?",
+          "options": ["1", "2", "3"]
+        },
+        "score": {
+          "displayText": "COMMENT YOUR SCORE: 1, 2, OR 3",
+          "promptText": "WHAT SCORE DID YOU GET?",
+          "voiceText": "Comment your score.",
+          "options": ["1", "2", "3"]
+        }
+      },
+      "variants": {
+        "fast": {
+          "hookVariant": "timer-challenge",
+          "ctaVariant": "hint-count",
+          "visualIntensity": "high",
+          "hypothesis": "A 15.5 second challenge increases completion rate.",
+          "timeline": {
+            "hook": 35,
+            "hints": [72, 72, 72],
+            "countdown": 54,
+            "reveal": 72,
+            "cta": 78,
+            "loop": 10
+          }
+        },
+        "balanced": {
+          "hookVariant": "question-first",
+          "ctaVariant": "hint-count",
+          "visualIntensity": "medium",
+          "hypothesis": "A 16.5 second pace balances comprehension and completion.",
+          "timeline": {
+            "hook": 35,
+            "hints": [78, 78, 78],
+            "countdown": 54,
+            "reveal": 72,
+            "cta": 90,
+            "loop": 10
+          }
+        },
+        "comment_bait": {
+          "hookVariant": "difficulty-challenge",
+          "ctaVariant": "hint-count",
+          "visualIntensity": "high",
+          "hypothesis": "A numeric CTA increases comments per thousand views.",
+          "timeline": {
+            "hook": 35,
+            "hints": [81, 78, 78],
+            "countdown": 54,
+            "reveal": 72,
+            "cta": 96,
+            "loop": 12
+          }
+        }
+      },
+      "theme": {
+        "mystery": "#070B1A",
+        "surface": "#10172B",
+        "progress": "#2DE2E6",
+        "accent": "#FFD166",
+        "urgency": "#FF6B35",
+        "answer": "#6BFF95",
+        "text": "#FFFFFF",
+        "muted": "#A8B3CF",
+        "titleFont": "Minecraft",
+        "bodyFont": "Minecraft",
+        "outlinePx": 6,
+        "cardRadius": 34
+      },
+      "voiceGeneration": {
+        "voiceId": "pNInz6obpgDQGcFmaJgB",
+        "model": "eleven_v3",
+        "speed": 1.08
+      },
+      "audio": {
+        "normalization": {
+          "voiceTargetLufs": -16,
+          "voiceTruePeakDb": -1.5,
+          "voiceLoudnessRange": 11
+        },
+        "music": {
+          "publicSrc": "audio/quiz-copy/music-cache/89915add3558bb75b643.m4a",
+          "volume": 0.13,
+          "duckedVolume": 0.045,
+          "fadeInFrames": 6,
+          "fadeOutFrames": 12,
+          "duckFadeFrames": 4
+        },
+        "impact": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.8
+        },
+        "tick": {
+          "publicSrc": "audio/sfx/quiz-copy/menu-button.m4a",
+          "durationInFrames": 5,
+          "volume": 1
+        },
+        "reveal": {
+          "publicSrc": "audio/sfx/quiz-copy/reveal-bell.m4a",
+          "durationInFrames": 16,
+          "volume": 0.95
+        }
+      },
+      "debug": {
+        "showSafeZones": false,
+        "showSceneBoundaries": false,
+        "showTimestampLabels": false,
+        "showVoiceSegments": false,
+        "showRetentionMarkers": false
+      }
+    }
+  ]
+}

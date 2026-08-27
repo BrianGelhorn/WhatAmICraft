@@ -80,6 +80,13 @@
     .platform-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px; }
     .platform-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .analytics-platforms { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+    .analytics-controls { display:flex; flex-wrap:wrap; gap:12px; margin:14px 0; }
+    .analytics-controls .field { min-width:150px; }
+    .analytics-chart { min-height:240px; border:1px solid var(--line); border-radius:10px; padding:10px; background:#101713; }
+    .analytics-chart svg { display:block; width:100%; height:auto; }
+    .analytics-callouts { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+    .analytics-callout { border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:#101713; }
+    .analytics-cohorts { margin-top:14px; }
     .analytics-platform { border:1px solid var(--line); border-radius:10px; padding:11px; background:#101713; }
     .analytics-platform strong,.analytics-platform span { display:block; }
     .analytics-platform span { margin-top:4px; color:var(--muted); font-size:12px; }
@@ -410,6 +417,34 @@
           <a class="button-link" href="/api/analytics/export.md" target="_blank">Resumen para GPT</a>
           <button class="primary" id="sync-analytics">Actualizar todo</button>
         </div>
+      </div>
+      <div class="analytics-controls" aria-label="Filtros de rendimiento">
+        <label class="field">Período<select id="analytics-window"><option value="24">Últimas 24 horas</option><option value="168" selected>Últimos 7 días</option><option value="720">Últimos 30 días</option><option value="all">Todo el historial</option></select></label>
+        <label class="field">Plataforma<select id="analytics-platform"><option value="all">Todas</option><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="facebook">Facebook Reels</option></select></label>
+      </div>
+      <p class="hint" id="analytics-scope" aria-live="polite"></p>
+      <div class="analytics-chart" id="analytics-chart" aria-live="polite"></div>
+      <div class="analytics-callouts" id="analytics-alerts" aria-live="polite"></div>
+      <div class="analytics-callouts" id="analytics-recommendations" aria-live="polite"></div>
+      <div class="analytics-callouts" id="analytics-experiments" aria-live="polite"></div>
+      <div class="analytics-callout" aria-label="Señales externas de tendencia">
+        <strong>Señales externas</strong>
+        <p class="hint">Importá JSON de una fuente o análisis externo. Se usa como contexto, nunca publica solo.</p>
+        <textarea id="analytics-trend-signals" rows="3" placeholder='[{"platform":"youtube","kind":"topic","value":"Minecraft 1.22","source":"manual","score":80,"expiresAt":"2026-09-01T00:00:00Z"}]'></textarea>
+        <button class="button-link" id="import-analytics-trends">Importar señales</button>
+        <button class="button-link" id="sync-analytics-trends">Actualizar fuente en vivo</button>
+        <span class="hint" id="analytics-trend-sync-status"></span>
+        <ul class="analysis-list" id="analytics-trend-signal-list"></ul>
+      </div>
+      <div class="analytics-controls analytics-cohorts" aria-label="Comparación de cohortes">
+        <label class="field">Comparar por<select id="analytics-cohort-dimension"><option value="formatLabel">Formato</option><option value="targetKind">Tipo de target</option><option value="templateVersion">Versión de plantilla</option><option value="musicSource">Música</option><option value="publishHourUtc">Hora de publicación</option></select></label>
+      </div>
+      <div class="table-wrap" id="analytics-cohorts-wrap" hidden>
+        <table><thead><tr><th>Plataforma</th><th>Cohorte</th><th>Videos</th><th>Vistas/video</th><th>Lift</th><th>Vistas/h</th><th>Engagement</th><th>Retención</th><th>Confianza</th></tr></thead><tbody id="analytics-cohorts-rows"></tbody></table>
+      </div>
+      <div class="table-wrap analytics-cohorts" id="analytics-quality-wrap" hidden>
+        <h3>Funnel y calidad de datos</h3>
+        <table><thead><tr><th>Plataforma</th><th>Medidos</th><th>Alcance/vista</th><th>Watch time</th><th>Finalización</th><th>Cobertura</th><th>Estado</th></tr></thead><tbody id="analytics-quality-rows"></tbody></table>
       </div>
       <section class="stats" aria-label="Resumen de estadísticas">
         <div class="stat"><span>Videos medidos</span><strong id="analytics-videos">0</strong></div>
@@ -935,12 +970,16 @@
     function renderAnalytics() {
       const analytics = state.analytics || {videos:[], platforms:[], summary:{}};
       const summary = analytics.summary || {};
+      const external = analytics.externalSummary || {};
       const number = value => Number(value || 0).toLocaleString('es-AR');
       const metric = (value, suffix = '') => value == null ? '—' : `${Number(value).toLocaleString('es-AR')}${suffix}`;
       $('analytics-videos').textContent = number(summary.videos);
       $('analytics-views').textContent = number(summary.views);
       $('analytics-engagements').textContent = number(summary.engagements);
       $('analytics-rate').textContent = metric(summary.engagementRateByViews, '%');
+      $('analytics-scope').textContent = external.videos
+        ? `Se excluyeron ${number(external.videos)} posts históricos externos (${number(external.views)} vistas) hasta vincularlos con episodios del proyecto.`
+        : summary.videos ? 'Mostrando únicamente videos publicados por el proyecto.' : 'Todavía no hay métricas propias del proyecto.';
       $('analytics-updated').textContent = analytics.generatedAt
         ? `Panel calculado: ${new Date(analytics.generatedAt).toLocaleString()}`
         : 'Todavía no hay datos. Publicá el piloto y actualizá las plataformas.';
@@ -950,6 +989,12 @@
           <span class="${item.error ? 'bad' : 'ok'}">${item.error ? escapeHtml(item.error) : `${number(item.videos)} videos · ${number(item.views)} vistas`}</span>
           <span>${item.syncedAt ? `Actualizado ${new Date(item.syncedAt).toLocaleString()}` : 'Todavía sin sincronizar'}</span>
         </div>`).join('');
+      renderAnalyticsChart(analytics);
+      renderAnalyticsCohorts(analytics);
+      renderAnalyticsQuality(analytics);
+      renderAnalyticsCallouts(analytics);
+      renderAnalyticsExperiments(analytics);
+      renderAnalyticsSignals(analytics);
       $('analytics-observations').innerHTML = (analytics.observations || []).map(item => `<li>${escapeHtml(item)}</li>`).join('');
       $('analytics-table-wrap').hidden = !(analytics.videos || []).length;
       $('analytics-rows').innerHTML = (analytics.videos || []).map(item => `
@@ -961,6 +1006,91 @@
           <td><strong>${metric(item.engagementRateByViews, '%')}</strong><br><span class="hint">${metric(item.likes)} likes · ${metric(item.comments)} comentarios · ${metric(item.shares)} compartidos · ${metric(item.saves)} guardados</span></td>
           <td>${metric(item.averageWatchSeconds, ' s')}</td><td>${metric(item.completionRate, '%')}</td>
         </tr>`).join('');
+    }
+
+    function renderAnalyticsChart(analytics) {
+      const number = value => Number(value || 0).toLocaleString('es-AR');
+      const platform = $('analytics-platform').value;
+      const windowValue = $('analytics-window').value;
+      const cutoff = windowValue === 'all' ? 0 : Date.now() - Number(windowValue) * 60 * 60 * 1000;
+      const grouped = new Map();
+      (analytics.series || []).filter(item => platform === 'all' || item.platform === platform).forEach(item => {
+        if (Date.parse(item.capturedAt) < cutoff) return;
+        const current = grouped.get(item.capturedAt) || {capturedAt:item.capturedAt, views:0, engagements:0};
+        current.views += Number(item.views || 0);
+        current.engagements += Number(item.engagements || 0);
+        grouped.set(item.capturedAt, current);
+      });
+      const points = [...grouped.values()].sort((a,b) => Date.parse(a.capturedAt) - Date.parse(b.capturedAt));
+      if (!points.length) {
+        $('analytics-chart').innerHTML = '<p class="hint">Todavía no hay snapshots para este período.</p>';
+        return;
+      }
+      const width = 760, height = 220, left = 48, right = 16, top = 18, bottom = 34;
+      const max = Math.max(...points.map(item => item.views), 1);
+      const x = index => points.length === 1 ? (width - left - right) / 2 + left : left + index * (width - left - right) / (points.length - 1);
+      const y = value => height - bottom - value / max * (height - top - bottom);
+      const path = points.map((item, index) => `${index ? 'L' : 'M'} ${x(index).toFixed(1)} ${y(item.views).toFixed(1)}`).join(' ');
+      const dots = points.map((item, index) => `<circle cx="${x(index).toFixed(1)}" cy="${y(item.views).toFixed(1)}" r="4" fill="var(--green)"><title>${new Date(item.capturedAt).toLocaleString()} · ${number(item.views)} vistas · ${number(item.engagements)} interacciones</title></circle>`).join('');
+      const first = new Date(points[0].capturedAt).toLocaleDateString();
+      const last = new Date(points.at(-1).capturedAt).toLocaleDateString();
+      $('analytics-chart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Evolución de vistas"><line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="var(--line-strong)"/><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="var(--line-strong)"/><path d="${path}" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}<text x="${left}" y="${height-10}" fill="var(--muted)">${escapeHtml(first)}</text><text x="${width-right}" y="${height-10}" text-anchor="end" fill="var(--muted)">${escapeHtml(last)}</text><text x="${left-8}" y="${top+4}" text-anchor="end" fill="var(--muted)">${number(max)}</text><text x="${left-8}" y="${height-bottom+4}" text-anchor="end" fill="var(--muted)">0</text></svg>`;
+    }
+
+    function renderAnalyticsCohorts(analytics) {
+      const number = value => Number(value || 0).toLocaleString('es-AR');
+      const metric = (value, suffix = '') => value == null ? '—' : `${Number(value).toLocaleString('es-AR')}${suffix}`;
+      const dimension = $('analytics-cohort-dimension').value;
+      const rows = (analytics.cohorts || []).filter(item => item.dimension === dimension).slice(0, 40);
+      $('analytics-cohorts-wrap').hidden = !rows.length;
+      $('analytics-cohorts-rows').innerHTML = rows.map(item => `
+        <tr><td><strong>${escapeHtml(item.platform)}</strong></td><td>${escapeHtml(item.value)}</td><td>${number(item.videos)} <span class="hint">(${number(item.measuredVideos)} medidos)</span></td><td>${metric(item.viewsPerVideo)}</td><td>${metric(item.viewsPerVideoLiftPct, '%')}</td><td>${metric(item.lifetimeViewsPerHour)}</td><td>${metric(item.engagementRateByViews, '%')}</td><td>${metric(item.completionRate, '%')}</td><td title="${escapeHtml(item.sampleWarning || '')}">${escapeHtml(item.sampleConfidence || '—')}</td></tr>`).join('');
+    }
+
+    function renderAnalyticsQuality(analytics) {
+      const number = value => Number(value || 0).toLocaleString('es-AR');
+      const metric = (value, suffix = '') => value == null ? '—' : `${Number(value).toLocaleString('es-AR')}${suffix}`;
+      const rows = analytics.quality || [];
+      $('analytics-quality-wrap').hidden = !rows.length;
+      $('analytics-quality-rows').innerHTML = rows.map(item => {
+        const warnings = item.warnings || [];
+        const status = warnings.length ? `<span class="bad">${escapeHtml(warnings.join(' · '))}</span>` : '<span class="ok">Datos utilizables</span>';
+        return `<tr><td><strong>${escapeHtml(item.platform)}</strong></td><td>${number(item.measuredVideos)}/${number(item.videos)}</td><td>${metric(item.reachPerView)}</td><td>${metric(item.averageWatchSeconds, ' s')}</td><td>${metric(item.completionRate, '%')}</td><td>${metric(item.coveragePercent, '%')}</td><td>${status}</td></tr>`;
+      }).join('');
+    }
+
+    function renderAnalyticsCallouts(analytics) {
+      const alerts = analytics.alerts || [];
+      const recommendations = analytics.recommendations || [];
+      $('analytics-alerts').innerHTML = alerts.length
+        ? `<div class="analytics-callout bad"><strong>Alertas</strong><ul>${alerts.slice(0, 8).map(item => `<li>${escapeHtml(item.platform)}: ${escapeHtml(item.message)}${item.episodeId ? ` (${escapeHtml(item.episodeId)})` : ''}</li>`).join('')}</ul></div>`
+        : '';
+      $('analytics-recommendations').innerHTML = recommendations.length
+        ? `<div class="analytics-callout ok"><strong>Recomendaciones basadas en datos</strong><ul>${recommendations.slice(0, 8).map(item => { const id = item.id || ''; const status = item.status || 'proposed'; const canExperiment = item.dimension !== 'trend'; return `<li>${escapeHtml(item.action)} — ${escapeHtml(item.reason)} <span class="hint">[${escapeHtml(status)}]</span>${id ? ` <button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="applied" data-start-experiment="${canExperiment}" ${status === 'applied' ? 'disabled' : ''}>${canExperiment ? 'Iniciar experimento' : 'Marcar aplicada'}</button><button class="button-link" data-recommendation-id="${escapeHtml(id)}" data-recommendation-status="dismissed" ${status === 'dismissed' ? 'disabled' : ''}>Descartar</button>` : ''}</li>`; }).join('')}</ul></div>`
+        : '<p class="hint">Todavía no hay suficientes videos medidos por cohorte para recomendar cambios con confianza.</p>';
+      document.querySelectorAll('[data-recommendation-status]').forEach(button => {
+        button.onclick = async () => {
+          button.disabled = true;
+          try { await api('/api/analytics/recommendation', {id: button.dataset.recommendationId, status: button.dataset.recommendationStatus, startExperiment: button.dataset.startExperiment === 'true'}); await refresh(); toast(button.dataset.startExperiment === 'true' ? 'Experimento iniciado' : 'Decisión guardada'); }
+          catch (error) { button.disabled = false; toast(error.message); }
+        };
+      });
+    }
+
+    function renderAnalyticsExperiments(analytics) {
+      const experiments = analytics.experiments || [];
+      $('analytics-experiments').innerHTML = experiments.length
+        ? `<div class="analytics-callout"><strong>Experimentos</strong><ul>${experiments.slice(0, 8).map(item => `<li>${escapeHtml(item.platform)} · ${escapeHtml(item.dimension)}=${escapeHtml(item.variantValue)}: control ${item.control.measuredVideos}/${item.minimumVideos}, variante ${item.variant.measuredVideos}/${item.minimumVideos}, lift ${item.liftPct == null ? '—' : escapeHtml(item.liftPct + '%')} <span class="hint">[${escapeHtml(item.sampleStatus)}]</span></li>`).join('')}</ul></div>`
+        : '';
+    }
+
+    function renderAnalyticsSignals(analytics) {
+      const signals = analytics.trendSignals || [];
+      const sync = analytics.trendSync || {};
+      $('analytics-trend-sync-status').textContent = sync.error || (sync.configured ? `Última actualización: ${sync.synced || 0} señales` : 'Fuente en vivo no configurada');
+      $('analytics-trend-signal-list').innerHTML = signals.length
+        ? signals.map(item => `<li><strong>${escapeHtml(item.platform)} · ${escapeHtml(item.kind)}:</strong> ${escapeHtml(item.value)} <span class="hint">(${escapeHtml(item.source)})</span></li>`).join('')
+        : '<li class="hint">No hay señales vigentes.</li>';
     }
 
     function renderDiagnostics() {
@@ -1135,6 +1265,22 @@
       catch(e) { toast(e.message); }
       finally { $('sync-analytics').disabled = false; }
     };
+    $('import-analytics-trends').onclick = async () => {
+      try {
+        const parsed = JSON.parse($('analytics-trend-signals').value);
+        await api('/api/analytics/trends', {signals: Array.isArray(parsed) ? parsed : parsed.signals});
+        $('analytics-trend-signals').value = '';
+        await refresh();
+        toast('Señales importadas');
+      } catch (error) { toast(error.message || 'JSON inválido'); }
+    };
+    $('sync-analytics-trends').onclick = async () => {
+      try { await api('/api/analytics/trends/sync', {}); await refresh(); toast('Fuente de tendencias actualizada'); }
+      catch (error) { toast(error.message); }
+    };
+    $('analytics-window').onchange = () => renderAnalyticsChart(state.analytics || {});
+    $('analytics-platform').onchange = () => renderAnalyticsChart(state.analytics || {});
+    $('analytics-cohort-dimension').onchange = () => renderAnalyticsCohorts(state.analytics || {});
     $('publish-now').onclick = async () => { try { await api('/api/publish-now',{}); toast('Publicación iniciada'); refresh(); } catch(e){ toast(e.message); } };
     $('manual-publish').onclick = async event => {
       const platform = event.target.dataset.publishPlatform; if (!platform || !selectedId) return;
