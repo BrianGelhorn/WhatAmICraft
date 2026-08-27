@@ -102,6 +102,7 @@
     .diag-card span { display:block; color:var(--muted); font-size:12px; margin-bottom:6px; }
     .diag-card strong { font-size:21px; }
     .ok { color:var(--green); }
+    .warn { color:var(--yellow); }
     .bad { color:var(--red); }
     .diag-table { margin-top:14px; overflow-x:auto; }
     .diag-log { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
@@ -998,7 +999,7 @@
       $('diag-services').innerHTML = services.length ? services.map(service => `
         <tr>
           <td><strong>${escapeHtml(service.name)}</strong></td>
-          <td class="${service.state === 'running' ? 'ok' : service.state === 'stopped' ? 'bad' : ''}">${escapeHtml(serviceLabels[service.state] || 'Sin datos')}</td>
+          <td class="${service.state === 'running' ? 'ok' : service.state === 'stopped' ? 'bad' : 'warn'}">${escapeHtml(serviceLabels[service.state] || 'Sin datos')}</td>
           <td>${escapeHtml(service.status)}</td>
         </tr>`).join('') : `<tr><td colspan="3">Sin datos de servicios.</td></tr>`;
 
