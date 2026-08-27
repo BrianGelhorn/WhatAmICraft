@@ -1,0 +1,6 @@
+interface:
+  display_name: "WhatAmICraft Repo Workflow"
+  short_description: "Ramas, CI y pushes con confirmación"
+  default_prompt: "Usá $whatamicraft-repo-workflow para modificar WhatAmICraft en la rama correcta, validar, commitear y pedir confirmación antes de pushear."
+
+
