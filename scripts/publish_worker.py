@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
 OUTPUT_DIR = ROOT / "out/episodes"
 LOG_DIR = ROOT / "out/logs"
+HEARTBEAT_PATH = ROOT / "out/health/publisher-worker"
 PUBLISH_LOCK = ROOT / "out/publishing.lock"
 CPUSETS = {
     "generation": os.getenv("GENERATION_CPUSET", "0-2"),
@@ -341,6 +342,8 @@ def main() -> None:
     interval = int(os.getenv("PUBLISH_QUEUE_INTERVAL", "30"))
     while True:
         try:
+            HEARTBEAT_PATH.parent.mkdir(parents=True, exist_ok=True)
+            HEARTBEAT_PATH.touch()
             config = load_config()
             apply_runtime(config)
             stock = inventory()

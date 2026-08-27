@@ -111,7 +111,7 @@ const diagnostics = {
   counts: {videos: 3, episodes: 4, pending: 1, candidates: 1, failed: 0, published: 1},
   access: {dashboard: 'https://example.invalid/dashboard', publicVideos: 'https://example.invalid/videos'},
   ops: {backups: 1, latestBackup: '2026-08-21T10:00:00Z', contextUpdated: '2026-08-21T11:00:00Z'},
-  services: [{name: 'dashboard', state: 'running', status: 'responding'}, {name: 'analytics-api', state: 'external', status: 'configured'}],
+  services: [{name: 'dashboard', state: 'running', status: 'Responde'}, {name: 'analytics-api', state: 'running', status: 'HTTP 200'}],
   errors: [],
   logs: [],
 };

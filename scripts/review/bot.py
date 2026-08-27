@@ -33,6 +33,7 @@ MONITORED_LOGS = (
     ROOT / "out/logs/publisher-worker.log",
     ROOT / "out/logs/dashboard.log",
 )
+HEARTBEAT_PATH = ROOT / "out/health/bot"
 MONITOR_STARTED = time.time()
 
 
@@ -524,6 +525,8 @@ def main() -> None:
     log("Bot de control iniciado")
     while True:
         try:
+            HEARTBEAT_PATH.parent.mkdir(parents=True, exist_ok=True)
+            HEARTBEAT_PATH.touch()
             for update in get_updates(offset):
                 offset = update["update_id"] + 1
                 OFFSET_PATH.parent.mkdir(parents=True, exist_ok=True)

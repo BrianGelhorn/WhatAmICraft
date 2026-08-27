@@ -41,14 +41,19 @@ def main() -> None:
     directory = ROOT / "out"
     events_path = Path(directory) / "events.jsonl"
     events_path.unlink(missing_ok=True)
+    heartbeat = Path(directory) / "test-bot-heartbeat"
+    heartbeat.parent.mkdir(parents=True, exist_ok=True)
+    heartbeat.touch()
     monitor = MonitorService(
         events_path=events_path,
         targets=[
             {"service": "fake-api", "url": f"{fake_url}/health", "expected": {200}},
             {"service": "fake-media", "url": f"{fake_url}/media", "expected": {200, 403}},
+            {"service": "fake-bot", "heartbeat": str(heartbeat), "maxAge": 120},
         ],
     )
     assert monitor.check_now()["ok"]
+    assert monitor.status()["services"][-1]["status"] == "up"
     FakeHandler.statuses["/health"] = 503
     assert monitor.check_now()["services"][0]["status"] == "degraded"
     FakeHandler.statuses["/health"] = 200
@@ -65,15 +70,18 @@ def main() -> None:
     status, health = json_request(f"{monitor_url}/health")
     assert status == 200 and health["service"] == "monitor"
     status, state = json_request(f"{monitor_url}/api/monitor/status")
-    assert status == 200 and len(state["services"]) == 2
+    assert status == 200 and len(state["services"]) == 3
     status, created = json_request(
         f"{monitor_url}/api/monitor/events",
         method="POST",
         payload={"service": "fake-api", "level": "warning", "message": "recovering"},
     )
     assert status == 201 and created["ok"]
+    heartbeat.unlink()
+    assert monitor.check_now()["services"][-1]["status"] == "down"
     server.shutdown()
     events_path.unlink(missing_ok=True)
+    heartbeat.unlink(missing_ok=True)
     fake.shutdown()
     print("ok: monitoring service checks dependencies, recovery, redaction, and HTTP API")
 
