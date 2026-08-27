@@ -29,6 +29,7 @@ const episode = (id, target, overrides = {}) => ({
   status: 'Sin generar',
   queueStatus: null,
   platforms: [],
+  historicalPlatforms: [],
   answer: target,
   clueDetails: [],
   revealText: '',
@@ -57,6 +58,7 @@ const state = {
     episode('mc-02', 'Wind Charge', {...preview, status: 'Esperando aprobación'}),
     episode('mc-03', 'Recovery Compass', {...preview, status: 'En cola', queueStatus: 'pending'}),
     episode('mc-04', 'Golden Apple', {...preview, kind: 'Food', status: 'Publicado', platforms: ['youtube']}),
+    episode('mc-05', 'Old Template', {status: 'Publicado', historicalPlatforms: ['youtube', 'instagram']}),
   ],
   formats: [{id: 'clues', label: 'Quiz definitivo', enabled: true, priority: 5, sharePct: 100, targetStock: 8, total: 4, rendered: 3, stock: 2, review: 1, queued: 1}],
   music: {
@@ -243,7 +245,9 @@ try {
   assert.equal(await evaluate(() => document.querySelector('#job-error').hidden), false);
   await click('[data-dismiss-job-error]');
   assert.equal(await evaluate(() => document.querySelector('#job-error').hidden), true);
-  assert.deepEqual(await evaluate(() => ['review', 'queued', 'to-generate-total', 'published-total'].map((id) => document.getElementById(id).textContent)), ['1', '1', '1', '1']);
+  assert.deepEqual(await evaluate(() => ['review', 'queued', 'to-generate-total', 'published-total'].map((id) => document.getElementById(id).textContent)), ['1', '1', '1', '2']);
+  await click('[data-video-filter="all"]');
+  assert.equal(await evaluate(() => document.querySelector('tr[data-id="mc-05"] .row-actions').textContent.includes('Generar')), false);
 
   await click('[data-video-filter="all"]');
   await setValue('#video-search', 'crossbow');

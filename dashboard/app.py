@@ -410,13 +410,16 @@ def dashboard_state() -> dict:
         queue_item = queue_by_id.get(episode["id"])
         has_new_video = video.exists() and video.name in new_video_names
         record = publishing.get(episode["id"], {})
-        current_publication = has_new_video and record.get("sha256") == sha256(video)
-        platforms = list(record.get("platforms", {})) if current_publication else []
+        publication_matches_video = video.exists() and record.get("sha256") == sha256(video)
+        current_publication = has_new_video and publication_matches_video
+        published_platforms = list(record.get("platforms", {})) if publication_matches_video else []
+        platforms = published_platforms if current_publication else []
+        historical_platforms = published_platforms if not current_publication else []
         if queue_item and not current_publication and queue_item["status"] != "pending":
             queue_item = None
         if episode["id"] in pending_ids or episode.get("needs_review"):
             status = "Pistas pendientes"
-        elif platforms:
+        elif platforms or historical_platforms:
             status = "Publicado"
         elif queue_item:
             status = {"pending": "En cola", "failed": "Error al publicar", "completed": "Publicado"}.get(
@@ -459,6 +462,7 @@ def dashboard_state() -> dict:
                 "status": status,
                 "queueStatus": queue_item["status"] if queue_item else None,
                 "platforms": platforms,
+                "historicalPlatforms": historical_platforms,
                 "answer": episode["answer"].get("displayName", episode["answer"].get("id", "")),
                 "clueDetails": clue_details,
                 "revealText": episode.get("reveal", {}).get("voice", {}).get("text", ""),
