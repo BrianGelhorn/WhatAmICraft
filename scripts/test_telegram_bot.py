@@ -207,6 +207,25 @@ def main() -> None:
 
         bot.handle_callback({"id": "cb-unknown", "message": {"chat": {"id": 42}}, "data": "unknown:value"})
         assert "Error:" in telegram_messages(telegram_server)[-1]["text"]
+
+        sent = []
+        original_tell = bot.tell
+        original_log = bot.log
+        bot.tell = lambda chat_id, text, keyboard=None: sent.append((chat_id, text))
+        bot.log = lambda _text: None
+        try:
+            outage = {}
+            bot.notify_telegram_failure(RuntimeError("dns"), outage)
+            bot.notify_telegram_failure(RuntimeError("dns"), outage)
+            assert len(sent) == 1
+            bot.notify_telegram_recovery(outage)
+            assert len(sent) == 2 and "restaurada" in sent[-1][1]
+            bot.notify_telegram_recovery(outage)
+            assert len(sent) == 2
+            assert [bot.next_retry_delay(delay) for delay in (5, 10, 20, 40, 60)] == [10, 20, 40, 60, 60]
+        finally:
+            bot.tell = original_tell
+            bot.log = original_log
     finally:
         telegram_server.shutdown()
         dashboard_server.shutdown()
