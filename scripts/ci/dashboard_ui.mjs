@@ -246,6 +246,7 @@ try {
   await click('[data-dismiss-job-error]');
   assert.equal(await evaluate(() => document.querySelector('#job-error').hidden), true);
   assert.deepEqual(await evaluate(() => ['review', 'queued', 'to-generate-total', 'published-total'].map((id) => document.getElementById(id).textContent)), ['1', '1', '1', '2']);
+  await click('[data-video-filter="all"]');
   assert.equal(await evaluate(() => document.querySelector('tr[data-id="mc-05"] .row-actions').textContent.includes('Generar')), false);
 
   await click('[data-video-filter="all"]');
