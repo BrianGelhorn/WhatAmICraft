@@ -12,6 +12,7 @@ from publishing import PUBLISHERS
 from publishing.common import PublishRequest, sha256
 from publishing.settings import apply_runtime, enabled_platforms, load_config
 from review.storage import pending_queue_ids, publishing_state, save_published_platform, set_queue_status
+from template_artifacts import validate_artifact
 from thumbnails import copy_thumbnail_config, render_thumbnails
 from video_formats import ready_episodes, thumbnail_path, video_stem
 
@@ -149,7 +150,16 @@ def run(args: argparse.Namespace) -> int:
                 set_queue_status(episode["id"], "failed", f"Falta {item.video.name}")
                 failed = True
             continue
+        try:
+            artifact = validate_artifact(item.video, episode_id=episode["id"], root=ROOT)
+        except RuntimeError as error:
+            print(f"{episode['id']}: omitido, {error}", file=sys.stderr)
+            if args.queue and not args.dry_run:
+                set_queue_status(episode["id"], "failed", str(error))
+            failed = True
+            continue
         print(f"{episode['id']}: {item.video.name}")
+        print(f"  plantilla: {artifact['templateVersion']}")
         if args.dry_run:
             print(f"  publicar: {', '.join(platforms)}")
             continue
@@ -169,6 +179,10 @@ def run(args: argparse.Namespace) -> int:
                 record["platforms"][platform] = {
                     **result,
                     "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "publishedTitle": platform_item.title,
+                    "publishedCaption": platform_item.caption,
+                    "publishedHashtags": list(platform_item.hashtags),
+                    "templateVersion": artifact.get("templateVersion"),
                 }
                 save_published_platform(episode["id"], fingerprint, platform, record["platforms"][platform])
                 print(f"  {platform}: listo")

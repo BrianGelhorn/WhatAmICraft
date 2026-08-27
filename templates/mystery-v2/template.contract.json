@@ -1,0 +1,70 @@
+{
+  "template": "mystery-v2",
+  "compositionId": "MysteryVideo",
+  "fps": 30,
+  "durationInFrames": 495,
+  "automation": {
+    "format": "mystery-v2",
+    "inputPath": "data/mystery-v2-episodes.json",
+    "schemaPath": "schemas/mystery-v2-episode.schema.json",
+    "producer": "scripts/produce_mystery_v2.py",
+    "generatedConfigPath": "src/generated/mystery-v2-episode.json",
+    "editableFields": [
+      "answer",
+      "background",
+      "hookOptions",
+      "ruleText",
+      "hints",
+      "countdown",
+      "reveal",
+      "ctaOptions",
+      "variants",
+      "theme",
+      "voiceGeneration",
+      "audio",
+      "debug"
+    ],
+    "generatedFields": [
+      "hook",
+      "cta",
+      "renderMode",
+      "timeline",
+      "voice.segments[]",
+      "voice.segments[].words[]",
+      "audio.effects[]"
+    ]
+  },
+  "intro": {
+    "hookDurationFrames": 35,
+    "handoffDurationFrames": 6,
+    "contentStartFrame": 35,
+    "maxContentStartFrame": 35,
+    "visualBeats": [
+      {"id": "question", "from": 0, "description": "question, category, urgency and generic category silhouette are visible"},
+      {"id": "rule", "from": 12, "description": "three-hints rule and global tension become prominent"},
+      {"id": "first-hint", "from": 35, "description": "first configured hint begins before 1.2 seconds"}
+    ]
+  },
+  "audio": {
+    "status": "pending",
+    "allowedSources": [],
+    "cues": [],
+    "normalization": {"voiceTargetLufs": -16, "voiceTruePeakDb": -1.5, "voiceLoudnessRange": 11}
+  },
+  "scenes": [
+    {"id": "hook", "from": 0, "durationInFrames": 35},
+    {"id": "hint-1", "from": 35, "durationInFrames": 78},
+    {"id": "hint-2", "from": 113, "durationInFrames": 78},
+    {"id": "hint-3", "from": 191, "durationInFrames": 78},
+    {"id": "countdown", "from": 269, "durationInFrames": 54},
+    {"id": "reveal", "from": 323, "durationInFrames": 72},
+    {"id": "cta", "from": 395, "durationInFrames": 90},
+    {"id": "loop", "from": 485, "durationInFrames": 10}
+  ],
+  "animationPolicy": {
+    "allowed": ["fade", "translate", "scale", "rotate"],
+    "maxScale": 1.12,
+    "allowCssTransitions": false,
+    "allowRandomness": false
+  }
+}

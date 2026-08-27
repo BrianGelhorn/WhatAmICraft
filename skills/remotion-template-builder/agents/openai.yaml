@@ -1,4 +1,4 @@
 interface:
   display_name: "Constructor de plantillas Remotion"
-  short_description: "Crear plantillas Remotion sin errores de audio"
-  default_prompt: "Construye primero la plantilla Remotion completa sin audio; despues reutiliza, quita, sincroniza o genera los audios necesarios y verifica el resultado en Studio."
+short_description: "Crear plantillas Remotion orientadas a retención"
+default_prompt: "Construye primero la plantilla Remotion completa sin audio con hook inmediato, contenido antes del frame 45 y CTA cuantificable; despues reutiliza, quita, sincroniza o genera los audios necesarios y verifica el resultado en Studio."

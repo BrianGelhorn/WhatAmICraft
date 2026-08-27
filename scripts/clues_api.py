@@ -12,6 +12,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+from mystery_prefabs import load_prefab_catalog
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET_ID = re.compile(r"^[a-z0-9]+(?:[_-][a-z0-9]+)*$")
@@ -41,11 +43,13 @@ class ClueCatalog:
         source_dirs: list[Path] | None = None,
         upload_dir: Path | None = None,
         used_targets_path: Path | None = None,
+        prefab_catalog_path: Path | None = None,
     ):
         self.root = root
         self.source_dirs = source_dirs or [root / "data/new-clues-20260815"]
         self.upload_dir = upload_dir or root / "data/clues/inbox"
         self.used_targets_path = used_targets_path or root / "data/used-targets.json"
+        self.prefab_catalog_path = prefab_catalog_path or root / "data/mystery-v2-visual-prefabs.json"
         self._write_lock = threading.Lock()
 
     def _files(self) -> list[Path]:
@@ -132,6 +136,9 @@ class ClueCatalog:
         if not item:
             raise FileNotFoundError(target_id)
         return item
+
+    def prefabs(self) -> dict:
+        return load_prefab_catalog(self.prefab_catalog_path)
 
     @staticmethod
     def validate_upload(value: dict) -> dict:
@@ -302,6 +309,8 @@ class Handler(BaseHTTPRequestHandler):
                 limit = min(100, max(1, int(query.get("limit", ["100"])[0])))
                 result["items"] = result["items"][offset:offset + limit]
                 self.send_json(result)
+            elif parsed.path == "/api/clue-prefabs":
+                self.send_json(self.catalog.prefabs())
             elif parsed.path.startswith("/api/clues/"):
                 self.send_json(self.catalog.get(unquote(parsed.path.removeprefix("/api/clues/"))))
             else:
@@ -370,7 +379,8 @@ def main() -> None:
     source = Path(os.getenv("CLUES_SOURCE_DIR", str(root / "data/new-clues-20260815")))
     upload = Path(os.getenv("CLUES_UPLOAD_DIR", str(root / "data/clues/inbox")))
     used = Path(os.getenv("CLUES_USED_TARGETS_PATH", str(root / "data/used-targets.json")))
-    server = make_server(os.getenv("CLUES_HOST", "0.0.0.0"), int(os.getenv("CLUES_PORT", "8790")), ClueCatalog(root, [source], upload, used))
+    prefab_catalog = Path(os.getenv("CLUES_PREFAB_CATALOG_PATH", str(root / "data/mystery-v2-visual-prefabs.json")))
+    server = make_server(os.getenv("CLUES_HOST", "0.0.0.0"), int(os.getenv("CLUES_PORT", "8790")), ClueCatalog(root, [source], upload, used, prefab_catalog))
     print(f"Clues API activo en el puerto {server.server_port}", flush=True)
     server.serve_forever()
 

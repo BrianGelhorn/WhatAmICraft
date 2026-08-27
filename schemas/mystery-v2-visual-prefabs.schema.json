@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "format", "status", "prefabs"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"const": 1},
+    "format": {"const": "mystery-v2-visual-prefabs"},
+    "status": {"enum": ["review", "approved"]},
+    "prefabs": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "required": ["number", "id", "title", "role", "status", "description", "relations", "supportedKinds", "assets"],
+        "properties": {
+          "number": {"type": "integer", "minimum": 1, "maximum": 30},
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "title": {"type": "string", "minLength": 1, "maxLength": 34},
+          "role": {"enum": ["property-state", "action-interaction", "origin-context"]},
+          "status": {"enum": ["draft", "approved"]},
+          "description": {"type": "string", "minLength": 1, "maxLength": 100},
+          "relations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9_]+$"}},
+          "supportedKinds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z]+$"}},
+          "assets": {"type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

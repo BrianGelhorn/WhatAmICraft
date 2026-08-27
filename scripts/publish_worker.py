@@ -21,6 +21,7 @@ from review.storage import publishing_state, save_stock_alert_state, stock_alert
 from review.telegram import configured as telegram_configured
 from review.telegram import send_message
 from publishing.common import sha256
+from template_artifacts import active_template_version, release_version
 from video_formats import (
     current_template_video_names,
     format_id_for,
@@ -279,6 +280,10 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
     generation = config["generation"]
     schedule = load_generation_schedule()
     if not generation["enabled"] or not is_due({"schedule": generation}, schedule):
+        return
+    if active_template_version() != release_version():
+        save_generation_schedule(next_run_iso(5))
+        log(LOG_DIR / "generator.log", "skip: template release awaits canary promotion")
         return
     if read_job("generation")["status"] == "running":
         save_generation_schedule(next_run_iso(5))
