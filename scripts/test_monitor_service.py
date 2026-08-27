@@ -77,6 +77,8 @@ def main() -> None:
         payload={"service": "fake-api", "level": "warning", "message": "recovering"},
     )
     assert status == 201 and created["ok"]
+    heartbeat.unlink()
+    assert monitor.check_now()["services"][-1]["status"] == "down"
     server.shutdown()
     events_path.unlink(missing_ok=True)
     heartbeat.unlink(missing_ok=True)
