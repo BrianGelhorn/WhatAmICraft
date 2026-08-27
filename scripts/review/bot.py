@@ -33,7 +33,9 @@ MONITORED_LOGS = (
     ROOT / "out/logs/publisher-worker.log",
     ROOT / "out/logs/dashboard.log",
 )
-MONITOR_STARTED = time.time()\nTELEGRAM_RETRY_INITIAL_SECONDS = 5\nTELEGRAM_RETRY_MAX_SECONDS = 60
+MONITOR_STARTED = time.time()
+TELEGRAM_RETRY_INITIAL_SECONDS = 5
+TELEGRAM_RETRY_MAX_SECONDS = 60
 
 
 def log(text: str) -> None:
