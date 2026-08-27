@@ -34,7 +34,7 @@ def bundled_ffmpeg() -> str | None:
     for name in names:
         if executable := shutil.which(name):
             return executable
-        for path in (ROOT / "node_modules").glob(f"@remotion/compositor-*/{name}"):
+        for path in sorted((ROOT / "node_modules").glob(f"@remotion/compositor-*/{name}")):
             if path.is_file():
                 return str(path)
     return None
