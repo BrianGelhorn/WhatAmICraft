@@ -34,6 +34,8 @@ MONITORED_LOGS = (
     ROOT / "out/logs/dashboard.log",
 )
 MONITOR_STARTED = time.time()
+TELEGRAM_RETRY_INITIAL_SECONDS = 5
+TELEGRAM_RETRY_MAX_SECONDS = 60
 
 
 def log(text: str) -> None:
@@ -518,13 +520,52 @@ def monitor_errors() -> None:
     write_alert_state(state)
 
 
+def next_retry_delay(delay: float) -> float:
+    return min(delay * 2, TELEGRAM_RETRY_MAX_SECONDS)
+
+
+def notify_telegram_failure(error: Exception, state: dict[str, bool]) -> None:
+    log(f"Bot: {error}")
+    if state.get("outage"):
+        return
+    state["outage"] = True
+    try:
+        if os.getenv("TELEGRAM_REVIEW_CHAT_ID"):
+            tell(os.environ["TELEGRAM_REVIEW_CHAT_ID"], f"⚠️ Error del bot:\n{error}")
+    except Exception:
+        pass
+
+
+def notify_telegram_recovery(state: dict[str, bool]) -> None:
+    if not state.get("outage"):
+        return
+    state["outage"] = False
+    try:
+        if os.getenv("TELEGRAM_REVIEW_CHAT_ID"):
+            tell(os.environ["TELEGRAM_REVIEW_CHAT_ID"], "✅ Conexión con Telegram restaurada.")
+    except Exception as error:
+        log(f"Bot: no se pudo notificar la recuperación: {error}")
+
+
 def main() -> None:
     apply_runtime()
     offset = int(OFFSET_PATH.read_text().strip()) if OFFSET_PATH.exists() else 0
     log("Bot de control iniciado")
+    retry_delay = float(TELEGRAM_RETRY_INITIAL_SECONDS)
+    telegram_state = {"outage": False}
     while True:
         try:
-            for update in get_updates(offset):
+            updates = get_updates(offset)
+        except Exception as error:
+            notify_telegram_failure(error, telegram_state)
+            time.sleep(retry_delay)
+            retry_delay = next_retry_delay(retry_delay)
+            continue
+
+        notify_telegram_recovery(telegram_state)
+        retry_delay = float(TELEGRAM_RETRY_INITIAL_SECONDS)
+        try:
+            for update in updates:
                 offset = update["update_id"] + 1
                 OFFSET_PATH.parent.mkdir(parents=True, exist_ok=True)
                 OFFSET_PATH.write_text(str(offset), encoding="utf-8")
