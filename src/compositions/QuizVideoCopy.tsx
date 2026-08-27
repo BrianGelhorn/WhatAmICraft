@@ -10,16 +10,14 @@ import {
 } from "remotion";
 import {Audio} from "@remotion/media";
 import {ClueSequenceSilent} from "../components/ClueSequenceSilent";
-import config from "../generated/quiz-copy-episode.json";
+import defaultConfig from "../generated/quiz-copy-episode.json";
 
-const CONTENT_START_FRAME = config.timeline.contentStartFrame;
-const clues = config.clues;
-const CLUE_SEQUENCE_DURATION_IN_FRAMES =
-  clues.length * config.timeline.hintDurationInFrames
-  + config.timeline.revealDurationInFrames;
-export const INTRO_AND_QUESTION_DURATION = CONTENT_START_FRAME;
+export type QuizCopyConfig = typeof defaultConfig;
+export const INTRO_AND_QUESTION_DURATION = defaultConfig.timeline.contentStartFrame;
 export const QUIZ_COPY_DURATION_IN_FRAMES =
-  CONTENT_START_FRAME + CLUE_SEQUENCE_DURATION_IN_FRAMES;
+  defaultConfig.timeline.contentStartFrame
+  + defaultConfig.clues.length * defaultConfig.timeline.hintDurationInFrames
+  + defaultConfig.timeline.revealDurationInFrames;
 
 const enter = {
   extrapolateLeft: "clamp" as const,
@@ -28,23 +26,27 @@ const enter = {
 };
 
 const REEL_ITEM_WIDTH = 150;
-const REEL_STOP_FRAME = config.timeline.reelStopFrame;
-
-const getReelPosition = (frame: number, stopIndex: number) =>
-  interpolate(frame, [0, REEL_STOP_FRAME], [0, stopIndex], {
+const getReelPosition = (frame: number, reelStopFrame: number, stopIndex: number) =>
+  interpolate(frame, [0, reelStopFrame], [0, stopIndex], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.18, 0.9, 0.22, 1),
   });
 
-export const QuizVideoCopy: React.FC = () => {
+export const QuizVideoCopy: React.FC<{config?: QuizCopyConfig}> = ({config = defaultConfig}) => {
+  const contentStartFrame = config.timeline.contentStartFrame;
+  const clues = config.clues;
+  const clueSequenceDurationInFrames =
+    clues.length * config.timeline.hintDurationInFrames
+    + config.timeline.revealDurationInFrames;
+  const reelStopFrame = config.timeline.reelStopFrame;
   const frame = useCurrentFrame();
   const music = config.audio.music;
-  const isIntro = frame < CONTENT_START_FRAME;
+  const isIntro = frame < contentStartFrame;
   const typeAsset = `images/guess-types/hidden/${config.answer.guessType}.png`;
   const roulettePool = config.hook.rouletteIcons;
   const rouletteAssets = roulettePool;
-  const rouletteActive = frame < REEL_STOP_FRAME;
+  const rouletteActive = frame < reelStopFrame;
   const reelAssets = [
     ...rouletteAssets,
     ...rouletteAssets,
@@ -52,17 +54,17 @@ export const QuizVideoCopy: React.FC = () => {
     ...rouletteAssets,
   ];
   const reelStopIndex = rouletteAssets.length * 2;
-  const reelPosition = getReelPosition(frame, reelStopIndex);
+  const reelPosition = getReelPosition(frame, reelStopFrame, reelStopIndex);
   const selectionImpact = interpolate(
     frame,
-    [REEL_STOP_FRAME, REEL_STOP_FRAME + 2, REEL_STOP_FRAME + 8],
+    [reelStopFrame, reelStopFrame + 2, reelStopFrame + 8],
     [0, 1, 0],
     {extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.quad)},
   );
   const reelOffset = 380 - (reelPosition + 0.5) * REEL_ITEM_WIDTH;
   const selectedRevealScale = interpolate(
     frame,
-    [REEL_STOP_FRAME, REEL_STOP_FRAME + 5, REEL_STOP_FRAME + 12],
+    [reelStopFrame, reelStopFrame + 5, reelStopFrame + 12],
     [0.66, 1.08, 1.02],
     {
       extrapolateLeft: "clamp",
@@ -70,15 +72,16 @@ export const QuizVideoCopy: React.FC = () => {
       easing: Easing.out(Easing.quad),
     },
   );
+  const silhouettePulseEndFrame = Math.max(contentStartFrame, reelStopFrame + 121);
   const silhouettePulse = interpolate(
     frame,
     [
-      REEL_STOP_FRAME,
-      REEL_STOP_FRAME + 30,
-      REEL_STOP_FRAME + 60,
-      REEL_STOP_FRAME + 90,
-      REEL_STOP_FRAME + 120,
-      CONTENT_START_FRAME,
+      reelStopFrame,
+      reelStopFrame + 30,
+      reelStopFrame + 60,
+      reelStopFrame + 90,
+      reelStopFrame + 120,
+      silhouettePulseEndFrame,
     ],
     [1, 1.03, 1, 1.03, 1, 0.98],
     {extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad)},
@@ -183,7 +186,7 @@ export const QuizVideoCopy: React.FC = () => {
           height: 1920,
           objectFit: "cover",
           filter: isIntro ? "blur(5px) brightness(.48) saturate(1.2)" : "blur(7px) brightness(.58)",
-          scale: interpolate(frame, [0, QUIZ_COPY_DURATION_IN_FRAMES], [1.08, 1.14], {
+          scale: interpolate(frame, [0, config.durationInFrames], [1.08, 1.14], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
             easing: Easing.linear,
@@ -199,7 +202,7 @@ export const QuizVideoCopy: React.FC = () => {
               "linear-gradient(180deg, rgba(2,8,18,.82), rgba(3,21,28,.2) 48%, rgba(2,8,18,.92))",
             opacity: interpolate(
               frame,
-              [0, 6, CONTENT_START_FRAME - 10, CONTENT_START_FRAME - 1],
+              [0, 6, contentStartFrame - 10, contentStartFrame - 1],
               [0, 1, 1, 0.28],
               enter,
             ),
@@ -251,7 +254,7 @@ export const QuizVideoCopy: React.FC = () => {
               overflow: "hidden",
               opacity: interpolate(
                 frame,
-                [0, 3, REEL_STOP_FRAME - 4, REEL_STOP_FRAME + 4],
+                [0, 3, reelStopFrame - 4, reelStopFrame + 4],
                 [0, 1, 1, 0],
                 enter,
               ),
@@ -305,7 +308,7 @@ export const QuizVideoCopy: React.FC = () => {
                 : `0 0 ${18 + selectionImpact * 18}px rgba(126,200,80,${0.8 + selectionImpact * 0.2})`,
               opacity: interpolate(
                 frame,
-                [8, 14, REEL_STOP_FRAME - 1, REEL_STOP_FRAME + 4],
+                [8, 14, reelStopFrame - 1, reelStopFrame + 4],
                 [0, 0.88, 0.88, 0],
                 enter,
               ),
@@ -326,17 +329,17 @@ export const QuizVideoCopy: React.FC = () => {
               opacity: interpolate(
                 frame,
                 [
-                  Math.max(0, REEL_STOP_FRAME - 10),
-                  REEL_STOP_FRAME - 2,
-                  CONTENT_START_FRAME - 14,
-                  CONTENT_START_FRAME,
+                  Math.max(0, reelStopFrame - 10),
+                  reelStopFrame - 2,
+                  contentStartFrame - 14,
+                  contentStartFrame,
                 ],
                 [0, 0.82, 0.82, 0],
                 enter,
               ),
               transform: `rotate(${interpolate(
                 frame,
-                [Math.max(0, REEL_STOP_FRAME - 10), CONTENT_START_FRAME],
+                [Math.max(0, reelStopFrame - 10), contentStartFrame],
                 [0, 250],
                 {
                   extrapolateLeft: "clamp",
@@ -362,7 +365,7 @@ export const QuizVideoCopy: React.FC = () => {
                 `brightness(0) drop-shadow(0 18px 0 rgba(0,0,0,.8)) drop-shadow(0 0 32px rgba(126,200,80,.95)) drop-shadow(0 0 ${18 + selectionImpact * 28}px rgba(255,211,79,${selectionImpact * 0.9}))`,
               opacity: interpolate(
                 frame,
-                [REEL_STOP_FRAME - 4, REEL_STOP_FRAME + 4],
+                [reelStopFrame - 4, reelStopFrame + 4],
                 [0, 1],
                 enter,
               ),
@@ -392,13 +395,13 @@ export const QuizVideoCopy: React.FC = () => {
               boxShadow: "0 10px 0 rgba(0,0,0,.48), 0 0 24px rgba(255,211,79,.55)",
               opacity: interpolate(
                 frame,
-                [REEL_STOP_FRAME - 1, REEL_STOP_FRAME],
+                [reelStopFrame - 1, reelStopFrame],
                 [0, 1],
                 enter,
               ),
               scale: interpolate(
                 frame,
-                [REEL_STOP_FRAME - 1, REEL_STOP_FRAME + 4],
+                [reelStopFrame - 1, reelStopFrame + 4],
                 [0.7, 1],
                 {...enter, output: "perceptual-scale"},
               ),
@@ -494,8 +497,8 @@ export const QuizVideoCopy: React.FC = () => {
                 [
                   config.timeline.categoryFromFrame,
                   config.timeline.categoryFromFrame + 6,
-                  CONTENT_START_FRAME - 22,
-                  CONTENT_START_FRAME - 8,
+                  contentStartFrame - 22,
+                  contentStartFrame - 8,
                 ],
                 [0, 1, 1, 0],
                 enter,
@@ -515,8 +518,8 @@ export const QuizVideoCopy: React.FC = () => {
 
       <Sequence
         name="Quiz hints and reveal"
-        from={CONTENT_START_FRAME}
-        durationInFrames={CLUE_SEQUENCE_DURATION_IN_FRAMES}
+        from={contentStartFrame}
+        durationInFrames={clueSequenceDurationInFrames}
         premountFor={30}
       >
         <ClueSequenceSilent

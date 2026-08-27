@@ -3,16 +3,16 @@ from __future__ import annotations
 import copy
 import json
 import random
-import re
 from pathlib import Path
 
 try:
+    from .template_artifacts import active_template_version, read_artifact
     from .thumbnails import DEFAULT_DESIGN_VARIANT, type_slug
 except ImportError:  # script entrypoints run with scripts/ on sys.path
+    from template_artifacts import active_template_version, read_artifact
     from thumbnails import DEFAULT_DESIGN_VARIANT, type_slug
 
 ROOT = Path(__file__).resolve().parents[1]
-CURRENT_TEMPLATE = "QuizCapasCopy"
 TARGET_KINDS = {
     item["id"]: item.get("kind", "")
     for item in json.loads((ROOT / "data/used-targets.json").read_text(encoding="utf-8")).get("targets", [])
@@ -85,22 +85,16 @@ def video_path(episode: dict, root: Path = ROOT) -> Path:
 
 
 def current_template_video_names(root: Path = ROOT) -> set[str]:
+    active = active_template_version(root)
     names = set()
-    for log in sorted((root / "out/logs").rglob("*.log")) if (root / "out/logs").exists() else []:
-        try:
-            lines = log.read_text(encoding="utf-8", errors="ignore").splitlines()
-        except OSError:
-            continue
-        template = None
-        for line in lines:
-            match = re.search(r"Composition\s+(\S+)", line)
-            if match:
-                template = match.group(1)
-            output = re.search(r"Output\s+.*(?:/|\\)episodes/(?:\.?)(mc-\d+-[^\s/]+\.mp4)", line)
-            if output and template == CURRENT_TEMPLATE:
-                names.add(output.group(1))
-    # ponytail: preserve only the two manually confirmed current-template videos until their logs are rotated.
-    names.update({"mc-02-goat_horn.mp4", "mc-03-wind_charge.mp4"})
+    episodes = root / "out/episodes"
+    if not episodes.is_dir():
+        return names
+    for manifest in episodes.glob("*.artifact.json"):
+        video = episodes / f"{manifest.name.removesuffix('.artifact.json')}.mp4"
+        artifact = read_artifact(video)
+        if artifact and artifact.get("templateVersion") == active:
+            names.add(video.name)
     return names
 
 

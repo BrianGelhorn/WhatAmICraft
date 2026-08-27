@@ -1,0 +1,14 @@
+interface:
+  display_name: "Minecraft Clue Generator"
+  short_description: "Genera 3 pistas verificadas y visuales"
+  default_prompt: "Usá $generate-minecraft-clues para crear 3 pistas verificadas, no repetidas y listas para una plantilla visual dinámica."
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
+policy:
+  products:
+  - "chatgpt"
+  - "codex"
+  - "api"
+  - "atlas"
+  allow_implicit_invocation: true
+

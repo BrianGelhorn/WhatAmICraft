@@ -14,6 +14,7 @@ from publishing.meta import _graph, _instagram_graph
 from publishing.tiktok import _chunks
 from review import storage
 from dashboard.app import _pkce_challenge
+from template_artifacts import render_props_path, write_artifact
 
 
 def main() -> None:
@@ -88,6 +89,19 @@ def main() -> None:
             },
         )
         (fixture / "out/episodes/mc-01-test.mp4").write_bytes(b"video")
+        thumbnail = fixture / "out/thumbnails/item/default/mc-01-test.vertical.jpg"
+        thumbnail.parent.mkdir(parents=True)
+        thumbnail.write_bytes(b"thumbnail")
+        props = render_props_path("mc-01-test", "video", fixture)
+        props.parent.mkdir(parents=True, exist_ok=True)
+        props.write_text('{"config": {}}', encoding="utf-8")
+        write_artifact(
+            episode_id="mc-01",
+            video=fixture / "out/episodes/mc-01-test.mp4",
+            config={},
+            thumbnail=thumbnail,
+            root=fixture,
+        )
         (fixture / "public/audio/quiz-copy/mc-01/clue.mp3").write_bytes(b"audio")
         storage.queue_episode("mc-01")
         assert storage.pending_queue_ids() == ["mc-01"]

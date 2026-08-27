@@ -1,0 +1,5 @@
+interface:
+  display_name: "WhatAmICraft CI/CD"
+  short_description: "Full-stack tests with secret safety"
+  default_prompt: "Use $whatamicraft-ci-cd to design or run safe CI/CD checks for WhatAmICraft across code, services, APIs, generation, media, Telegram, and publishing."
+
