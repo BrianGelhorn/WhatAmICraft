@@ -13,7 +13,9 @@ For product behavior, data, services, media, generation, publishing, analytics, 
 
 - Treat the mini PC as the only production host. Treat Windows/local as development and explicit one-off rendering only.
 - Treat `pre-main` as the notebook integration branch and `main` as the production promotion branch.
-- Never touch production, publish, restart services, merge `main`, or alter remote settings unless requested.
+- Production is GitHub-controlled: make changes on a branch, validate them, merge to `main`, and let the production workflow deploy to the mini PC. Never copy files, edit code/configuration, install services, clean data, publish, restart services, or deploy directly on production unless the user explicitly specifies that direct production action.
+- Read-only production diagnostics over SSH are allowed when relevant. A direct production exception must be narrowly scoped, reported, and synchronized back into the repository afterward; it must not become the normal release path.
+- Never merge `main` or alter remote settings unless requested.
 - Never read or stage secrets, `.env*`, `.secrets/`, databases, backups, runtime state, dependencies, or generated/media files.
 - Never force-push, rewrite history, discard user changes, or mix unrelated work.
 - Keep `main` releasable; use a work branch.
@@ -66,7 +68,7 @@ Continue the current focused branch when the task is a direct follow-up. Stop be
 
 ## Production release
 
-`main` is the release source. A successful merge to `main` is expected to trigger the self-hosted mini-PC deployment; do not manually copy the checkout. `pre-main` deploys only to the isolated Windows notebook environment through `scripts/pre_main.ps1`; it must never use production data/secrets or contact real providers. Verify required checks, backup/rollback readiness, deployment conclusion, service health, and version after a `main` merge.
+`main` is the only production release source. A successful merge to `main` is expected to trigger the self-hosted mini-PC deployment; do not manually copy the checkout or apply direct production changes as a substitute. `pre-main` deploys only to the isolated Windows notebook environment through `scripts/pre_main.ps1`; it must never use production data/secrets or contact real providers. Verify required checks, backup/rollback readiness, deployment conclusion, service health, and version after a `main` merge.
 
 Production secrets stay at `/etc/whatamicraft/production.env`. Never read them. Start/rebuild only through the root-owned no-argument launcher:
 
@@ -79,4 +81,3 @@ If it is missing or asks for unsupported access, stop and ask the operator. Neve
 ## Report
 
 End with branch, intended base, commit(s), checks, push/PR status, deployment status, and any unverified boundary.
-
