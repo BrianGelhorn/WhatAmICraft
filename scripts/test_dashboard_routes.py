@@ -83,6 +83,11 @@ def service_statuses_use_monitor_health() -> None:
     assert by_name["media"]["state"] == "stopped"
     assert by_name["monitor"]["state"] == "running"
     assert not any(item["state"] == "external" for item in statuses)
+    app.MONITOR_API_URL = ""
+    fallback = app.service_statuses()
+    assert {item["name"] for item in fallback} == {*app.MONITORED_SERVICES, "monitor"}
+    assert all(item["state"] != "external" for item in fallback)
+    app.MONITOR_API_URL = original_url
 
 
 @contextmanager
