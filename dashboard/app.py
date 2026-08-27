@@ -552,8 +552,10 @@ def _terminate_process(process: subprocess.Popen | None, pid: int | None = None)
     target = process.pid if process else pid
     if not target:
         return
+    group_signalled = False
     try:
         os.killpg(target, signal.SIGTERM)
+        group_signalled = True
     except (AttributeError, ProcessLookupError, PermissionError):
         try:
             if process and process.poll() is None:
@@ -566,10 +568,18 @@ def _terminate_process(process: subprocess.Popen | None, pid: int | None = None)
         try:
             process.wait(timeout=2)
         except subprocess.TimeoutExpired:
+            pass
+        if group_signalled:
             try:
                 os.killpg(target, signal.SIGKILL)
             except (AttributeError, ProcessLookupError, PermissionError):
-                process.kill()
+                if process.poll() is None:
+                    process.kill()
+    elif group_signalled:
+        try:
+            os.killpg(target, signal.SIGKILL)
+        except (AttributeError, ProcessLookupError, PermissionError):
+            return
 
 
 def cancel_active_job(lane: str | None = None) -> None:

@@ -47,6 +47,7 @@ jobs:
           PYTHONPATH=scripts python scripts/test_dashboard_analytics.py
           PYTHONPATH=scripts python scripts/test_dashboard_oauth.py
           PYTHONPATH=scripts python scripts/test_dashboard_routes.py
+          PYTHONPATH=scripts python scripts/test_thread_lifecycle.py
           PYTHONPATH=scripts python scripts/test_generation_inventory.py
       - name: Dashboard browser behavior
         shell: bash
