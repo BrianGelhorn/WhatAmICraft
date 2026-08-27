@@ -7,8 +7,8 @@
   "private": true,
   "dependencies": {
     "@elevenlabs/elevenlabs-js": "^2.64.0",
-    "@remotion/captions": "4.0.512",
-    "@remotion/cli": "4.0.512",
+    "@remotion/captions": "4.0.515",
+    "@remotion/cli": "4.0.515",
     "@remotion/media": "4.0.515",
     "dotenv": "^17.4.2",
     "minecraft-data": "^3.112.0",
