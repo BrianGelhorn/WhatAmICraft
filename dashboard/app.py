@@ -284,7 +284,11 @@ def append_log(path: Path, line: str) -> None:
 def service_statuses() -> list[dict]:
     """Return observable service health without presenting deployment topology as status."""
     if not MONITOR_API_URL:
-        return [{"name": "dashboard", "state": "running", "status": "Responde"}]
+        return [
+            {"name": "dashboard", "state": "running", "status": "Responde"},
+            *({"name": name, "state": "unknown", "status": "Sin datos"} for name in MONITORED_SERVICES if name != "dashboard"),
+            {"name": "monitor", "state": "unknown", "status": "Sin datos"},
+        ]
 
     try:
         response_status, result = monitor_request("/api/monitor/check", method="POST")
