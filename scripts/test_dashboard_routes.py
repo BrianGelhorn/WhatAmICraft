@@ -61,6 +61,30 @@ def dashboard_job_controls_are_aligned() -> None:
     assert ".actions button { display:inline-flex; align-items:center; justify-content:center;" in markup
 
 
+def service_statuses_use_monitor_health() -> None:
+    original_url = app.MONITOR_API_URL
+    original_request = app.monitor_request
+    try:
+        app.MONITOR_API_URL = "http://monitor"
+        app.monitor_request = lambda _path, **_kwargs: (HTTPStatus.OK, {"services": [
+            {"service": "dashboard", "status": "up", "detail": "HTTP 200"},
+            {"service": "clues-api", "status": "degraded", "detail": "HTTP 503"},
+            {"service": "analytics-api", "status": "up", "detail": "HTTP 200"},
+            {"service": "backup-rollback", "status": "up", "detail": "HTTP 200"},
+            {"service": "media", "status": "down", "detail": "timed out"},
+        ]})
+        statuses = app.service_statuses()
+    finally:
+        app.MONITOR_API_URL = original_url
+        app.monitor_request = original_request
+    by_name = {item["name"]: item for item in statuses}
+    assert by_name["dashboard"]["state"] == "running"
+    assert by_name["clues-api"]["state"] == "degraded"
+    assert by_name["media"]["state"] == "stopped"
+    assert by_name["monitor"]["state"] == "running"
+    assert not any(item["state"] == "external" for item in statuses)
+
+
 @contextmanager
 def isolated_directory():
     root = ROOT / ".tmp" / f"dashboard-routes-{uuid.uuid4().hex}"
@@ -75,6 +99,7 @@ def main() -> None:
     cancellation_terminates_process()
     cancellation_marks_job_complete()
     dashboard_job_controls_are_aligned()
+    service_statuses_use_monitor_health()
     workflow = (ROOT / ".github/workflows/services-ci.yml").read_text(encoding="utf-8")
     assert "python scripts/test_dashboard_routes.py" in workflow
     assert "node scripts/ci/dashboard_ui.mjs" in workflow
