@@ -11,7 +11,7 @@
     "@remotion/cli": "4.0.512",
     "@remotion/media": "4.0.512",
     "dotenv": "^17.4.2",
-    "minecraft-data": "^3.112.0",
+    "minecraft-data": "^3.113.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "remotion": "4.0.512"
