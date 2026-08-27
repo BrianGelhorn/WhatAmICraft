@@ -47,6 +47,20 @@ if [ -d "$release_dir/data/new-clues-20260815" ]; then
     "$app_dir/data/new-clues-20260815/"
 fi
 
+# Keep the user-level maintenance timer under the same GitHub-controlled release.
+user_systemd_dir=/home/brian/.config/systemd/user
+install -d -m 700 "$user_systemd_dir"
+install -m 0644 \
+  "$release_dir/scripts/linux/docker-disk-cleanup.service" \
+  "$user_systemd_dir/docker-disk-cleanup.service"
+install -m 0644 \
+  "$release_dir/scripts/linux/docker-disk-cleanup.timer" \
+  "$user_systemd_dir/docker-disk-cleanup.timer"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
+systemctl --user daemon-reload
+systemctl --user enable --now docker-disk-cleanup.timer
+
 # Trigger the Debian automount before Docker creates bind mounts into it.
 video_path="${VIDEO_STORAGE_PATH:-/srv/minecraft-videos/episodes}"
 for attempt in $(seq 1 36); do
