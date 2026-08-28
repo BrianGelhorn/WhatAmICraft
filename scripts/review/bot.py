@@ -36,6 +36,7 @@ MONITORED_LOGS = (
 MONITOR_STARTED = time.time()
 TELEGRAM_RETRY_INITIAL_SECONDS = 5
 TELEGRAM_RETRY_MAX_SECONDS = 60
+TELEGRAM_RECOVERY_CONFIRMATIONS = 2
 
 
 def log(text: str) -> None:
@@ -526,8 +527,9 @@ def next_retry_delay(delay: float) -> float:
     return min(delay * 2, TELEGRAM_RETRY_MAX_SECONDS)
 
 
-def notify_telegram_failure(error: Exception, state: dict[str, bool]) -> None:
+def notify_telegram_failure(error: Exception, state: dict[str, bool | int]) -> None:
     log(f"Bot: {error}")
+    state["recovery_successes"] = 0
     if state.get("outage"):
         return
     state["outage"] = True
@@ -538,10 +540,15 @@ def notify_telegram_failure(error: Exception, state: dict[str, bool]) -> None:
         pass
 
 
-def notify_telegram_recovery(state: dict[str, bool]) -> None:
+def notify_telegram_recovery(state: dict[str, bool | int]) -> None:
     if not state.get("outage"):
         return
+    successes = int(state.get("recovery_successes", 0)) + 1
+    state["recovery_successes"] = successes
+    if successes < TELEGRAM_RECOVERY_CONFIRMATIONS:
+        return
     state["outage"] = False
+    state["recovery_successes"] = 0
     try:
         if os.getenv("TELEGRAM_REVIEW_CHAT_ID"):
             tell(os.environ["TELEGRAM_REVIEW_CHAT_ID"], "✅ Conexión con Telegram restaurada.")
