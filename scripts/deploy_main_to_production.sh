@@ -22,8 +22,27 @@ if [ -f "$app_dir/.release-version" ]; then
 fi
 
 drain_timeout="${DEPLOY_DRAIN_TIMEOUT_SECONDS:-1800}"
+production_lock_stale="${PRODUCTION_LOCK_STALE_SECONDS:-180}"
+publishing_lock_stale="${PUBLISH_LOCK_STALE_SECONDS:-21600}"
+clear_stale_lock() {
+  local lock="$1" max_age="$2" age
+  [ -e "$lock" ] || return 0
+  age=$(( $(date +%s) - $(stat -c %Y "$lock") ))
+  if [ "$age" -gt "$max_age" ]; then
+    echo "Removing stale lock: $lock"
+    rmdir "$lock" 2>/dev/null || {
+      echo "Stale lock is not empty: $lock" >&2
+      return 1
+    }
+  fi
+}
 started_at="$(date +%s)"
 while [ -e "$app_dir/out/production.lock" ] || [ -e "$app_dir/out/publishing.lock" ]; do
+  clear_stale_lock "$app_dir/out/production.lock" "$production_lock_stale" || true
+  clear_stale_lock "$app_dir/out/publishing.lock" "$publishing_lock_stale" || true
+  if [ ! -e "$app_dir/out/production.lock" ] && [ ! -e "$app_dir/out/publishing.lock" ]; then
+    break
+  fi
   if [ "$(( $(date +%s) - started_at ))" -ge "$drain_timeout" ]; then
     echo "Timed out waiting for generation/publication tasks to finish" >&2
     exit 1
