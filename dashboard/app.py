@@ -409,6 +409,7 @@ def dashboard_state() -> dict:
         }
         queue_item = queue_by_id.get(episode["id"])
         has_new_video = video.exists() and video.name in new_video_names
+        has_legacy_video = video.exists() and not has_new_video
         record = publishing.get(episode["id"], {})
         publication_matches_video = has_new_video and record.get("sha256") == sha256(video)
         current_publication = publication_matches_video
@@ -427,6 +428,8 @@ def dashboard_state() -> dict:
             )
         elif has_new_video:
             status = "Esperando aprobación"
+        elif has_legacy_video:
+            status = "Histórico"
         else:
             status = "Sin generar"
 
@@ -453,7 +456,7 @@ def dashboard_state() -> dict:
                 "clues": len(episode.get("clues", [])),
                 "needsReview": episode.get("needs_review", False),
                 "hasVideo": has_new_video,
-                "hasLegacyVideo": False,
+                "hasLegacyVideo": has_legacy_video,
                 "hasThumbnail": thumbnail.exists(),
                 "hasThumbnails": len(thumbnail_urls) == len(thumbnails),
                 "videoUrl": f"/videos/{video.name}" if has_new_video else None,
@@ -514,7 +517,7 @@ def dashboard_state() -> dict:
     return {
         "episodes": items,
         "legacyVideos": legacy_videos,
-        "toGenerate": [item for item in items if not item["hasVideo"]],
+        "toGenerate": [item for item in items if not item["hasVideo"] and not item["hasLegacyVideo"]],
         "formats": format_stats,
         "music": {
             "originals": [
@@ -684,9 +687,14 @@ def start_job(
     force_render: bool = False,
 ) -> None:
     config = load_config()
-    if episode_id and not format_id:
+    if episode_id:
         episode = next((item for item in all_episodes() if item["id"] == episode_id), None)
-        format_id = format_id_for(episode) if episode else None
+        if episode:
+            video = episode_video(episode)
+            if video.exists() and video.name not in current_template_video_names():
+                raise RuntimeError(f"{episode_id} ya tiene un video histórico y no se regenera")
+        if not format_id:
+            format_id = format_id_for(episode) if episode else None
     if not format_id or format_id == "all":
         format_id = choose_weighted_format(config["generation"].get("formats", {}))
     command = [

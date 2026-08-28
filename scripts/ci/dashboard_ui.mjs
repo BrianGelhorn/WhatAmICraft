@@ -59,6 +59,7 @@ const state = {
     episode('mc-03', 'Recovery Compass', {...preview, status: 'En cola', queueStatus: 'pending'}),
     episode('mc-04', 'Golden Apple', {...preview, kind: 'Food', status: 'Publicado', platforms: ['youtube']}),
     episode('mc-05', 'Old Template', {status: 'Publicado', historicalPlatforms: ['youtube', 'instagram']}),
+    episode('mc-06', 'Legacy Unpublished', {status: 'Histórico', hasLegacyVideo: true}),
   ],
   formats: [{id: 'clues', label: 'Quiz definitivo', enabled: true, priority: 5, sharePct: 100, targetStock: 8, total: 4, rendered: 3, stock: 2, review: 1, queued: 1}],
   music: {
@@ -248,6 +249,7 @@ try {
   assert.deepEqual(await evaluate(() => ['review', 'queued', 'to-generate-total', 'published-total'].map((id) => document.getElementById(id).textContent)), ['1', '1', '1', '2']);
   await click('[data-video-filter="all"]');
   assert.equal(await evaluate(() => document.querySelector('tr[data-id="mc-05"] .row-actions').textContent.includes('Generar')), false);
+  assert.equal(await evaluate(() => document.querySelector('tr[data-id="mc-06"] .row-actions').textContent.includes('Generar')), false);
 
   await click('[data-video-filter="all"]');
   await setValue('#video-search', 'crossbow');
