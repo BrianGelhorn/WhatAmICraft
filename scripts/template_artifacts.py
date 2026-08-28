@@ -26,7 +26,11 @@ def _read_text(path: Path) -> str | None:
 
 
 def release_version(root: Path = ROOT) -> str:
-    configured = os.getenv("WHATAMICRAFT_TEMPLATE_VERSION") or _read_text(root / ".release-version")
+    configured = (
+        os.getenv("WHATAMICRAFT_TEMPLATE_VERSION")
+        or _read_text(root / ".release-version")
+        or _read_text(root / "out/.release-version")
+    )
     if configured:
         return configured
     try:

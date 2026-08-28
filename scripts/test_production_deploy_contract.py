@@ -28,6 +28,7 @@ def main() -> None:
     assert "production.lock" in script and "publishing.lock" in script
     assert "DEPLOY_DRAIN_TIMEOUT_SECONDS" in script
     assert "release_marker" in script and "DEPLOY_SHA" in script
+    assert "runtime_release_marker" in script and "out/.release-version" in script
     assert "active-template-version" in script and "previous_release" in script
     assert 'git -C "$GITHUB_WORKSPACE" diff --quiet' in script
     assert "templates/" in script and "scripts/video_formats.py" in script

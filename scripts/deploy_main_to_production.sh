@@ -68,6 +68,11 @@ release_marker_tmp="$release_marker.tmp"
 printf '%s\n' "$DEPLOY_SHA" > "$release_marker_tmp"
 mv -f "$release_marker_tmp" "$release_marker"
 
+runtime_release_marker="$app_dir/out/.release-version"
+runtime_release_marker_tmp="$runtime_release_marker.tmp"
+printf '%s\n' "$DEPLOY_SHA" > "$runtime_release_marker_tmp"
+mv -f "$runtime_release_marker_tmp" "$runtime_release_marker"
+
 active_marker="$app_dir/out/.active-template-version"
 if [ ! -f "$active_marker" ]; then
   active_marker_tmp="$active_marker.tmp"
