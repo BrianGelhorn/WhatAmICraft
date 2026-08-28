@@ -62,6 +62,9 @@ def telegram_messages(server: ThreadingHTTPServer) -> list[dict]:
 
 
 def main() -> None:
+    compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+    bot_compose = compose.split("  bot:\n", 1)[1].split("\n  dashboard:\n", 1)[0]
+    assert "    dns:\n      - 1.1.1.1\n      - 8.8.8.8" in bot_compose
     fixture = ROOT / "out/test-telegram-bot"
     shutil.rmtree(fixture, ignore_errors=True)
     (fixture / "videos").mkdir(parents=True)
@@ -229,6 +232,8 @@ def main() -> None:
             outage = {}
             bot.notify_telegram_failure(RuntimeError("dns"), outage)
             bot.notify_telegram_failure(RuntimeError("dns"), outage)
+            assert len(sent) == 1
+            bot.notify_telegram_recovery(outage)
             assert len(sent) == 1
             bot.notify_telegram_recovery(outage)
             assert len(sent) == 2 and "restaurada" in sent[-1][1]

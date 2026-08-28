@@ -52,6 +52,8 @@ const preview = {
   revealText: 'It is the Wind Charge!',
 };
 
+const recentSnapshot = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
 const state = {
   episodes: [
     episode('mc-01', 'Crossbow'),
@@ -71,7 +73,7 @@ const state = {
     generatedAt: '2026-08-21T12:00:00Z',
     summary: {videos: 1, views: 100, engagements: 12, engagementRateByViews: 12},
     platforms: [{platform: 'youtube', videos: 1, views: 100, engagements: 12, error: null, syncedAt: '2026-08-21T12:00:00Z'}],
-    series: [{platform: 'youtube', capturedAt: '2026-08-21T12:00:00Z', views: 100, engagements: 12}],
+    series: [{platform: 'youtube', capturedAt: recentSnapshot, views: 100, engagements: 12}],
     cohorts: [{dimension: 'formatLabel', platform: 'youtube', value: 'Quiz definitivo', videos: 1, measuredVideos: 1, viewsPerVideo: 100, lifetimeViewsPerHour: 10, engagementRateByViews: 12, completionRate: 70}],
     quality: [{platform: 'youtube', videos: 1, measuredVideos: 1, reachPerView: 0.9, averageWatchSeconds: 18, completionRate: 70, coveragePercent: 100, warnings: []}],
     trends: [{platform: 'youtube', trend: 'up', viewsPerHour: 10}],

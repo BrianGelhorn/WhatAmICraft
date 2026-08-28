@@ -47,6 +47,9 @@ services:
     build: .
     entrypoint: ["python3", "scripts/review/bot.py"]
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     environment:
       ELEVENLABS_VOICE_ID: ${ELEVENLABS_VOICE_ID:-pNInz6obpgDQGcFmaJgB}
       ELEVENLABS_MODEL: ${ELEVENLABS_MODEL:-eleven_v3}
