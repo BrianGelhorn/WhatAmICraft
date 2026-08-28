@@ -16,7 +16,7 @@ from publishing.settings import (
     save_generation_schedule,
     save_schedule,
 )
-from review.storage import pending_queue_ids, read_json
+from review.storage import pending_queue_ids, read_json, set_queue_status
 from review.storage import publishing_state, save_stock_alert_state, stock_alert_state
 from review.telegram import configured as telegram_configured
 from review.telegram import send_message
@@ -136,7 +136,11 @@ def inventory() -> dict[str, list[str]]:
         if video_for(episode).exists()
         and published_state.get(episode["id"], {}).get("sha256") == sha256(video_for(episode))
     }
-    approved = set(pending_queue_ids()).intersection(videos)
+    pending = pending_queue_ids()
+    stale = sorted(set(pending) - videos)
+    for episode_id in stale:
+        set_queue_status(episode_id, "failed", "Video faltante o no corresponde a la plantilla activa")
+    approved = set(pending).intersection(videos)
     candidates = (videos - published) - approved
     by_format = {}
     for format_id in {format_id_for(episode) for episode in current}:
