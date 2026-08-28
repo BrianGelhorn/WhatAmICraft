@@ -167,17 +167,23 @@ def main() -> None:
         assert ("/api/action", {"episodeId": "mc-02", "action": "audio"}) in dashboard_server.requests
 
         bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
-        assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
-        assert "mc-05" not in telegram_messages(telegram_server)[-1]["text"]
+        approval_text = telegram_messages(telegram_server)[-1]["text"]
+        assert "mc-03" in approval_text
+        assert "mc-04" not in approval_text
+        assert "mc-05" not in approval_text
         bot.handle_callback({"id": "cb-send", "message": {"chat": {"id": 42}}, "data": "sendvideo:mc-03"})
         assert any(path.endswith("/sendVideo") and b"telegram-review-video" in body for path, body in telegram_server.requests)
         bot.handle_callback({"id": "cb-accept", "message": {"chat": {"id": 42}}, "data": "accept:mc-03"})
         assert queue and queue[0]["status"] == "pending"
+        bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
+        assert "mc-03" not in telegram_messages(telegram_server)[-1]["text"]
 
         bot.handle_message({"chat": {"id": 42}, "text": "/cola"})
         assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 42}, "text": "/sacar mc-03"})
         assert not queue
+        bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
+        assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 42}, "text": "/aprobar mc-03"})
         bot.handle_message({"chat": {"id": 42}, "text": "/pistas mc-03"})
         assert hints == [{"episodeId": "mc-03"}]
