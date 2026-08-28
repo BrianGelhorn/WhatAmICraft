@@ -87,8 +87,35 @@ def check_stale_generation_job_recovery() -> None:
         shutil.rmtree(fixture, ignore_errors=True)
 
 
+def check_inventory_quarantines_stale_queue() -> None:
+    episode = {"id": "mc-stale", "format": "clues", "target": {"id": "stone", "kind": "item"}}
+    updates: list[tuple[str, str, str | None]] = []
+    original = {
+        "episodes": worker.episodes,
+        "video_for": worker.video_for,
+        "names": worker.current_template_video_names,
+        "state": worker.publishing_state,
+        "queue_ids": worker.pending_queue_ids,
+        "queue_status": worker.set_queue_status,
+    }
+    try:
+        worker.episodes = lambda: [episode]
+        worker.video_for = lambda _episode: Path("/tmp/missing-stale.mp4")
+        worker.current_template_video_names = lambda: set()
+        worker.publishing_state = lambda: {"videos": {}}
+        worker.pending_queue_ids = lambda: ["mc-stale"]
+        worker.set_queue_status = lambda episode_id, status, error=None: updates.append((episode_id, status, error))
+        result = worker.inventory()
+        assert result["pending"] == []
+        assert updates == [("mc-stale", "failed", "Video faltante o no corresponde a la plantilla activa")]
+    finally:
+        for name, value in original.items():
+            setattr(worker, {"episodes": "episodes", "video_for": "video_for", "names": "current_template_video_names", "state": "publishing_state", "queue_ids": "pending_queue_ids", "queue_status": "set_queue_status"}[name], value)
+
+
 def main() -> None:
     check_generation_lane_guard()
+    check_inventory_quarantines_stale_queue()
     check_stale_generation_job_recovery()
     fixture = ROOT / "out/test-automatic-publishing"
     shutil.rmtree(fixture, ignore_errors=True)

@@ -14,7 +14,7 @@ from publishing.settings import apply_runtime, enabled_platforms, load_config
 from review.storage import pending_queue_ids, publishing_state, save_published_platform, set_queue_status
 from template_artifacts import validate_artifact
 from thumbnails import copy_thumbnail_config, render_thumbnails
-from video_formats import ready_episodes, thumbnail_path, video_stem
+from video_formats import current_template_video_names, ready_episodes, thumbnail_path, video_stem
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
@@ -118,6 +118,21 @@ def run(args: argparse.Namespace) -> int:
     elif args.queue:
         queued = set(pending_queue_ids())
         selected = [episode for episode in selected if episode["id"] in queued]
+    current_names = current_template_video_names(ROOT)
+    stale_queue = set()
+    eligible = []
+    for episode in selected:
+        video = video_for(episode)
+        if video.exists() and video.name in current_names:
+            eligible.append(episode)
+        elif args.queue:
+            stale_queue.add(episode["id"])
+    if args.episode and selected and not eligible:
+        raise RuntimeError(f"El video de {args.episode} no corresponde a la plantilla activa")
+    if args.queue and not args.dry_run:
+        for episode_id in stale_queue:
+            set_queue_status(episode_id, "failed", "Video faltante o no corresponde a la plantilla activa")
+    selected = eligible
     config = load_config()
     apply_runtime(config)
     active_platforms = enabled_platforms(config)
