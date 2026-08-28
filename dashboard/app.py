@@ -687,9 +687,14 @@ def start_job(
     force_render: bool = False,
 ) -> None:
     config = load_config()
-    if episode_id and not format_id:
+    if episode_id:
         episode = next((item for item in all_episodes() if item["id"] == episode_id), None)
-        format_id = format_id_for(episode) if episode else None
+        if episode:
+            video = episode_video(episode)
+            if video.exists() and video.name not in current_template_video_names():
+                raise RuntimeError(f"{episode_id} ya tiene un video histórico y no se regenera")
+        if not format_id:
+            format_id = format_id_for(episode) if episode else None
     if not format_id or format_id == "all":
         format_id = choose_weighted_format(config["generation"].get("formats", {}))
     command = [
