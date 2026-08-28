@@ -793,6 +793,7 @@
 
     function videoBucket(episode) {
       if (episode.platforms.length || (episode.historicalPlatforms || []).length) return 'published';
+      if (episode.hasLegacyVideo) return 'legacy';
       if (episode.queueStatus === 'pending') return 'queued';
       if (!episode.hasVideo) return 'generate';
       return 'attention';
@@ -832,7 +833,7 @@
           <td><span class="status ${statusClass(episode)}">${escapeHtml(episode.status)}</span></td>
           <td class="hide-mobile published">${published ? publishedPlatforms.map(escapeHtml).join(' · ') : '—'}</td>
           <td><div class="row-actions">
-            ${episode.hasVideo ? '<button data-action="inspect">Ver</button>' : published ? '<span class="hint">Histórico</span>' : `<button class="primary" data-action="generate" ${jobRunning ? 'disabled' : ''}>Generar</button>`}
+            ${episode.hasVideo ? '<button data-action="inspect">Ver</button>' : published || episode.hasLegacyVideo ? '<span class="hint">Histórico</span>' : `<button class="primary" data-action="generate" ${jobRunning ? 'disabled' : ''}>Generar</button>`}
             ${canApprove ? '<button class="primary" data-action="approve">Aprobar</button>' : ''}
             ${episode.queueStatus ? '<button data-action="unqueue">Quitar de cola</button>' : ''}
             ${secondary}
