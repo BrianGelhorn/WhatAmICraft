@@ -15,6 +15,7 @@ from template_artifacts import (
     validate_artifact,
     write_artifact,
     write_legacy_artifact,
+    release_version,
 )
 from video_formats import current_template_video_names
 
@@ -37,6 +38,10 @@ def main() -> None:
         props.write_text(json.dumps({"config": config}), encoding="utf-8")
 
         previous = os.environ.get("WHATAMICRAFT_TEMPLATE_VERSION")
+        os.environ.pop("WHATAMICRAFT_TEMPLATE_VERSION", None)
+        (fixture / "out/.release-version").parent.mkdir(parents=True, exist_ok=True)
+        (fixture / "out/.release-version").write_text("release-file", encoding="utf-8")
+        assert release_version(fixture) == "release-file"
         os.environ["WHATAMICRAFT_TEMPLATE_VERSION"] = "release-a"
         try:
             manifest = write_artifact(
