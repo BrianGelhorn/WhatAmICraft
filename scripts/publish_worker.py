@@ -71,6 +71,7 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
             encoding="utf-8",
             errors="replace",
         )
+        set_job_pid(process.pid, lane)
         assert process.stdout
         for line in process.stdout:
             log(path, line.rstrip())
