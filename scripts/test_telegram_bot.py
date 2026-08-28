@@ -69,10 +69,13 @@ def main() -> None:
     video.write_bytes(b"telegram-review-video")
     published_video = fixture / "videos/mc-04-apple.mp4"
     published_video.write_bytes(b"telegram-published-video")
+    legacy_video = fixture / "videos/mc-05-dirt.mp4"
+    legacy_video.write_bytes(b"telegram-legacy-video")
     episodes = [
         {"id": "mc-02", "target": {"id": "diamond", "kind": "item", "display_name": "Diamond"}},
         {"id": "mc-03", "target": {"id": "stone", "kind": "block", "display_name": "Stone"}},
         {"id": "mc-04", "target": {"id": "apple", "kind": "food", "display_name": "Apple"}},
+        {"id": "mc-05", "target": {"id": "dirt", "kind": "block", "display_name": "Dirt"}},
     ]
     queue: list[dict] = []
     hints: list[dict] = []
@@ -100,6 +103,7 @@ def main() -> None:
         "logs": bot.MONITORED_LOGS,
         "episodes": bot.all_episodes,
         "video_path": bot.video_path,
+        "current_template_video_names": bot.current_template_video_names,
         "queue_items": bot.queue_items,
         "queue_episode": bot.queue_episode,
         "remove_queue_item": bot.remove_queue_item,
@@ -141,6 +145,7 @@ def main() -> None:
         bot.MONITORED_LOGS = (fixture / "logs/generator.log",)
         bot.all_episodes = lambda: episodes
         bot.video_path = lambda episode, _root: fixture / "videos" / f"{episode['id']}-{episode['target']['id']}.mp4"
+        bot.current_template_video_names = lambda _root: {"mc-02-diamond.mp4", "mc-03-stone.mp4", "mc-04-apple.mp4"}
         bot.queue_items = lambda: list(queue)
         bot.queue_episode = queue_episode
         bot.remove_queue_item = remove_queue_item
@@ -162,16 +167,23 @@ def main() -> None:
         assert ("/api/action", {"episodeId": "mc-02", "action": "audio"}) in dashboard_server.requests
 
         bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
-        assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
+        approval_text = telegram_messages(telegram_server)[-1]["text"]
+        assert "mc-03" in approval_text
+        assert "mc-04" not in approval_text
+        assert "mc-05" not in approval_text
         bot.handle_callback({"id": "cb-send", "message": {"chat": {"id": 42}}, "data": "sendvideo:mc-03"})
         assert any(path.endswith("/sendVideo") and b"telegram-review-video" in body for path, body in telegram_server.requests)
         bot.handle_callback({"id": "cb-accept", "message": {"chat": {"id": 42}}, "data": "accept:mc-03"})
         assert queue and queue[0]["status"] == "pending"
+        bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
+        assert "mc-03" not in telegram_messages(telegram_server)[-1]["text"]
 
         bot.handle_message({"chat": {"id": 42}, "text": "/cola"})
         assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 42}, "text": "/sacar mc-03"})
         assert not queue
+        bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
+        assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 42}, "text": "/aprobar mc-03"})
         bot.handle_message({"chat": {"id": 42}, "text": "/pistas mc-03"})
         assert hints == [{"episodeId": "mc-03"}]
@@ -234,7 +246,7 @@ def main() -> None:
         for name, value in original.items():
             setattr(bot, {
                 "root": "ROOT", "offset": "OFFSET_PATH", "log_path": "LOG_PATH", "alert_state": "ALERT_STATE_PATH",
-                "dashboard": "DASHBOARD_URL", "logs": "MONITORED_LOGS", "episodes": "all_episodes", "video_path": "video_path",
+                "dashboard": "DASHBOARD_URL", "logs": "MONITORED_LOGS", "episodes": "all_episodes", "video_path": "video_path", "current_template_video_names": "current_template_video_names",
                 "queue_items": "queue_items", "queue_episode": "queue_episode", "remove_queue_item": "remove_queue_item",
                 "pending_hints": "pending_hints_items", "pend_hints": "pend_hints", "clear_hints": "clear_hints",
                 "published": "publishing_state", "read_job": "read_job", "generation_schedule": "load_generation_schedule",
