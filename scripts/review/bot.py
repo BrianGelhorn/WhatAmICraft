@@ -15,7 +15,7 @@ from publishing.settings import apply_runtime, load_generation_schedule, load_sc
 from review.storage import clear_hints, pend_hints, pending_hints_items, publishing_state
 from review.storage import queue_episode, queue_items, reject_episode, remove_queue_item
 from review.telegram import answer_callback, get_updates, send_for_review, send_message
-from video_formats import all_episodes, video_path
+from video_formats import all_episodes, current_template_video_names, video_path
 
 ROOT = Path(__file__).resolve().parents[2]
 OFFSET_PATH = ROOT / "out/telegram-offset.txt"
@@ -135,11 +135,13 @@ def approval_items() -> list[dict]:
     queue = {item["episodeId"]: item for item in queue_items()}
     published = publishing_state().get("videos", {})
     sent = read_alert_state().get("sentForReview", {})
+    current_videos = current_template_video_names(ROOT)
     items = []
     for episode_id, episode in episodes.items():
         video = video_path(episode, ROOT)
         if (
             not video.is_file()
+            or video.name not in current_videos
             or queue.get(episode_id, {}).get("status") == "pending"
             or is_currently_published(published, episode_id, video)
         ):
