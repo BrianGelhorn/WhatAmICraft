@@ -88,7 +88,14 @@ def check_stale_generation_job_recovery() -> None:
 
 
 def check_inventory_quarantines_stale_queue() -> None:
-    episode = {"id": "mc-stale", "format": "clues", "target": {"id": "stone", "kind": "item"}}
+    fixture = ROOT / "out/test-inventory-legacy"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    stale = {"id": "mc-stale", "format": "clues", "target": {"id": "stone", "kind": "item"}}
+    legacy = {"id": "mc-legacy", "format": "clues", "target": {"id": "dirt", "kind": "item"}}
+    legacy_video = fixture / "mc-legacy-old.mp4"
+    legacy_video.write_bytes(b"legacy-video")
+    videos = {"mc-stale": fixture / "missing.mp4", "mc-legacy": legacy_video}
     updates: list[tuple[str, str, str | None]] = []
     original = {
         "episodes": worker.episodes,
@@ -99,18 +106,24 @@ def check_inventory_quarantines_stale_queue() -> None:
         "queue_status": worker.set_queue_status,
     }
     try:
-        worker.episodes = lambda: [episode]
-        worker.video_for = lambda _episode: Path("/tmp/missing-stale.mp4")
+        worker.episodes = lambda: [stale, legacy]
+        worker.video_for = lambda episode: videos[episode["id"]]
         worker.current_template_video_names = lambda: set()
         worker.publishing_state = lambda: {"videos": {}}
-        worker.pending_queue_ids = lambda: ["mc-stale"]
+        worker.pending_queue_ids = lambda: ["mc-stale", "mc-legacy"]
         worker.set_queue_status = lambda episode_id, status, error=None: updates.append((episode_id, status, error))
         result = worker.inventory()
         assert result["pending"] == []
-        assert updates == [("mc-stale", "failed", "Video faltante o no corresponde a la plantilla activa")]
+        assert result["legacy"] == ["mc-legacy"]
+        assert result["formats"]["clues"]["missing"] == ["mc-stale"]
+        assert updates == [
+            ("mc-legacy", "failed", "Video faltante o no corresponde a la plantilla activa"),
+            ("mc-stale", "failed", "Video faltante o no corresponde a la plantilla activa"),
+        ]
     finally:
         for name, value in original.items():
             setattr(worker, {"episodes": "episodes", "video_for": "video_for", "names": "current_template_video_names", "state": "publishing_state", "queue_ids": "pending_queue_ids", "queue_status": "set_queue_status"}[name], value)
+        shutil.rmtree(fixture, ignore_errors=True)
 
 
 def main() -> None:
