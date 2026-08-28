@@ -410,12 +410,12 @@ def dashboard_state() -> dict:
         queue_item = queue_by_id.get(episode["id"])
         has_new_video = video.exists() and video.name in new_video_names
         record = publishing.get(episode["id"], {})
-        publication_matches_video = video.exists() and record.get("sha256") == sha256(video)
-        current_publication = has_new_video and publication_matches_video
-        published_platforms = list(record.get("platforms", {})) if publication_matches_video else []
+        publication_matches_video = has_new_video and record.get("sha256") == sha256(video)
+        current_publication = publication_matches_video
+        published_platforms = list(record.get("platforms", {}))
         platforms = published_platforms if current_publication else []
         historical_platforms = published_platforms if not current_publication else []
-        if queue_item and not current_publication and queue_item["status"] != "pending":
+        if queue_item and not has_new_video:
             queue_item = None
         if episode["id"] in pending_ids or episode.get("needs_review"):
             status = "Pistas pendientes"
