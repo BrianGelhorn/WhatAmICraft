@@ -89,7 +89,6 @@ elif [ -n "$previous_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$prev
     scripts/produce_quiz_copy.py
     scripts/produce_mystery_v2.py
     scripts/produce_mystery_prefab_gallery.py
-    scripts/template_artifacts.py
     scripts/thumbnails.py
     scripts/video_formats.py
   )
