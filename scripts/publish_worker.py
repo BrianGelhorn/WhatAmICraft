@@ -129,6 +129,11 @@ def inventory() -> dict[str, list[str]]:
         for episode in current
         if video_for(episode).exists() and video_for(episode).name in current_names
     }
+    legacy = {
+        episode["id"]
+        for episode in current
+        if video_for(episode).exists() and video_for(episode).name not in current_names
+    }
     published_state = publishing_state()["videos"]
     published = {
         episode["id"]
@@ -156,13 +161,18 @@ def inventory() -> dict[str, list[str]]:
             "label": format_label(format_id),
             "pending": sorted(format_approved),
             "candidates": sorted(format_candidates),
-            "missing": [episode["id"] for episode in format_episodes if episode["id"] not in format_videos],
+            "missing": [
+                episode["id"]
+                for episode in format_episodes
+                if episode["id"] not in format_videos and episode["id"] not in legacy
+            ],
         }
     return {
         "pending": sorted(approved),
         "candidates": sorted(candidates),
         "stock": sorted(approved | candidates),
-        "missing": [episode["id"] for episode in current if episode["id"] not in videos],
+        "missing": [episode["id"] for episode in current if episode["id"] not in videos and episode["id"] not in legacy],
+        "legacy": sorted(legacy),
         "formats": by_format,
     }
 
