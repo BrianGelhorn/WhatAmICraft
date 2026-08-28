@@ -1099,9 +1099,10 @@
       const c = diagnostics.counts, d = diagnostics.disk, db = diagnostics.database;
       const fatal = diagnostics.services.some(service => service.severity === 'fatal');
       const warning = diagnostics.services.some(service => service.severity === 'warning');
-      const healthy = diagnostics.internet && !fatal && !warning;
-      $('live-status').classList.toggle('bad', fatal || warning);
-      $('live-status-text').textContent = fatal ? 'Sistema con fallas' : warning ? 'Sistema con advertencias' : 'Sistema operativo';
+      const networkDown = !diagnostics.internet;
+      const healthy = !networkDown && !fatal && !warning;
+      $('live-status').classList.toggle('bad', networkDown || fatal || warning);
+      $('live-status-text').textContent = fatal ? 'Sistema con fallas' : networkDown ? 'Sin salida a internet' : warning ? 'Sistema con advertencias' : 'Sistema operativo';
       $('diag-internet').textContent = diagnostics.internet ? 'OK' : 'Sin salida';
       $('diag-internet').className = diagnostics.internet ? 'ok' : 'bad';
       $('diag-disk').textContent = `${d.freeGb} GB libres`;
