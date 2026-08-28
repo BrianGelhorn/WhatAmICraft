@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,6 +11,7 @@ JOB_PATHS = {
     "publishing": ROOT / "out/current-publishing-job.json",
 }
 LEGACY_OWNERS = {"automatic": "publisher-worker", "manual": "dashboard"}
+STALE_PIDLESS_JOB = timedelta(minutes=15)
 
 
 def _now() -> str:
@@ -32,6 +33,18 @@ def _default() -> dict:
     }
 
 
+def _pidless_job_is_stale(job: dict) -> bool:
+    if job.get("pid") or not job.get("updatedAt"):
+        return False
+    try:
+        updated = datetime.fromisoformat(str(job["updatedAt"]).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return False
+    if updated.tzinfo is None:
+        updated = updated.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) - updated > STALE_PIDLESS_JOB
+
+
 def _read_job(lane: str) -> dict:
     path = JOB_PATHS[lane]
     try:
@@ -42,7 +55,9 @@ def _read_job(lane: str) -> dict:
             job.get("owner") == current_owner
             or (not job.get("owner") and LEGACY_OWNERS.get(job.get("source")) == current_owner)
         )
-        if job["status"] == "running" and job["pid"] and owned and not _process_alive(job["pid"]):
+        if job["status"] == "running" and owned and (
+            (job["pid"] and not _process_alive(job["pid"])) or _pidless_job_is_stale(job)
+        ):
             job.update({
                 "status": "failed",
                 "returnCode": -1,
