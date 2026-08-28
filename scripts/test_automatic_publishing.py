@@ -64,7 +64,7 @@ def check_stale_generation_job_recovery() -> None:
     fixture.mkdir(parents=True)
     generation = fixture / "generation.json"
     main = fixture / "main.json"
-    job = {"status": "running", "source": "automatic", "pid": 999999, "owner": "", "lines": []}
+    job = {"status": "running", "source": "automatic", "pid": 999999, "owner": "", "lines": [], "updatedAt": "2026-01-01T00:00:00+00:00"}
     generation.write_text(json.dumps(job), encoding="utf-8")
     main.write_text(json.dumps({**job, "source": "manual"}), encoding="utf-8")
     original_paths = job_status.JOB_PATHS
@@ -74,6 +74,9 @@ def check_stale_generation_job_recovery() -> None:
         job_status.JOB_PATHS = {"main": main, "generation": generation, "publishing": fixture / "publishing.json"}
         os.environ["JOB_OWNER"] = "publisher-worker"
         job_status._process_alive = lambda _pid: False
+        assert job_status.read_job("generation")["status"] == "failed"
+        assert json.loads(generation.read_text(encoding="utf-8"))["status"] == "failed"
+        generation.write_text(json.dumps({**job, "pid": None}), encoding="utf-8")
         assert job_status.read_job("generation")["status"] == "failed"
         assert json.loads(generation.read_text(encoding="utf-8"))["status"] == "failed"
         assert job_status.read_job("main")["status"] == "running"
