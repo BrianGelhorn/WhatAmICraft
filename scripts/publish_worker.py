@@ -30,7 +30,7 @@ from video_formats import (
     ready_episodes,
     video_path,
 )
-from job_status import append_job_line, begin_job, finish_job, read_job
+from job_status import append_job_line, begin_job, finish_job, read_job, set_job_pid
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
