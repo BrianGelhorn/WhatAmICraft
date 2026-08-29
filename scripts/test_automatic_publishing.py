@@ -70,6 +70,7 @@ def check_stale_generation_job_recovery() -> None:
     original_paths = job_status.JOB_PATHS
     original_owner = os.environ.get("JOB_OWNER")
     original_alive = job_status._process_alive
+    original_start = job_status._process_start
     try:
         job_status.JOB_PATHS = {"main": main, "generation": generation, "publishing": fixture / "publishing.json"}
         os.environ["JOB_OWNER"] = "publisher-worker"
@@ -80,9 +81,21 @@ def check_stale_generation_job_recovery() -> None:
         assert job_status.read_job("generation")["status"] == "failed"
         assert json.loads(generation.read_text(encoding="utf-8"))["status"] == "failed"
         assert job_status.read_job("main")["status"] == "running"
+
+        generation.write_text(json.dumps({**job, "pid": 42, "processStart": "old"}), encoding="utf-8")
+        job_status._process_alive = lambda _pid: True
+        job_status._process_start = lambda _pid: "new"
+        assert job_status.read_job("generation")["status"] == "failed"
+
+        generation.write_text(json.dumps({**job, "pid": 42, "processStart": "old"}), encoding="utf-8")
+        job_status.finish_job("completed", 0, lane="generation")
+        finished = json.loads(generation.read_text(encoding="utf-8"))
+        assert finished["status"] == "completed"
+        assert not any("interrumpida" in line for line in finished["lines"])
     finally:
         job_status.JOB_PATHS = original_paths
         job_status._process_alive = original_alive
+        job_status._process_start = original_start
         if original_owner is None:
             os.environ.pop("JOB_OWNER", None)
         else:
@@ -192,6 +205,47 @@ def check_inventory_quarantines_stale_queue() -> None:
 
 
 
+
+def check_inventory_requeues_provider_failures() -> None:
+    fixture = ROOT / "out/test-inventory-retry"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    episode = {"id": "mc-77", "format": "clues", "target": {"id": "stone", "kind": "item"}}
+    video = fixture / "mc-77-stone.mp4"
+    video.write_bytes(b"current-video")
+    error = "youtube: Token has been expired or revoked."
+    updates: list[tuple[str, str, str | None]] = []
+    original = {
+        "episodes": worker.episodes,
+        "video_for": worker.video_for,
+        "names": worker.current_template_video_names,
+        "state": worker.publishing_state,
+        "queue_ids": worker.pending_queue_ids,
+        "queue_items": worker.queue_items,
+        "queue_status": worker.set_queue_status,
+    }
+    try:
+        worker.episodes = lambda: [episode]
+        worker.video_for = lambda _episode: video
+        worker.current_template_video_names = lambda: {video.name}
+        worker.publishing_state = lambda: {"videos": {}}
+        worker.pending_queue_ids = lambda: []
+        worker.queue_items = lambda: [{"episodeId": "mc-77", "status": "failed", "error": error}]
+        worker.set_queue_status = lambda episode_id, status, value=None: updates.append((episode_id, status, value))
+        result = worker.inventory()
+        assert result["pending"] == ["mc-77"]
+        assert updates == [("mc-77", "pending", error)]
+    finally:
+        worker.episodes = original["episodes"]
+        worker.video_for = original["video_for"]
+        worker.current_template_video_names = original["names"]
+        worker.publishing_state = original["state"]
+        worker.pending_queue_ids = original["queue_ids"]
+        worker.queue_items = original["queue_items"]
+        worker.set_queue_status = original["queue_status"]
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
 def check_empty_stock_retries_without_waiting_hours() -> None:
     config = {
         "schedule": {"enabled": False},
@@ -296,6 +350,7 @@ def main() -> None:
     check_worker_startup_wakes_empty_stock()
     check_generation_lane_guard()
     check_inventory_quarantines_stale_queue()
+    check_inventory_requeues_provider_failures()
     check_stale_generation_job_recovery()
     check_run_logged_tracks_child_pid()
     fixture = ROOT / "out/test-automatic-publishing"
@@ -439,7 +494,8 @@ def main() -> None:
             worker.main()
         except KeyboardInterrupt:
             pass
-        assert queue["status"] == "failed"
+        assert queue["status"] == "pending"
+        assert queue["ids"] == ["mc-01"]
         assert "fake provider unavailable" in (queue["error"] or "")
         assert len(saved_schedules) == 2
     finally:
