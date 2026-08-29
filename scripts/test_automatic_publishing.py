@@ -123,6 +123,25 @@ def check_run_logged_tracks_child_pid() -> None:
         assert isinstance(recorded.get("pid"), int)
         assert recorded["lane"] == "generation"
         assert recorded["status"] == "completed"
+
+        def fail_tracking(pid, lane="main"):
+            recorded.update(pid=pid, lane=lane)
+            raise RuntimeError("tracking failed")
+
+        worker.set_job_pid = fail_tracking
+        result = worker.run_logged(
+            [sys.executable, "-c", "import time; time.sleep(60)"],
+            "pid-tracking-failure.log",
+            "PID tracking failure fixture",
+            "generation",
+        )
+        assert result.returncode == 1
+        try:
+            os.kill(recorded["pid"], 0)
+        except ProcessLookupError:
+            pass
+        else:
+            raise AssertionError("tracking failure left the render child running")
     finally:
         worker.LOG_DIR = original["log_dir"]
         worker.CPUSETS = original["cpusets"]
