@@ -79,6 +79,7 @@ def main() -> None:
         {"id": "mc-03", "target": {"id": "stone", "kind": "block", "display_name": "Stone"}},
         {"id": "mc-04", "target": {"id": "apple", "kind": "food", "display_name": "Apple"}},
         {"id": "mc-05", "target": {"id": "dirt", "kind": "block", "display_name": "Dirt"}},
+        {"id": "mc-06", "target": {"id": "kelp", "kind": "item", "display_name": "Kelp"}},
     ]
     queue: list[dict] = []
     hints: list[dict] = []
@@ -148,7 +149,7 @@ def main() -> None:
         bot.MONITORED_LOGS = (fixture / "logs/generator.log",)
         bot.all_episodes = lambda: episodes
         bot.video_path = lambda episode, _root: fixture / "videos" / f"{episode['id']}-{episode['target']['id']}.mp4"
-        bot.current_template_video_names = lambda _root: {"mc-02-diamond.mp4", "mc-03-stone.mp4", "mc-04-apple.mp4"}
+        bot.current_template_video_names = lambda _root: {"mc-02-diamond.mp4", "mc-03-stone.mp4", "mc-04-apple.mp4", "mc-06-kelp.mp4"}
         bot.queue_items = lambda: list(queue)
         bot.queue_episode = queue_episode
         bot.remove_queue_item = remove_queue_item
@@ -204,7 +205,10 @@ def main() -> None:
         generated = fixture / "videos/mc-02-diamond.mp4"
         generated.write_bytes(b"telegram-generated-video")
         jobs["generation"] = {"status": "completed", "label": "Generación automática mc-02", "lines": []}
-        bot.notify_generation_done(jobs["generation"], {})
+        notification_state = bot.read_alert_state()
+        bot.notify_generation_done(jobs["generation"], notification_state)
+        assert notification_state["sentForReview"]["mc-02"] == bot.sha256(generated)
+        bot.write_alert_state(notification_state)
         assert any(path.endswith("/sendVideo") and b"mc-02" in body for path, body in telegram_server.requests)
         assert "Terminó Generación automática mc-02" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 99}, "text": "/start"})
@@ -216,8 +220,16 @@ def main() -> None:
         error_log = fixture / "logs/generator.log"
         error_log.parent.mkdir(parents=True, exist_ok=True)
         bot.monitor_errors()
+        orphan = fixture / "videos/mc-06-kelp.mp4"
+        orphan.write_bytes(b"orphaned-completed-video")
+        videos_before = len([path for path, _body in telegram_server.requests if path.endswith("/sendVideo")])
         error_log.write_text("ERROR render synthetic failure\n", encoding="utf-8")
         bot.monitor_errors()
+        videos_after = [body for path, body in telegram_server.requests if path.endswith("/sendVideo")]
+        assert len(videos_after) == videos_before + 1
+        assert b"orphaned-completed-video" in videos_after[-1]
+        bot.monitor_errors()
+        assert len([path for path, _body in telegram_server.requests if path.endswith("/sendVideo")]) == len(videos_after)
         assert "ERROR DETECTADO" in telegram_messages(telegram_server)[-1]["text"]
 
         bot.handle_callback({"id": "cb-unknown", "message": {"chat": {"id": 42}}, "data": "unknown:value"})
