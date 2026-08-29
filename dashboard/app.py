@@ -389,7 +389,7 @@ def analytics_snapshot() -> dict:
 def dashboard_state() -> dict:
     queue = {"items": queue_items()}
     queue_by_id = {item["episodeId"]: item for item in queue["items"]}
-    failed = [item for item in queue["items"] if item.get("status") == "failed" and item.get("error")]
+    failed = [item for item in queue["items"] if item.get("error")]
     pending = {"items": pending_hints_items()}
     pending_ids = {item["episodeId"] for item in pending["items"]}
     publishing = publishing_state()["videos"]
@@ -423,9 +423,9 @@ def dashboard_state() -> dict:
         elif platforms or historical_platforms:
             status = "Publicado"
         elif queue_item:
-            status = {"pending": "En cola", "failed": "Error al publicar", "completed": "Publicado"}.get(
-                queue_item["status"], queue_item["status"]
-            )
+            status = "En cola con error" if queue_item["status"] == "pending" and queue_item.get("error") else {
+                "pending": "En cola", "failed": "Error al publicar", "completed": "Publicado"
+            }.get(queue_item["status"], queue_item["status"])
         elif has_new_video:
             status = "Esperando aprobación"
         elif has_legacy_video:
