@@ -17,7 +17,7 @@ from publishing.settings import (
     save_generation_schedule,
     save_schedule,
 )
-from review.storage import pending_queue_ids, read_json, set_queue_status
+from review.storage import pending_queue_ids, queue_items, read_json, set_queue_status
 from review.storage import publishing_state, save_stock_alert_state, stock_alert_state
 from review.telegram import configured as telegram_configured
 from review.telegram import send_message
@@ -164,6 +164,15 @@ def inventory() -> dict[str, list[str]]:
         and published_state.get(episode["id"], {}).get("sha256") == sha256(video_for(episode))
     }
     pending = pending_queue_ids()
+    retryable = [
+        item for item in queue_items()
+        if item.get("status") == "failed"
+        and item.get("episodeId") in videos
+        and str(item.get("error") or "").startswith(("youtube:", "tiktok:", "instagram:", "facebook:"))
+    ]
+    for item in retryable:
+        set_queue_status(item["episodeId"], "pending", item["error"])
+    pending = [*pending, *(item["episodeId"] for item in retryable if item["episodeId"] not in pending)]
     stale = sorted(set(pending) - videos)
     for episode_id in stale:
         set_queue_status(episode_id, "failed", "Video faltante o no corresponde a la plantilla activa")
