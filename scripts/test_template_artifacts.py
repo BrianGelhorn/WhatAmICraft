@@ -8,6 +8,7 @@ import os
 import shutil
 from pathlib import Path
 
+from migrate_compatible_artifacts import migrate
 from template_artifacts import (
     activate_template_version,
     artifact_path,
@@ -68,6 +69,12 @@ def main() -> None:
             )
             assert validate_artifact(legacy_video, episode_id="mc-02", root=fixture)["legacy"] is True
             assert current_template_video_names(fixture) == {video.name}
+
+            assert migrate(fixture, "release-b", lambda version: version == "release-a") == 1
+            os.environ["WHATAMICRAFT_TEMPLATE_VERSION"] = "release-b"
+            activate_template_version("release-b", fixture)
+            assert current_template_video_names(fixture) == {video.name}
+            assert validate_artifact(legacy_video, root=fixture)["templateVersion"] == "legacy"
 
             video.write_bytes(b"video-mutated")
             try:
