@@ -208,7 +208,7 @@ def run(args: argparse.Namespace) -> int:
         if args.queue:
             set_queue_status(
                 episode["id"],
-                "failed" if episode_errors else "completed",
+                "pending" if episode_errors else "completed",
                 "; ".join(episode_errors) or None,
             )
         elif not episode_errors:
