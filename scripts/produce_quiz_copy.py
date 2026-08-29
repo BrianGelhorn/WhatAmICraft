@@ -327,10 +327,7 @@ def generate_audio(episode: dict) -> dict:
 
 def prepare_audio(episode: dict, generate: bool, seed: bool, force: bool) -> dict:
     path = manifest_path(episode)
-    try:
-        manifest = read_json(path) if path.exists() else None
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        manifest = None
+    manifest = read_json(path) if path.exists() else None
     files_exist = all(public_path(voice["publicSrc"]).exists() for _, voice, _ in generated_voices(episode))
     if not force and manifest and manifest.get("signature") == audio_signature(episode) and files_exist:
         return manifest
