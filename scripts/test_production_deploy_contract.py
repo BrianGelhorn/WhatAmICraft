@@ -21,6 +21,7 @@ def main() -> None:
     assert "current_sha" in workflow and "current=false" in workflow
     assert "needs: gate" in workflow
     assert "head_sha" in workflow and "runs-on: [self-hosted, linux, x64]" in workflow
+    assert "fetch-depth: 0" in workflow
     assert "group: whatamicraft-production" in workflow and "cancel-in-progress: false" in workflow
     assert "push:" in staging and "- main" in staging
     assert '"$GITHUB_WORKSPACE/scripts/backup_state.py" --quiet' in script
@@ -34,6 +35,7 @@ def main() -> None:
     assert "runtime_release_marker" in script and "out/.release-version" in script
     assert "active-template-version" in script and "previous_release" in script
     assert 'git -C "$GITHUB_WORKSPACE" diff --quiet' in script
+    assert 'scripts/migrate_compatible_artifacts.py' in script
     assert "templates/" in script and "scripts/video_formats.py" in script
     assert "video storage" in script and "/srv/minecraft-videos/episodes" in script
     for required in (
