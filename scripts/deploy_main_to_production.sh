@@ -112,6 +112,8 @@ elif [ -n "$previous_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$prev
     scripts/video_formats.py
   )
   if git -C "$GITHUB_WORKSPACE" diff --quiet "$previous_release" "$DEPLOY_SHA" -- "${template_paths[@]}"; then
+    python3 "$GITHUB_WORKSPACE/scripts/migrate_compatible_artifacts.py" \
+      --root "$app_dir" --repo "$GITHUB_WORKSPACE" --release "$DEPLOY_SHA"
     active_marker_tmp="$active_marker.tmp"
     printf '%s\n' "$DEPLOY_SHA" > "$active_marker_tmp"
     mv -f "$active_marker_tmp" "$active_marker"
