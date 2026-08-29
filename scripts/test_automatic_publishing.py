@@ -181,6 +181,7 @@ def check_inventory_quarantines_stale_queue() -> None:
         "names": worker.current_template_video_names,
         "state": worker.publishing_state,
         "queue_ids": worker.pending_queue_ids,
+        "queue_items": worker.queue_items,
         "queue_status": worker.set_queue_status,
     }
     try:
@@ -189,6 +190,7 @@ def check_inventory_quarantines_stale_queue() -> None:
         worker.current_template_video_names = lambda: set()
         worker.publishing_state = lambda: {"videos": {}}
         worker.pending_queue_ids = lambda: ["mc-stale", "mc-legacy"]
+        worker.queue_items = lambda: []
         worker.set_queue_status = lambda episode_id, status, error=None: updates.append((episode_id, status, error))
         result = worker.inventory()
         assert result["pending"] == []
@@ -200,7 +202,7 @@ def check_inventory_quarantines_stale_queue() -> None:
         ]
     finally:
         for name, value in original.items():
-            setattr(worker, {"episodes": "episodes", "video_for": "video_for", "names": "current_template_video_names", "state": "publishing_state", "queue_ids": "pending_queue_ids", "queue_status": "set_queue_status"}[name], value)
+            setattr(worker, {"episodes": "episodes", "video_for": "video_for", "names": "current_template_video_names", "state": "publishing_state", "queue_ids": "pending_queue_ids", "queue_items": "queue_items", "queue_status": "set_queue_status"}[name], value)
         shutil.rmtree(fixture, ignore_errors=True)
 
 
