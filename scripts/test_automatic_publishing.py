@@ -347,7 +347,24 @@ def check_worker_startup_wakes_empty_stock() -> None:
         worker.time.sleep = original["sleep"]
 
 
+
+def check_corrupt_audio_manifest_is_discarded() -> None:
+    fixture = ROOT / "out/test-audio-manifest-recovery"
+    manifest = fixture / "public/audio/quiz-copy/mc-54/manifest.json"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        manifest.write_text("", encoding="utf-8")
+        assert worker.discard_invalid_audio_manifest("mc-54", fixture)
+        assert not manifest.exists()
+        manifest.write_text("{}", encoding="utf-8")
+        assert not worker.discard_invalid_audio_manifest("mc-54", fixture)
+        assert manifest.exists()
+    finally:
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
 def main() -> None:
+    check_corrupt_audio_manifest_is_discarded()
     check_empty_stock_retries_without_waiting_hours()
     check_worker_startup_wakes_empty_stock()
     check_generation_lane_guard()

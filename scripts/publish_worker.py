@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import os
 import shutil
 import signal
@@ -141,6 +142,20 @@ def episodes() -> list[dict]:
 
 def video_for(episode: dict) -> Path:
     return video_path(episode)
+
+
+def discard_invalid_audio_manifest(episode_id: str, root: Path = ROOT) -> bool:
+    path = root / "public/audio/quiz-copy" / episode_id / "manifest.json"
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return False
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        value = None
+    if isinstance(value, dict):
+        return False
+    path.unlink(missing_ok=True)
+    return True
 
 
 def inventory() -> dict[str, list[str]]:
@@ -355,6 +370,7 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
                 LOG_DIR / "generator.log",
                 f"select episode={episode_id} format={format_id} label={format_label(format_id)}",
             )
+            discard_invalid_audio_manifest(episode_id)
             result = run_logged(
                 [
                     sys.executable,
