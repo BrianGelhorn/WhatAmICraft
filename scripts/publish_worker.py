@@ -361,9 +361,9 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
                 "generation",
             )
             if result.returncode == 0:
-                if len(inventory()["stock"]) < generation["targetStock"]:
-                    retry_minutes = 0
+                retry_minutes = 0 if len(inventory()["stock"]) < generation["targetStock"] else generation["intervalMinutes"]
                 break
+            retry_minutes = min(5, generation["intervalMinutes"])
             log(LOG_DIR / "generator.log", f"skip: {episode_id} falló; se prueba el siguiente")
     else:
         log(
@@ -375,11 +375,15 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
 
 def main() -> None:
     interval = int(os.getenv("PUBLISH_QUEUE_INTERVAL", "30"))
+    startup = True
     while True:
         try:
             config = load_config()
             apply_runtime(config)
             stock = inventory()
+            if startup and config["generation"]["enabled"] and not stock["stock"]:
+                save_generation_schedule(next_run_iso(0))
+            startup = False
             alert_low_stock(len(stock["pending"]), config["generation"]["lowStockThreshold"])
             if is_due(config, load_schedule()):
                 published_ok = publish_or_repost(config, stock)
