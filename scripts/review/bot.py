@@ -173,16 +173,17 @@ def approvals_text() -> tuple[str, list]:
     return "\n".join(lines), keyboard
 
 
-def send_review_video(episode_id: str) -> bool:
+def send_review_video(episode_id: str, alert_state: dict | None = None) -> bool:
     item = next((item for item in approval_items() if item["id"] == episode_id), None)
     if not item:
         raise RuntimeError(f"{episode_id} no está disponible para aprobación")
     if item["sent"]:
         return False
     send_for_review(episode_id, item["target"], item["video"])
-    state = read_alert_state()
+    state = alert_state if alert_state is not None else read_alert_state()
     state.setdefault("sentForReview", {})[episode_id] = sha256(item["video"])
-    write_alert_state(state)
+    if alert_state is None:
+        write_alert_state(state)
     return True
 
 
@@ -451,7 +452,7 @@ def notify_generation_done(job: dict, state: dict) -> None:
     sent_ids = []
     for episode_id in target_ids:
         try:
-            if send_review_video(episode_id):
+            if send_review_video(episode_id, state):
                 sent_ids.append(episode_id)
         except Exception as error:
             log(f"error enviando {episode_id} a aprobación: {error}")
@@ -481,6 +482,13 @@ def monitor_errors() -> None:
         state["initialized"] = True
         write_alert_state(state)
         return
+    for item in approval_items():
+        if item["sent"]:
+            continue
+        try:
+            send_review_video(item["id"], state)
+        except Exception as error:
+            log(f"error recuperando {item['id']} para aprobación: {error}")
     for path in paths:
         key = str(path)
         size = path.stat().st_size
