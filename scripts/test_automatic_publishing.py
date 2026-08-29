@@ -191,7 +191,109 @@ def check_inventory_quarantines_stale_queue() -> None:
         shutil.rmtree(fixture, ignore_errors=True)
 
 
+
+def check_empty_stock_retries_without_waiting_hours() -> None:
+    config = {
+        "schedule": {"enabled": False},
+        "generation": {
+            "enabled": True,
+            "intervalMinutes": 180,
+            "targetStock": 8,
+            "lowStockThreshold": 5,
+            "publishGuardMinutes": 90,
+        },
+    }
+    stock = {
+        "pending": [],
+        "candidates": [],
+        "stock": [],
+        "formats": {"clues": {"missing": ["mc-01"], "pending": [], "candidates": []}},
+    }
+    saved: list[str] = []
+    original = {
+        "generation_schedule": worker.load_generation_schedule,
+        "save_generation_schedule": worker.save_generation_schedule,
+        "active_template": worker.active_template_version,
+        "release": worker.release_version,
+        "read_job": worker.read_job,
+        "publishing_active": worker.publishing_active,
+        "generation_window": worker.generation_window_open,
+        "choose_format": worker.choose_generation_format,
+        "run_logged": worker.run_logged,
+        "log": worker.log,
+    }
+    try:
+        worker.load_generation_schedule = lambda: {"nextRunAt": "2026-01-01T00:00:00+00:00"}
+        worker.save_generation_schedule = saved.append
+        worker.active_template_version = lambda: "current"
+        worker.release_version = lambda: "current"
+        worker.read_job = lambda _lane: {"status": "idle"}
+        worker.publishing_active = lambda: False
+        worker.generation_window_open = lambda *_args: True
+        worker.choose_generation_format = lambda *_args: "clues"
+        worker.run_logged = lambda *_args: SimpleNamespace(returncode=1)
+        worker.log = lambda *_args: None
+        worker.maybe_generate(config, stock)
+        retry = datetime.fromisoformat(saved[-1])
+        assert 0 < (retry - datetime.now(timezone.utc)).total_seconds() <= 5 * 60 + 5
+    finally:
+        worker.load_generation_schedule = original["generation_schedule"]
+        worker.save_generation_schedule = original["save_generation_schedule"]
+        worker.active_template_version = original["active_template"]
+        worker.release_version = original["release"]
+        worker.read_job = original["read_job"]
+        worker.publishing_active = original["publishing_active"]
+        worker.generation_window_open = original["generation_window"]
+        worker.choose_generation_format = original["choose_format"]
+        worker.run_logged = original["run_logged"]
+        worker.log = original["log"]
+
+
+def check_worker_startup_wakes_empty_stock() -> None:
+    config = {"schedule": {"enabled": False}, "generation": {"enabled": True, "lowStockThreshold": 5}}
+    saved: list[str] = []
+    original = {
+        "config": worker.load_config,
+        "runtime": worker.apply_runtime,
+        "inventory": worker.inventory,
+        "save_generation_schedule": worker.save_generation_schedule,
+        "alert": worker.alert_low_stock,
+        "is_due": worker.is_due,
+        "schedule": worker.load_schedule,
+        "maybe_generate": worker.maybe_generate,
+        "sleep": worker.time.sleep,
+    }
+    try:
+        worker.load_config = lambda: config
+        worker.apply_runtime = lambda _config: None
+        worker.inventory = lambda: {"pending": [], "stock": []}
+        worker.save_generation_schedule = saved.append
+        worker.alert_low_stock = lambda *_args: None
+        worker.is_due = lambda *_args: False
+        worker.load_schedule = lambda: {}
+        worker.maybe_generate = lambda *_args: None
+        worker.time.sleep = lambda _seconds: (_ for _ in ()).throw(KeyboardInterrupt())
+        try:
+            worker.main()
+        except KeyboardInterrupt:
+            pass
+        assert len(saved) == 1
+        assert datetime.fromisoformat(saved[0]) <= datetime.now(timezone.utc)
+    finally:
+        worker.load_config = original["config"]
+        worker.apply_runtime = original["runtime"]
+        worker.inventory = original["inventory"]
+        worker.save_generation_schedule = original["save_generation_schedule"]
+        worker.alert_low_stock = original["alert"]
+        worker.is_due = original["is_due"]
+        worker.load_schedule = original["schedule"]
+        worker.maybe_generate = original["maybe_generate"]
+        worker.time.sleep = original["sleep"]
+
+
 def main() -> None:
+    check_empty_stock_retries_without_waiting_hours()
+    check_worker_startup_wakes_empty_stock()
     check_generation_lane_guard()
     check_inventory_quarantines_stale_queue()
     check_stale_generation_job_recovery()
