@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -30,7 +31,7 @@ from video_formats import (
     ready_episodes,
     video_path,
 )
-from job_status import append_job_line, begin_job, finish_job, read_job
+from job_status import append_job_line, begin_job, finish_job, read_job, set_job_pid
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
@@ -51,6 +52,22 @@ def log(path: Path, text: str) -> None:
         file.write(line + "\n")
 
 
+
+def _stop_child(process: subprocess.Popen) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+
+
 def run_logged(command: list[str], log_name: str, label: str, lane: str = "main") -> subprocess.CompletedProcess:
     if lane in CPUSETS and shutil.which("taskset"):
         command = ["taskset", "-c", CPUSETS[lane], *command]
@@ -61,6 +78,7 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
         log(path, "skip: another task is already running")
         return subprocess.CompletedProcess(command, 1)
     log(path, "run: " + " ".join(command))
+    process = None
     try:
         process = subprocess.Popen(
             command,
@@ -70,6 +88,7 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
             text=True,
             encoding="utf-8",
             errors="replace",
+            start_new_session=True,
         )
         set_job_pid(process.pid, lane)
         assert process.stdout
@@ -81,6 +100,8 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
         finish_job("completed" if code == 0 else "failed", code, lane=lane)
         return subprocess.CompletedProcess(command, code)
     except Exception as error:
+        if process is not None:
+            _stop_child(process)
         log(path, f"error: {error}")
         finish_job("failed", 1, str(error), lane)
         return subprocess.CompletedProcess(command, 1)

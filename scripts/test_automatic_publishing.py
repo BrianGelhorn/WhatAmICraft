@@ -90,6 +90,68 @@ def check_stale_generation_job_recovery() -> None:
         shutil.rmtree(fixture, ignore_errors=True)
 
 
+
+def check_run_logged_tracks_child_pid() -> None:
+    fixture = ROOT / "out/test-worker-pid"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    recorded: dict[str, object] = {}
+    original = {
+        "log_dir": worker.LOG_DIR,
+        "cpusets": worker.CPUSETS,
+        "begin": worker.begin_job,
+        "set_pid": worker.set_job_pid,
+        "append": worker.append_job_line,
+        "finish": worker.finish_job,
+    }
+    try:
+        worker.LOG_DIR = fixture
+        worker.CPUSETS = {}
+        worker.begin_job = lambda *_args: None
+        worker.set_job_pid = lambda pid, lane="main": recorded.update(pid=pid, lane=lane)
+        worker.append_job_line = lambda *_args: None
+        worker.finish_job = lambda status, code, error=None, lane="main": recorded.update(
+            status=status, code=code, error=error, lane=lane
+        )
+        result = worker.run_logged(
+            [sys.executable, "-c", "print('ok')"],
+            "pid-tracking.log",
+            "PID tracking fixture",
+            "generation",
+        )
+        assert result.returncode == 0
+        assert isinstance(recorded.get("pid"), int)
+        assert recorded["lane"] == "generation"
+        assert recorded["status"] == "completed"
+
+        def fail_tracking(pid, lane="main"):
+            recorded.update(pid=pid, lane=lane)
+            raise RuntimeError("tracking failed")
+
+        worker.set_job_pid = fail_tracking
+        result = worker.run_logged(
+            [sys.executable, "-c", "import time; time.sleep(60)"],
+            "pid-tracking-failure.log",
+            "PID tracking failure fixture",
+            "generation",
+        )
+        assert result.returncode == 1
+        try:
+            os.kill(recorded["pid"], 0)
+        except ProcessLookupError:
+            pass
+        else:
+            raise AssertionError("tracking failure left the render child running")
+    finally:
+        worker.LOG_DIR = original["log_dir"]
+        worker.CPUSETS = original["cpusets"]
+        worker.begin_job = original["begin"]
+        worker.set_job_pid = original["set_pid"]
+        worker.append_job_line = original["append"]
+        worker.finish_job = original["finish"]
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
 def check_inventory_quarantines_stale_queue() -> None:
     fixture = ROOT / "out/test-inventory-legacy"
     shutil.rmtree(fixture, ignore_errors=True)
@@ -133,6 +195,7 @@ def main() -> None:
     check_generation_lane_guard()
     check_inventory_quarantines_stale_queue()
     check_stale_generation_job_recovery()
+    check_run_logged_tracks_child_pid()
     fixture = ROOT / "out/test-automatic-publishing"
     shutil.rmtree(fixture, ignore_errors=True)
     output = fixture / "out/episodes"
