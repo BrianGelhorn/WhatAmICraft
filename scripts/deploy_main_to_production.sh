@@ -93,11 +93,15 @@ printf '%s\n' "$DEPLOY_SHA" > "$runtime_release_marker_tmp"
 mv -f "$runtime_release_marker_tmp" "$runtime_release_marker"
 
 active_marker="$app_dir/out/.active-template-version"
+active_release=""
+if [ -f "$active_marker" ]; then
+  active_release="$(<"$active_marker")"
+fi
 if [ ! -f "$active_marker" ]; then
   active_marker_tmp="$active_marker.tmp"
   printf '%s\n' "${previous_release:-legacy}" > "$active_marker_tmp"
   mv -f "$active_marker_tmp" "$active_marker"
-elif [ -n "$previous_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$previous_release^{commit}" 2>/dev/null; then
+elif [ -n "$active_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$active_release^{commit}" 2>/dev/null; then
   template_paths=(
     src/
     templates/
@@ -111,7 +115,8 @@ elif [ -n "$previous_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$prev
     scripts/thumbnails.py
     scripts/video_formats.py
   )
-  if git -C "$GITHUB_WORKSPACE" diff --quiet "$previous_release" "$DEPLOY_SHA" -- "${template_paths[@]}"; then
+  # A previous deploy may contain an unpromoted change or its later revert.
+  if git -C "$GITHUB_WORKSPACE" diff --quiet "$active_release" "$DEPLOY_SHA" -- "${template_paths[@]}"; then
     python3 "$GITHUB_WORKSPACE/scripts/migrate_compatible_artifacts.py" \
       --root "$app_dir" --repo "$GITHUB_WORKSPACE" --release "$DEPLOY_SHA"
     active_marker_tmp="$active_marker.tmp"
