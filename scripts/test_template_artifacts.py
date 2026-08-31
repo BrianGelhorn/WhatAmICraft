@@ -70,7 +70,7 @@ def main() -> None:
             assert validate_artifact(legacy_video, episode_id="mc-02", root=fixture)["legacy"] is True
             assert current_template_video_names(fixture) == {video.name}
 
-            assert migrate(fixture, "release-b", lambda version: version == "release-a") == 1
+            assert migrate(video.parent, "release-b", lambda version: version == "release-a") == 1
             os.environ["WHATAMICRAFT_TEMPLATE_VERSION"] = "release-b"
             activate_template_version("release-b", fixture)
             assert current_template_video_names(fixture) == {video.name}

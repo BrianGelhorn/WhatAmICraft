@@ -21,6 +21,8 @@ def check_active_template_baseline(script: str) -> None:
     with tempfile.TemporaryDirectory(prefix="whatamicraft-deploy-test-") as temporary:
         repo = Path(temporary) / "repo"
         app = Path(temporary) / "runtime"
+        videos = Path(temporary) / "video-disk/episodes"
+        videos.mkdir(parents=True)
         (repo / "src").mkdir(parents=True)
         (repo / "scripts").mkdir()
         (app / "out/episodes").mkdir(parents=True)
@@ -53,7 +55,7 @@ def check_active_template_baseline(script: str) -> None:
             "legacy": {"templateVersion": active, "legacy": True},
         }
         for name, manifest in manifests.items():
-            (app / f"out/episodes/{name}.artifact.json").write_text(json.dumps(manifest), encoding="utf-8")
+            (videos / f"{name}.artifact.json").write_text(json.dumps(manifest), encoding="utf-8")
 
         def deploy(previous_release: str, release: str) -> None:
             subprocess.run(["bash", "-euo", "pipefail", "-c", block], check=True, env={
@@ -62,16 +64,30 @@ def check_active_template_baseline(script: str) -> None:
                 "GITHUB_WORKSPACE": str(repo),
                 "previous_release": previous_release,
                 "DEPLOY_SHA": release,
+                "video_path": str(videos),
             })
 
         def read_manifests() -> dict:
-            return {name: json.loads((app / f"out/episodes/{name}.artifact.json").read_text())
+            return {name: json.loads((videos / f"{name}.artifact.json").read_text())
                     for name in manifests}
 
         deploy(previous, restored)
         assert marker.read_text().strip() == restored, "restoring the active template must unblock generation"
         manifests["current"]["templateVersion"] = restored
         assert read_manifests() == manifests, "only compatible, non-legacy artifacts may migrate"
+        assert not list((app / "out/episodes").iterdir()), "host checkout is not the video volume"
+
+        videos.rename(videos.with_name("unmounted"))
+        marker.write_text(active + "\n", encoding="utf-8")
+        try:
+            deploy(previous, restored)
+        except subprocess.CalledProcessError:
+            pass
+        else:
+            raise AssertionError("missing video volume must fail deployment")
+        assert marker.read_text().strip() == active, "missing volume must not advance active marker"
+        videos.with_name("unmounted").rename(videos)
+        deploy(previous, restored)
 
         changed = commit("different", "new template awaiting promotion")
         operational = commit("different", "operational fix only")
@@ -117,6 +133,7 @@ def main() -> None:
     assert 'scripts/migrate_compatible_artifacts.py' in script
     assert "templates/" in script and "scripts/video_formats.py" in script
     assert "video storage" in script and "/srv/minecraft-videos/episodes" in script
+    assert script.index('video_path="${VIDEO_STORAGE_PATH:') < script.index('release_marker="$app_dir/.release-version"')
     for required in (
         "archive --format=tar",
         "rsync -a --delete",

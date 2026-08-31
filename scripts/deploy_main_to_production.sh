@@ -82,6 +82,17 @@ if [ -d "$release_dir/data/new-clues-20260815" ]; then
     "$app_dir/data/new-clues-20260815/"
 fi
 
+# Trigger the Debian automount before migrating artifacts or advancing release markers.
+video_path="${VIDEO_STORAGE_PATH:-/srv/minecraft-videos/episodes}"
+for attempt in $(seq 1 36); do
+  [ -d "$video_path" ] && break
+  sleep 5
+done
+[ -d "$video_path" ] || {
+  echo "Production video storage is unavailable: $video_path" >&2
+  exit 1
+}
+
 release_marker="$app_dir/.release-version"
 release_marker_tmp="$release_marker.tmp"
 printf '%s\n' "$DEPLOY_SHA" > "$release_marker_tmp"
@@ -118,7 +129,7 @@ elif [ -n "$active_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$active
   # A previous deploy may contain an unpromoted change or its later revert.
   if git -C "$GITHUB_WORKSPACE" diff --quiet "$active_release" "$DEPLOY_SHA" -- "${template_paths[@]}"; then
     python3 "$GITHUB_WORKSPACE/scripts/migrate_compatible_artifacts.py" \
-      --root "$app_dir" --repo "$GITHUB_WORKSPACE" --release "$DEPLOY_SHA"
+      --episodes-dir "$video_path" --repo "$GITHUB_WORKSPACE" --release "$DEPLOY_SHA"
     active_marker_tmp="$active_marker.tmp"
     printf '%s\n' "$DEPLOY_SHA" > "$active_marker_tmp"
     mv -f "$active_marker_tmp" "$active_marker"
@@ -138,17 +149,6 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
 systemctl --user daemon-reload
 systemctl --user enable --now docker-disk-cleanup.timer
-
-# Trigger the Debian automount before Docker creates bind mounts into it.
-video_path="${VIDEO_STORAGE_PATH:-/srv/minecraft-videos/episodes}"
-for attempt in $(seq 1 36); do
-  [ -d "$video_path" ] && break
-  sleep 5
-done
-[ -d "$video_path" ] || {
-  echo "Production video storage is unavailable: $video_path" >&2
-  exit 1
-}
 
 sudo -n /usr/local/sbin/whatamicraft-up
 

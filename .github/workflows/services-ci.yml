@@ -111,6 +111,7 @@ jobs:
           PYTHONPATH=scripts python scripts/test_publishing.py
           PYTHONPATH=scripts python scripts/test_youtube_publishing.py
           PYTHONPATH=scripts python scripts/test_automatic_publishing.py
+          PYTHONPATH=scripts python scripts/test_deploy_publishing_recovery.py
           PYTHONPATH=scripts python scripts/test_priorities.py
           PYTHONPATH=scripts python scripts/ci/service_contracts.py --publisher
 
