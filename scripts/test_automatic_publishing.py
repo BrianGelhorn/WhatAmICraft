@@ -19,6 +19,7 @@ import publish  # noqa: E402
 import publish_worker as worker  # noqa: E402
 import job_status  # noqa: E402
 from template_artifacts import release_version, render_props_path, write_artifact  # noqa: E402
+from test_deploy_publishing_recovery import main as check_deploy_publishing_recovery  # noqa: E402
 
 
 def check_generation_lane_guard() -> None:
@@ -364,6 +365,7 @@ def check_corrupt_audio_manifest_is_discarded() -> None:
 
 
 def main() -> None:
+    check_deploy_publishing_recovery()
     check_corrupt_audio_manifest_is_discarded()
     check_empty_stock_retries_without_waiting_hours()
     check_worker_startup_wakes_empty_stock()

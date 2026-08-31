@@ -40,12 +40,16 @@ def compatible(repo: Path, previous: str, release: str) -> bool:
     return unchanged.returncode == 0
 
 
-def migrate(root: Path, release: str, is_compatible) -> int:
+def migrate(episodes_dir: Path, release: str, is_compatible) -> int:
+    if not episodes_dir.is_dir():
+        raise FileNotFoundError(f"Video storage is unavailable: {episodes_dir}")
     migrated = 0
-    for path in (root / "out/episodes").glob("*.artifact.json"):
+    for path in episodes_dir.glob("*.artifact.json"):
         try:
             artifact = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(artifact, dict):
             continue
         previous = artifact.get("templateVersion")
         if artifact.get("legacy") or previous == release or not isinstance(previous, str):
@@ -62,11 +66,11 @@ def migrate(root: Path, release: str, is_compatible) -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--episodes-dir", type=Path, required=True)
     parser.add_argument("--repo", type=Path, required=True)
     parser.add_argument("--release", required=True)
     args = parser.parse_args()
-    count = migrate(args.root, args.release, lambda previous: compatible(args.repo, previous, args.release))
+    count = migrate(args.episodes_dir, args.release, lambda previous: compatible(args.repo, previous, args.release))
     print(f"Compatible template artifacts migrated: {count}")
 
 

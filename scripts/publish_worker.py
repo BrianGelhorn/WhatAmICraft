@@ -23,7 +23,7 @@ from review.storage import publishing_state, save_stock_alert_state, stock_alert
 from review.telegram import configured as telegram_configured
 from review.telegram import send_message
 from publishing.common import sha256
-from template_artifacts import active_template_version, release_version
+from template_artifacts import active_template_version, release_version, validate_artifact
 from video_formats import (
     current_template_video_names,
     format_id_for,
@@ -128,8 +128,14 @@ def generation_window_open(config: dict, schedule: dict, now: datetime | None = 
     due = _date(schedule.get("nextRunAt"))
     if due is None:
         return False
+    now = now or datetime.now(timezone.utc)
+    last_publish = read_job("publishing")
+    # A failed automatic attempt schedules a short retry, not a normal publish window.
+    # The caller still checks the publishing lock before starting generation.
+    if due > now and last_publish.get("source") == "automatic" and last_publish.get("status") == "failed":
+        return True
     guard = timedelta(minutes=config["generation"]["publishGuardMinutes"])
-    return due - (now or datetime.now(timezone.utc)) > guard
+    return due - now > guard
 
 
 def publishing_active() -> bool:
@@ -179,15 +185,24 @@ def inventory() -> dict[str, list[str]]:
         and published_state.get(episode["id"], {}).get("sha256") == sha256(video_for(episode))
     }
     pending = pending_queue_ids()
-    retryable = [
-        item for item in queue_items()
-        if item.get("status") == "failed"
-        and item.get("episodeId") in videos
-        and str(item.get("error") or "").startswith(("youtube:", "tiktok:", "instagram:", "facebook:"))
-    ]
-    for item in retryable:
-        set_queue_status(item["episodeId"], "pending", item["error"])
-    pending = [*pending, *(item["episodeId"] for item in retryable if item["episodeId"] not in pending)]
+    for item in queue_items():
+        if item.get("status") != "failed" or item.get("episodeId") not in videos:
+            continue
+        error = str(item.get("error") or "")
+        if error == "Video faltante o no corresponde a la plantilla activa":
+            episode = next(episode for episode in current if episode["id"] == item["episodeId"])
+            try:
+                artifact = validate_artifact(video_for(episode), episode_id=episode["id"], require_active=True, root=ROOT)
+            except (OSError, RuntimeError, ValueError):
+                continue
+            if artifact.get("legacy"):
+                continue
+            error = None
+        elif not error.startswith(("youtube:", "tiktok:", "instagram:", "facebook:")):
+            continue
+        set_queue_status(item["episodeId"], "pending", error)
+        if item["episodeId"] not in pending:
+            pending.append(item["episodeId"])
     stale = sorted(set(pending) - videos)
     for episode_id in stale:
         set_queue_status(episode_id, "failed", "Video faltante o no corresponde a la plantilla activa")
