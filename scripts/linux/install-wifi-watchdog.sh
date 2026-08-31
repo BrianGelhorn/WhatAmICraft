@@ -40,3 +40,6 @@ SERVICE
 systemctl daemon-reload
 systemctl enable --now wifi-watchdog.service
 systemctl --no-pager --full status wifi-watchdog.service
+
+# Existing production launchers call this hook on every GitHub-controlled deploy.
+bash "${SCRIPT_DIR}/install-minecraft-quiz-service.sh" --install-only

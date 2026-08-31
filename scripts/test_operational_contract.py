@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import subprocess
 
+from test_linux_recovery import main as check_linux_recovery
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,7 +27,8 @@ def main() -> None:
     assert not [path for path in tracked if path and media_pattern.search(path)]
 
     assert "scripts/backup_state.py --quiet" in start
-    assert "docker compose up -d" in start
+    assert "sudo -n /usr/local/sbin/whatamicraft-up" in start
+    assert "docker compose" not in start
     assert "ip link" in watchdog and "getent ahostsv4" in watchdog and "curl --ipv4" in watchdog
     assert "FAILS_BEFORE_RECOVERY:-6" in watchdog
     assert "has_local_network" in watchdog and "systemctl restart networking.service" in watchdog
@@ -66,6 +69,7 @@ def main() -> None:
     assert "whatamicraft-staging-${GITHUB_RUN_ID}" in staging_ci
     assert "down -v --remove-orphans" in staging_ci
     assert "production" not in staging_ci.lower()
+    check_linux_recovery()
     print("ok: mini PC restart, Wi-Fi recovery, backup, isolated staging, and CI cleanup contracts")
 
 
