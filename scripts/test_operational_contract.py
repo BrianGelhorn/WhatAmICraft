@@ -39,6 +39,22 @@ def main() -> None:
     assert "CLUES_API_URL: http://clues-api:8790" in compose
     assert "CLUES_SOURCE_DIR: /app/data/new-clues-20260815" in compose
     assert "MONITOR_CLUES_URL: http://clues-api:8790" in compose
+    assert "x-stable-dns: &stable-dns\n  - 1.1.1.1\n  - 8.8.8.8" in compose
+    for service in (
+        "producer",
+        "dashboard",
+        "clues-api",
+        "analytics-api",
+        "publisher",
+        "publisher-worker",
+        "backup-rollback",
+        "media",
+        "monitor",
+        "tunnel",
+    ):
+        section = compose.split(f"\n  {service}:", 1)[1]
+        section = re.split(r"\n(?=  [A-Za-z0-9_-]+:)", section, maxsplit=1)[0]
+        assert "dns: *stable-dns" in section
     assert "backup-rollback:" in staging
     assert "BACKUP_ADMIN_TOKEN" in staging
     assert "dockerfile: Dockerfile.media" in compose
