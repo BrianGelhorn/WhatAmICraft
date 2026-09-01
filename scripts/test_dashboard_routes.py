@@ -80,13 +80,15 @@ def service_statuses_use_monitor_health() -> None:
     by_name = {item["name"]: item for item in statuses}
     assert by_name["dashboard"]["state"] == "running"
     assert by_name["clues-api"]["state"] == "degraded"
+    assert by_name["clues-api"]["severity"] == "warning"
     assert by_name["media"]["state"] == "stopped"
+    assert by_name["media"]["severity"] == "fatal"
     assert by_name["monitor"]["state"] == "running"
-    assert not any(item["state"] == "external" for item in statuses)
+    assert all(item["state"] != "external" and item.get("severity") != "external" for item in statuses)
     app.MONITOR_API_URL = ""
     fallback = app.service_statuses()
     assert {item["name"] for item in fallback} == {*app.MONITORED_SERVICES, "monitor"}
-    assert all(item["state"] != "external" for item in fallback)
+    assert all(item["state"] != "external" and item.get("severity") != "external" for item in fallback)
     app.MONITOR_API_URL = original_url
 
 

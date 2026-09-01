@@ -54,8 +54,11 @@ def main() -> None:
     )
     assert monitor.check_now()["ok"]
     assert monitor.status()["services"][-1]["status"] == "up"
+    assert monitor.status()["services"][-1]["severity"] == "ok"
     FakeHandler.statuses["/health"] = 503
-    assert monitor.check_now()["services"][0]["status"] == "degraded"
+    degraded = monitor.check_now()["services"][0]
+    assert degraded["status"] == "degraded"
+    assert degraded["severity"] == "warning"
     FakeHandler.statuses["/health"] = 200
     assert monitor.check_now()["ok"]
     event = monitor.record_event("dashboard", "error", "token=abc password=secret", {"meta": {"access_token": "private"}})
@@ -78,7 +81,9 @@ def main() -> None:
     )
     assert status == 201 and created["ok"]
     heartbeat.unlink()
-    assert monitor.check_now()["services"][-1]["status"] == "down"
+    down = monitor.check_now()["services"][-1]
+    assert down["status"] == "down"
+    assert down["severity"] == "fatal"
     server.shutdown()
     events_path.unlink(missing_ok=True)
     heartbeat.unlink(missing_ok=True)

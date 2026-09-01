@@ -96,7 +96,15 @@ JOB_LOCK = threading.Lock()
 ANALYTICS_LOCK = threading.Lock()
 ANALYTICS_API_URL = os.getenv("ANALYTICS_API_URL", "").rstrip("/")
 MONITOR_API_URL = os.getenv("MONITOR_API_URL", "").rstrip("/")
-MONITORED_SERVICES = ("dashboard", "clues-api", "analytics-api", "backup-rollback", "media", "bot", "publisher-worker")
+BASE_MONITORED_SERVICES = ("dashboard", "clues-api", "analytics-api", "backup-rollback", "media")
+MONITORED_SERVICES = (
+    *BASE_MONITORED_SERVICES,
+    *(
+        name.strip()
+        for name in os.getenv("MONITOR_HEARTBEAT_SERVICES", "bot,publisher-worker").split(",")
+        if name.strip() in {"bot", "publisher-worker"}
+    ),
+)
 JOB = {"status": "idle", "label": "", "lines": [], "returnCode": None}
 ACTIVE_PROCESSES = {}
 CANCEL_REQUESTED = {}
@@ -283,42 +291,47 @@ def append_log(path: Path, line: str) -> None:
 
 
 def service_statuses() -> list[dict]:
-    """Return observable service health without presenting deployment topology as status."""
-    if not MONITOR_API_URL:
+    """Return observable service health with an explicit severity."""
+    state_map = {"up": "running", "degraded": "degraded", "down": "stopped"}
+    severity_map = {"running": "ok", "degraded": "warning", "stopped": "fatal", "unknown": "warning"}
+
+    def fallback() -> list[dict]:
         return [
-            {"name": "dashboard", "state": "running", "status": "Responde"},
-            *({"name": name, "state": "unknown", "status": "Sin datos"} for name in MONITORED_SERVICES if name != "dashboard"),
-            {"name": "monitor", "state": "unknown", "status": "Sin datos"},
+            {"name": "dashboard", "state": "running", "severity": "ok", "status": "Responde"},
+            *(
+                {"name": name, "state": "unknown", "severity": "warning", "status": "Sin datos"}
+                for name in MONITORED_SERVICES
+                if name != "dashboard"
+            ),
+            {"name": "monitor", "state": "unknown", "severity": "warning", "status": "Sin datos"},
         ]
+
+    if not MONITOR_API_URL:
+        return fallback()
 
     try:
         response_status, result = monitor_request("/api/monitor/check", method="POST")
         if response_status != HTTPStatus.OK or not isinstance(result, dict):
             raise MonitorApiError("El monitor devolvió una respuesta inválida")
-        by_name = {item.get("service"): item for item in result.get("services", []) if isinstance(item, dict)}
-        state_map = {"up": "running", "degraded": "degraded", "down": "stopped"}
         services = []
-        for name in MONITORED_SERVICES:
-            item = by_name.get(name)
-            if not item:
-                services.append({"name": name, "state": "unknown", "status": "Sin datos"})
+        for item in result.get("services", []):
+            if not isinstance(item, dict) or not item.get("service"):
                 continue
+            state = state_map.get(item.get("status"), "unknown")
             services.append({
-                "name": name,
-                "state": state_map.get(item.get("status"), "unknown"),
+                "name": item["service"],
+                "state": state,
+                "severity": item.get("severity") or severity_map[state],
                 "status": item.get("detail") or "Sin detalle",
                 "latencyMs": item.get("latencyMs"),
                 "checkedAt": item.get("checkedAt"),
             })
-        services.append({"name": "monitor", "state": "running", "status": "Responde"})
+        services.append({"name": "monitor", "state": "running", "severity": "ok", "status": "Responde"})
         return services
     except (MonitorApiError, ValueError, TypeError):
-        return [
-            {"name": "dashboard", "state": "running", "status": "Responde"},
-            *({"name": name, "state": "unknown", "status": "Sin datos"} for name in MONITORED_SERVICES if name != "dashboard"),
-            {"name": "monitor", "state": "stopped", "status": "No responde"},
-        ]
-
+        services = fallback()
+        services[-1] = {"name": "monitor", "state": "stopped", "severity": "fatal", "status": "No responde"}
+        return services
 
 def diagnostics_state() -> dict:
     config = load_config()
