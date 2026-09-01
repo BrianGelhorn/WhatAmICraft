@@ -52,7 +52,8 @@ def main() -> None:
         "monitor",
         "tunnel",
     ):
-        section = compose.split(f"\n  {service}:", 1)[1].split("\n  ", 1)[0]
+        section = compose.split(f"\n  {service}:", 1)[1]
+        section = re.split(r"\n(?=  [A-Za-z0-9_-]+:)", section, maxsplit=1)[0]
         assert "dns: *stable-dns" in section
     assert "backup-rollback:" in staging
     assert "BACKUP_ADMIN_TOKEN" in staging
