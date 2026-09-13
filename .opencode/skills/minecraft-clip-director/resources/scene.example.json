@@ -1,0 +1,41 @@
+{
+  "id": "G08",
+  "title": "Busqueda entre estantes vacios",
+  "recipe": "search",
+  "status": "pendiente_de_ensayo",
+  "fps": 30,
+  "duration_frames": 180,
+  "hook_frame": 0,
+  "uses": [
+    {"category": "herramientas", "reason": "Buscar la respuesta, no demostrar donde se obtiene una herramienta."},
+    {"category": "minerales", "reason": "Generar expectativa antes de resolver, sin representar una veta."},
+    {"category": "pociones", "reason": "Inspeccionar posibilidades, sin mostrar ingredientes ni recetas."}
+  ],
+  "props": ["estantes vacios", "divisor gris", "pedestal vacio"],
+  "spoiler_exclusions": ["No usar si estantes o pedestal adelantan la pista del episodio."],
+  "setup": ["SET-G08 de la biblioteca: plataforma, dos estantes, divisor y nicho sin techo.", "En servidor: /function studio:scene/g08/setup; esperar el aviso de preparacion."],
+  "automation": {
+    "setup": "datapack",
+    "action": "manual",
+    "manual_actions": ["Caminar, girar y detenerse frente al nicho."],
+    "notes": "start no mueve al jugador. Replay Mod y exportacion requieren el cliente."
+  },
+  "beats": [
+    {"start": 0, "end": 29, "action": "Mirar un estante y despues el otro; iniciar un paso corto.", "visible": "Busqueda activa desde el primer segundo."},
+    {"start": 30, "end": 119, "action": "Avanzar hacia (282.5,81,3.5) y mirar nicho a derecha.", "visible": "Se inspecciona una nueva posibilidad."},
+    {"start": 120, "end": 179, "action": "Mover primero a x=283.5 y despues z=4.5; frenar antes del pedestal.", "visible": "Se rodea el divisor sin atravesarlo y queda un final estable."}
+  ],
+  "camera": {
+    "space": "world",
+    "movement": "fixed",
+    "fov": 65,
+    "keyframes": [
+      {"frame": 0, "position": [282, 91, -4], "look_at": [282, 81.5, 3.5]},
+      {"frame": 179, "position": [282, 91, -4], "look_at": [282, 81.5, 3.5]}
+    ],
+    "framing": "Estantes, jugador y nicho deben caber en vertical. Ensayar a tamano de telefono."
+  },
+  "reset": ["/function studio:reset para volver a la marca inicial.", "Dejar margen de grabacion antes de volver a actuar."],
+  "reject_if": ["Jugador atraviesa el divisor.", "Nicho fuera de cuadro.", "Los giros parecen paseo sin inspeccion."],
+  "output": "mc_search_room_scan_thirdtop_vanilla_scene_t01.mp4"
+}

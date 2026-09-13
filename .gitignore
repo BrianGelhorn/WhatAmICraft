@@ -34,6 +34,8 @@ __pycache__
 *.woff2
 .secrets/
 backups/
+Server/data/
+Server/generated/
 staging/runtime/
 staging/.test-runtime*/
 hosted-preview/
