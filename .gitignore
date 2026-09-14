@@ -42,3 +42,5 @@ out/*
 public/audio/
 public/images/
 references/
+Server/data/
+Server/generated/

@@ -1,0 +1,4 @@
+# Allow-list Docker build context: never send the persistent world to Docker.
+*
+!Dockerfile
+!scene_controller.py
