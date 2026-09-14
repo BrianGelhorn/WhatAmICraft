@@ -1,0 +1,16 @@
+{
+  "id": "F01",
+  "title": "Apilabilidad de comestibles",
+  "predicate": "ser un item comestible que puede llevarse en una pila",
+  "targets": ["golden_apple", "chorus_fruit"],
+  "source_cases": [
+    {"target_id": "golden_apple", "episode_id": "mc-25", "clue_index": 1, "clue_text": "I am an edible item that can be carried in a stack.", "version": "1.21.5", "source": "data/quiz-copy-episodes.json", "fact_ids": []},
+    {"target_id": "chorus_fruit", "episode_id": "mc-26", "clue_index": 1, "clue_text": "I am an edible item that can be carried in a stack.", "version": "1.21.5", "source": "data/quiz-copy-episodes.json", "fact_ids": []}
+  ],
+  "candidate_universe": {"status": "provisional", "candidate_ids": ["golden_apple", "chorus_fruit"], "scope": "Solo los dos casos documentados aquí; no afirma exhaustividad ni se puede certificar una asignación."},
+  "illustrated_part": "Relación conceptual de comestible apilable; posible representación neutra, aún no autorizada.",
+  "not_demonstrated": ["La apilabilidad mecánica no se demuestra con HUD, inventario ni otro objeto.", "No existe captura vanilla ni representación UI Remotion aprobada."],
+  "forbidden_audiovisual_attributes": {"texture": "Sin textura dorada o púrpura que identifique un target.", "sound": "Sin tono específico de consumo.", "environment": "Sin End ni entorno distintivo.", "quantities": "Sin cifra 64 ni contador de pila.", "montage": "Sin montaje ni teleport para sugerir una mecánica."},
+  "case_versions": {"generated_content": "26.1", "historical_bank": "1.21.5", "server_capture": "1.21.11"},
+  "status": {"documentation": "documented", "mechanics": "mechanics_pending", "candidate_preservation": "candidate_preservation_pending", "visual": "visual_pending"}
+}
