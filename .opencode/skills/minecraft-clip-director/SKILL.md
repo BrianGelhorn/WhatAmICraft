@@ -20,7 +20,7 @@ Usa `resources/scene.example.json`. Incluye predicado, >=2 targets, universo con
 
 Las etiquetas son literales: `documented`, `mechanics_pending`, `candidate_preservation_pending`, `visual_pending`. Una declaración no es prueba mecánica: nunca marques `verified`. Registra versiones no vacías por caso: contenido generado nuevo exige Java 26.1; el ejemplo histórico usa 1.21.5 y captura Server 1.21.11. No hay migración automática.
 
-El universo no se recorta para fabricar 3→2→1. En asignación, `clue_index` elige un `M_i` y exige solo `M_i ⊆ V`; los tres `M_i` aún se validan con >=2, reducción estricta, >=2 tras dos pistas y target único tras tres. Universo `provisional` rechaza certificación. El validador solo comprueba estructura, citas y conjuntos declarados, no verdad semántica.
+El universo no se recorta para fabricar 3→2→1. En asignación, `clue_index` elige un `M_i` y exige solo `M_i ⊆ V`, con `M_1` siempre subconjunto estricto del universo (la pista 1 debe descartar a alguien); los tres `M_i` aún se validan con >=2, reducción estricta, >=2 tras dos pistas y target único tras tres. Universo `provisional` rechaza certificación. El validador solo comprueba estructura, citas y conjuntos declarados, no verdad semántica.
 
 ## Entrega
 

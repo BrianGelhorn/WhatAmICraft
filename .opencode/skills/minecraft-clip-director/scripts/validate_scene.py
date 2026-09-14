@@ -92,6 +92,7 @@ def validate_assignment(assignment, family_targets):
         ordered.append(match["candidate_ids"])
     selected = ordered[assignment["clue_index"] - 1]
     require(set(selected) <= set(visual), "assignment: selected M_i must be contained in visual candidates V")
+    require(set(ordered[0]) < set(universe), "assignment.clue_matches[1]: clue 1 must exclude at least one declared universe candidate")
     first_two = intersection(ordered[:2])
     all_three = intersection(ordered)
     require(len(first_two) >= 2, "assignment: first two cumulative matches must retain at least two candidates")

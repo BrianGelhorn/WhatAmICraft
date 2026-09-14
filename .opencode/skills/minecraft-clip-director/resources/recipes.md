@@ -15,3 +15,4 @@ Una familia es un predicado aplicable a varios targets, no una escena ni una pro
 - No usar HUD, inventario ni el target para probar la propiedad de otro target.
 - `documented` significa cita presente; no significa `verified`.
 - La asignación posterior debe preservar los candidates compatibles con el clip, no solo conservar el target final.
+- El predicado debe excluir al menos un candidato plausible (ej: wind_charge frente a armas con durabilidad); un predicado que no descarta a nadie es trivial y la pista 1 lo debe reflejar.

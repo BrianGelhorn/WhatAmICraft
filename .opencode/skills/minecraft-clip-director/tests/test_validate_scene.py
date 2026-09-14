@@ -23,7 +23,7 @@ def valid_assignment(target="mace"):
         "clue_index": 1,
         "target_id": target,
         "candidate_universe_status": "provisional",
-        "candidate_universe_ids": ["mace", "trident", "fishing_rod"],
+        "candidate_universe_ids": ["mace", "trident", "fishing_rod", "wind_charge"],
         "visual_candidate_ids": ["mace", "trident", "fishing_rod"],
         "clue_matches": [
             {"index": 1, "candidate_ids": ["mace", "trident", "fishing_rod"]},
@@ -116,6 +116,16 @@ class FamilyTests(unittest.TestCase):
             validator.validate(family)
         family["assignment"] = valid_assignment()
         family["assignment"]["clue_matches"][0]["candidate_ids"] = ["mace", "unknown_target"]
+        with self.assertRaises(ValueError):
+            validator.validate(family)
+
+    def test_assignment_rejects_trivial_first_clue(self):
+        family = copy.deepcopy(self.family)
+        assignment = valid_assignment()
+        first = list(assignment["clue_matches"][0]["candidate_ids"])
+        assignment["candidate_universe_ids"] = first
+        assignment["visual_candidate_ids"] = first
+        family["assignment"] = assignment
         with self.assertRaises(ValueError):
             validator.validate(family)
 
