@@ -20,7 +20,13 @@ services:
       FABRIC_LOADER_VERSION: "0.19.5"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
-      MEMORY: "2G"
+      # Local console pipe for setup verification; no extra network listener.
+      CREATE_CONSOLE_IN_PIPE: "true"
+      PAUSE_WHEN_EMPTY_SECONDS: "0"
+      # Layers start at -64, so this world's grass surface is Y72.
+      LEVEL_TYPE: "minecraft:flat"
+      GENERATOR_SETTINGS: '{"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":135},{"block":"minecraft:grass_block","height":1}],"biome":"minecraft:plains","structures":{"structures":{}}}'
+      MEMORY: "8G"
     volumes:
       # Stateful, local filming world. Never use `down -v` here.
       - ./data:/data

@@ -2,3 +2,4 @@
 *
 !Dockerfile
 !scene_controller.py
+!landscape.py

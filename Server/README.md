@@ -1,34 +1,47 @@
-# Studio de rodaje Minecraft
+# Studio de paisajes Minecraft
 
-Servidor Fabric aislado para **Java 1.21.11** y un datapack vanilla nativo. Replay Mod se instala solamente en el cliente de grabacion; el servidor no intenta controlar camaras, animaciones ni renders.
+Servidor Fabric local **Java 1.21.11**, datapack formato 81. La geometria se compila con Python estandar: no requiere IA para colocar bloques, mods de terreno ni servicios externos. Replay Mod y la captura siguen siendo tareas del cliente.
 
-## Arranque (PowerShell, desde la raiz del repo)
+## Generacion reproducible
+
+`landscape.py` define tres composiciones de 192x192 bloques. Cada columna tiene relleno desde Y-63 hasta la superficie; los bordes se unen al superflat en Y72 y la zona de accion queda a Y80. No se cambia el generador del mundo existente.
+
+| ID | Paisaje | Prueba manual |
+| --- | --- | --- |
+| f02 | Colinas de robles, claro de entrenamiento, arco en ruinas y rocas apoyadas | Mace y trident frente a un dummy; reset lo repone |
+| f03 | Macizo rocoso con abetos y santuario excavado, fachada, techo y pedestal | Colocar sea lantern y soul lantern; reset retira la luz anterior |
+| f04 | Ribera curva contenida, abedules, puente y terraza de cultivos | Nether wart en arena de almas y sugar cane junto al canal de riego |
+
+El generador resuelve relieve suave, transicion del claro, especies con copas diferentes, grupos de arboles y soporte de adornos. La semilla modifica variacion y distribucion sin cambiar la funcion de la escena. Las pruebas no certifican la verdad de pistas ni la calidad de una captura.
+
+Desde la raiz del repositorio:
 
 ```powershell
 docker compose -f Server/docker-compose.yaml run --rm --build studio-builder validate
-docker compose -f Server/docker-compose.yaml run --rm --build studio-builder build
-docker compose -f Server/docker-compose.yaml up -d
-docker compose -f Server/docker-compose.yaml logs -f mc
+docker compose -f Server/docker-compose.yaml run --rm studio-builder build --origin 120 1100 --pitch 1152 --seed 20260915
+docker compose -f Server/docker-compose.yaml up -d mc
 ```
 
-Conecta el cliente Java 1.21.11 a `localhost`. El puerto solo escucha en localhost; la configuracion local actual usa `ONLINE_MODE: "FALSE"` y RCON desactivado. En este modo no se autentican identidades de jugadores: no publiques el puerto ni lo expongas mediante tuneles. Para un servidor compartido, activa `ONLINE_MODE: "TRUE"` antes de habilitar acceso externo. Para parar sin borrar el mundo:
+Esta es la ubicacion de la prueba nueva: f02 `(120,1100)`, f03 `(1272,1100)`, f04 `(2424,1100)`. Se eligio Z1100 para no reconstruir encima de los pisos antiguos. `build` solo escribe el datapack; el `setup` dentro de Minecraft construye el paisaje.
 
-```powershell
-docker compose -f Server/docker-compose.yaml down
-# Nunca uses `down -v`; Server/data contiene el mundo persistente.
-```
+- `--origin X Z`: esquina de referencia del claro de f02. Omitirlo usa el origen historico `(120,14)`, no la ubicacion de prueba nueva.
+- `--pitch N`: distancia entre escenas, minimo 192; por defecto 1152 para conservar la separacion historica. No agranda el bioma.
+- `--seed N`: misma semilla y coordenadas producen los mismos bloques. Por defecto 20260915.
 
-Antes de un rodaje, con el contenedor parado, copia `Server/data/world` a una carpeta de backup fuera de `Server/data`. No borres ni renombres `Server/data` (en Windows `Server` y `server` son el mismo directorio).
+`Server/generated/studio/manifest.json` registra semilla, origen, limites, alturas, arboles, ticks y puntos de comprobacion con bloques esperados. Cada caja escribe X/Z `origen-96..origen+95` y Y `-63..143`. **Setup reemplaza todo ese volumen**, no solo el claro: usa un espacio reservado sin construcciones que quieras conservar. No trasladar un diseño a terreno normal sin revisar alturas y limites.
 
-`Server/generated/` no se versiona: el paso `studio-builder build` es obligatorio en un clon nuevo antes de arrancar `mc`. Genera el datapack desde la fuente Python; no copia mundos ni credenciales.
+## Seguridad y respaldo
 
-## Operacion dentro del juego
+Antes de reemplazar escenas, para `mc` y respalda `Server/data/world` y el datapack generado en otra carpeta. No uses `down -v` ni borres `Server/data`. El respaldo previo a esta implementacion se guardo en `C:\Users\brian\AppData\Local\Temp\opencode\whatamicraft-before-landscapes-20260915-01.tar.gz`; contiene el mundo y su datapack anterior. El despliegue no borra los pisos viejos fuera de las cajas nuevas.
 
-Un operador debe estar en la zona reservada del laboratorio (Overworld, x -16..384, y 64..144, z -32..32) y tener permisos de operador. El pack no se ejecuta automaticamente: despues de `build`, entra al mundo y ejecuta `/reload` una vez si el servidor ya estaba encendido. Primero usa creativo y `/tp @s 0 90 -8`; despues ejecuta el `setup` de la escena. RCON queda desactivado; para bootstrap de OP usa la consola local con `docker compose -f Server/docker-compose.yaml attach mc`, escribe `op TuJugador`, y separa con `Ctrl-P`, `Ctrl-Q` sin parar el servidor.
+El servicio escucha solo en `127.0.0.1:25565`, con RCON apagado. `ONLINE_MODE: "FALSE"` no autentica identidades: no publiques el puerto. La consola por pipe solo es accesible mediante Docker local; no abre otro puerto. El mundo no pausa vacio para permitir construcciones por consola.
+
+## Comandos en el juego
+
+Conecta Java 1.21.11 a `localhost:25565` como OP. Tras regenerar el datapack usa `/reload`; despues selecciona una escena y espera el aviso listo:
 
 ```mcfunction
 /function studio:help
-/function studio:scene/g11/setup
 /function studio:scene/f02/setup
 /function studio:start
 /function studio:reset
@@ -36,19 +49,28 @@ Un operador debe estar en la zona reservada del laboratorio (Overworld, x -16..3
 /function studio:stop
 ```
 
-Estudio de un solo operador, sin lock: `setup` selecciona, forceloads y construye solo su caja reservada antes de avisar que esta lista. `start` limpia el inventario, da el kit real de la toma y marca el inicio (f02 ademas te pasa a survival frente a un armor stand para golpear de verdad y ver la durabilidad real en HUD). `reset` reconstruye el SET completo de la escena activa. `stop` cancela tareas, resetea, y elimina solamente el forceload de la caja de estudio activa. `next` usa retorno temprano y prepara exactamente una escena posterior G11..G13,F02..F04.
+Usa `scene/f03/setup` o `scene/f04/setup` para elegir directamente. `start` coloca al operador en el claro antes de cambiar modo y agrega el kit **sin borrar su inventario**. f02 usa survival: los golpes y la durabilidad son reales, y el dummy puede romperse. f03/f04 usan creativo.
 
-F02, F03 y F04 son escenarios de prueba correlacionados con sus familias: F02 carril de prueba para armas con durabilidad (mace/trident), F03 cuarto oscuro para bloques de luz (sea_lantern/soul_lantern) y F04 parcelas de sustrato para cultivos (nether_wart/sugar_cane): universos `provisional`, sin captura vanilla ni prueba mecanica. La actuacion es manual; el usuario sostiene y muestra los items el mismo.
+`reset` reconstruye terreno, plantas y estructura; cancela la construccion pendiente y retira solo dummies etiquetados de esa caja. `next` selecciona una sola escena. `stop` cancela tareas y libera solo chunks adquiridos por el studio, sin demoler el paisaje. Las cargas previas de terceros se conservan, incluso si se reconstruye el pack con otro origen.
 
-G11, G12 y G13 requieren actuacion natural del jugador: no hay eventos automaticos. Las construcciones de G01..G10 ya no estan registradas; si quedan restos fisicos de sets viejos en el mundo, se limpian a mano o se regenera la zona con un nuevo `setup`.
+Solo un operador controla el studio; su identificador de sesion persiste si se desconecta. Un OP puede usar `/function studio:admin/release` tras confirmar que no interrumpe su toma. Un tag antiguo no autoriza al propietario anterior. Para entrar a una escena ya construida por consola, usa `/function studio:start` (no hace falta reconstruirla).
 
-Los SETs son las transcripciones estructuradas de `docs/minecraft-clip-library.md`; la guia de camara y las limitaciones de Replay Mod estan en `docs/minecraft-clip-shooting-guide.md`. Graba la accion real y decide las rutas de camara despues en Replay Mod: no hay API de Replay Mod ni bot en este proyecto.
+La construccion comprueba que los chunks cargaron, luego ejecuta un tick numerado por tick de juego (hasta 200 comandos y 32768 bloques por tick) repartidos en tres archivos encadenados por escena (`build0`/`build1`/`build2` de ~26.000 lineas cada uno): una pasada del juego no evalua mas lineas que su limite interno de 65536 comandos. Se mantienen como maximo 169 chunks por escena activa. El tiempo depende del servidor (unos minutos por escena). Solo se anuncia listo al terminar y coincidir los puntos de comprobacion.
 
-## Comprobaciones
-
-```powershell
-docker compose -f Server/docker-compose.yaml run --rm --entrypoint sh studio-builder -c "python -m unittest discover -s tests -v"
-docker compose -f Server/docker-compose.yaml config
+```mcfunction
+/scoreboard players get #ready studio_ready
+/scoreboard players get #checks studio_ready
 ```
 
-Las pruebas validan el mapeo G01--G10, duraciones, referencias de funciones, resets/tareas programadas y el aislamiento del compose. No sustituyen un ensayo visual o de colisiones en Minecraft.
+`#ready`: 0 construyendo, 1 listo, -1 fallo (chunks o puntos de comprobacion). Si falla, revisa logs y vuelve a ejecutar setup. Por escena existen `setup`, `start` y `reset` (mas `build0`/`build1`/`build2` internos encadenados): no los llames a mano para saltarte las comprobaciones.
+
+## Verificacion
+
+```powershell
+docker compose -f Server/docker-compose.yaml run --rm --entrypoint python studio-builder -m unittest discover -s tests -v
+docker exec -u 1000 server-mc-1 mc-send-to-console "function studio:scene/f02/setup"
+docker exec -u 1000 server-mc-1 mc-send-to-console "scoreboard players get #ready studio_ready"
+docker logs --tail 30 server-mc-1
+```
+
+La consola solo inicia setups sin un operador reclamado; no mueve jugadores ajenos. Las pruebas cubren continuidad del suelo, relieve, semillas, colocacion de arboles, contencion de agua, riego, limites por tick, referencias de funciones y cancelacion. Repetir setup/reset en Minecraft y revisar desde el cliente real sigue siendo necesario para juzgar la imagen, sombras y colisiones.

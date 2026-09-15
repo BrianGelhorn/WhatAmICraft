@@ -1,119 +1,282 @@
 #!/usr/bin/env python3
-"""Build and validate the native studio datapack.  It never contacts a server."""
+"""Compile deterministic landscapes into a bounded Java 1.21.11 datapack."""
 from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
+
+import landscape
 
 ROOT = Path(__file__).parent
 OUT = ROOT / "generated" / "studio"
-PACK_FORMAT = 81  # Java 1.21.11 data pack format
-
-# These are structured transcriptions of docs/minecraft-clip-library.md section 8.
-BASE = [
-    "gamemode creative @s", "execute in minecraft:overworld run tp @s 0 90 -8",
-    "gamerule minecraft:advance_time false", "gamerule minecraft:advance_weather false",
-    "gamerule minecraft:spawn_mobs false", "time set 6000", "weather clear",
-]
-SETS = {
-"g11": ["fill 0 80 14 12 80 22 minecraft:stone_bricks", "fill 5 81 18 7 90 18 minecraft:stone_bricks", "fill 4 81 18 4 89 18 minecraft:ladder[facing=west]", "fill 2 90 16 8 90 20 minecraft:stone_bricks", "setblock 4 90 18 minecraft:air", "setblock 7 91 19 minecraft:sea_lantern", "tp @s 2.5 81 18.5 -90 10"],
-"g12": ["fill 40 80 14 43 80 22 minecraft:stone_bricks", "fill 49 80 14 52 80 22 minecraft:stone_bricks", "fill 44 71 14 48 79 22 minecraft:air", "fill 44 70 14 48 70 22 minecraft:black_concrete", "fill 44 80 17 48 80 18 minecraft:oak_planks", "tp @s 41.5 81 17.5 -90 0"],
-"g13": ["fill 80 80 14 92 80 22 minecraft:stone_bricks", "fill 80 81 14 80 84 22 minecraft:gray_concrete", "fill 92 81 14 92 84 22 minecraft:gray_concrete", "fill 80 85 14 92 85 17 minecraft:gray_concrete", "fill 80 81 18 84 84 18 minecraft:gray_concrete", "fill 87 81 18 92 84 18 minecraft:gray_concrete", "setblock 81 82 21 minecraft:sea_lantern", "setblock 91 82 21 minecraft:sea_lantern", "tp @s 85.5 81 15.5 0 0"],
-"f02": ["fill 120 80 14 132 80 22 minecraft:stone_bricks", "fill 120 81 14 132 86 22 minecraft:air", "fill 122 80 14 122 80 22 minecraft:quartz_block", "fill 126 80 14 126 80 22 minecraft:quartz_block", "fill 130 80 14 130 80 22 minecraft:quartz_block", "summon minecraft:armor_stand 126 81 18 {ShowArms:1b,NoBasePlate:1b}", "tp @s 121.5 81 18.5 -90 10"],
-"f03": ["fill 160 80 14 172 80 22 minecraft:stone_bricks", "fill 160 80 8 172 80 13 minecraft:stone_bricks", "fill 160 81 14 160 84 22 minecraft:stone_bricks", "fill 172 81 14 172 84 22 minecraft:stone_bricks", "fill 160 85 14 172 85 22 minecraft:stone_bricks", "fill 160 81 22 172 84 22 minecraft:stone_bricks", "fill 160 81 14 164 84 14 minecraft:stone_bricks", "fill 168 81 14 172 84 14 minecraft:stone_bricks", "fill 165 84 14 167 84 14 minecraft:stone_bricks", "setblock 166 81 18 minecraft:stone_bricks", "tp @s 166.5 81 9.5 0 0"],
-"f04": ["fill 200 80 14 205 80 22 minecraft:soul_sand", "fill 206 80 13 206 80 22 minecraft:stone_bricks", "fill 207 80 15 212 80 22 minecraft:sand", "fill 207 80 14 211 80 14 minecraft:water", "fill 207 80 13 211 80 13 minecraft:stone_bricks", "setblock 212 80 14 minecraft:stone_bricks", "tp @s 203.5 81 18.5 -90 0"],
-}
-DURATIONS = {"g11":180,"g12":180,"g13":180,"f02":180,"f03":180,"f04":180}
+PACK_FORMAT = 81
+ORIGIN = [120, 14]
+PITCH = 1152
+SEED = 20260915
+SCENES = ("f02", "f03", "f04")
 KITS = {
-"f02": ["minecraft:mace", "minecraft:trident"],
-"f03": ["minecraft:sea_lantern", "minecraft:soul_lantern"],
-"f04": ["minecraft:nether_wart", "minecraft:sugar_cane"],
-}
-KILLS = {
-"f02": ["kill @e[type=minecraft:armor_stand,x=119,y=79,z=13,dx=14,dy=10,dz=10]"],
+    "f02": ["minecraft:mace", "minecraft:trident"],
+    "f03": ["minecraft:sea_lantern", "minecraft:soul_lantern"],
+    "f04": ["minecraft:nether_wart", "minecraft:sugar_cane"],
 }
 BRIEFS = {
-"g11": ("trepada con escalera (actuación natural, sin familia)", "Subí la torre por la escalera y posá arriba para la toma."),
-"g12": ("cruce por puente sobre foso (actuación natural, sin familia)", "Cruzá el puente de roble de plataforma a plataforma."),
-"g13": ("cruce de umbral bajo pórtico (actuación natural, sin familia)", "Entrá por el pórtico y marcá el cruce del umbral."),
-"f02": ("armas no apilables que pierden durabilidad con el uso (mace/trident)", "En survival, golpeá el dummy con mace y trident por turnos mirando la barra de durabilidad en HUD."),
-"f03": ("bloques de luz (sea_lantern/soul_lantern)", "Caminá por la senda hasta la puerta, entrá al cuarto oscuro y colocá cada bloque real en el pedestal."),
-"f04": ("plantas de cultivo (nether_wart/sugar_cane)", "Plantá cada cultivo real en su sustrato: wart en arena de almas, caña en arena junto al agua."),
+    "f02": "Prueba las armas frente al dummy. Reset repone el dummy; no certifica mecanicas.",
+    "f03": "Entra al santuario y coloca cada luz en el pedestal. Reset retira la anterior.",
+    "f04": "Planta wart en arena de almas y cana en la arena junto al canal de agua.",
 }
-CHUNKS = {"g11":[(0,0),(0,1)], "g12":[(2,0),(2,1),(3,0),(3,1)], "g13":[(5,0),(5,1)], "f02":[(7,0),(7,1),(8,0),(8,1)], "f03":[(10,0),(10,1),(11,0),(11,1)], "f04":[(12,0),(12,1),(13,0),(13,1)]}
 
-def write(rel: str, lines: list[str]) -> None:
+
+def origins():
+    return {s: (ORIGIN[0] + i * PITCH, ORIGIN[1]) for i, s in enumerate(SCENES)}
+
+
+def chunks(scene):
+    ox, oz = origins()[scene]
+    half = landscape.HALF
+    return [(x, z) for x in range((ox - half) // 16, (ox + half - 1) // 16 + 1)
+            for z in range((oz - half) // 16, (oz + half - 1) // 16 + 1)]
+
+
+def write(rel, lines):
     path = OUT / rel
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-def guard() -> list[str]:
-    check = "execute unless dimension minecraft:overworld"
-    box = "execute unless entity @s[x=-16,y=64,z=-32,dx=400,dy=80,dz=64]"
-    return [f"{check} run tellraw @s {{\"text\":\"Studio: use the Overworld lab control area.\",\"color\":\"red\"}}", f"{check} run return 0", f"{box} run tellraw @s {{\"text\":\"Studio: stand in the reserved lab control area first.\",\"color\":\"red\"}}", f"{box} run return 0"]
 
-def build() -> None:
-    write("pack.mcmeta", [json.dumps({"pack":{"pack_format":PACK_FORMAT,"description":"WhatAmICraft isolated filming studio (Java 1.21.11)"}}, indent=2)])
+def schedule_ticks(commands, max_volume=32768, max_count=200):
+    """Number each command with the tick that may run it.
+
+    Returns (ticks, total): tick number -> commands, and the first free tick.
+    One guarded build file runs a single tick per game tick, so a scene needs
+    only setup/start/reset instead of hundreds of batch files.
+    """
+    ticks, tick, volume, count = {}, 0, 0, 0
+    for command in commands:
+        words = command.split()
+        cost = 1
+        if words[0] == "fill":
+            x1, y1, z1, x2, y2, z2 = map(int, words[1:7])
+            cost = (x2 - x1 + 1) * (y2 - y1 + 1) * (z2 - z1 + 1)
+            if not 0 < cost <= max_volume:
+                raise ValueError(f"Invalid fill volume: {command}")
+        if count >= max_count or volume + cost > max_volume:
+            tick += 1
+            volume, count = 0, 0
+        ticks.setdefault(tick, []).append(command)
+        volume += cost
+        count += 1
+    return ticks, tick + 1
+
+
+def operator_guard():
+    # The claim score persists when the owner disconnects; console can explicitly release it.
+    return [
+        'execute unless dimension minecraft:overworld run return 0',
+        'execute if score #claimed studio_ready matches 1 unless score @s studio_owner_id = #owner studio_ready run tellraw @s {"text":"Studio ocupado. Usa el operador original o studio:admin/release.","color":"red"}',
+        'execute if score #claimed studio_ready matches 1 unless score @s studio_owner_id = #owner studio_ready run return 0',
+    ]
+
+
+def build():
+    validate()
+    # Do not replace the bind-mounted root or delete anything outside our generated functions.
+    functions = OUT / "data/studio/function"
+    if OUT.name != "studio" or "world" in OUT.resolve().parts or functions.is_symlink():
+        raise ValueError("Refusing unsafe generated output")
+    if functions.exists():
+        shutil.rmtree(functions)
+    write("pack.mcmeta", [json.dumps({"pack": {"pack_format": PACK_FORMAT,
+          "description": "WhatAmICraft deterministic mountain studio (Java 1.21.11)"}})])
     write("data/minecraft/tags/function/load.json", ['{"values":["studio:load"]}'])
-    write("data/studio/function/load.mcfunction", ["scoreboard objectives add studio_scene dummy", "scoreboard objectives add studio_run dummy", "scoreboard objectives add studio_chunk dummy"])
-    write("data/studio/function/help.mcfunction", ["tellraw @s {\"text\":\"Studio: scene/g11..g13,f02..f04/setup -> start; reset; next; stop. OP only.\",\"color\":\"gold\"}", "tellraw @s {\"text\":\"Manual acting: G11 climb, G12 crossing, G13 threshold. F02/F03/F04 are correlated test stages (F02 mace/trident, F03 sea_lantern/soul_lantern, F04 nether_wart/sugar_cane). Start clears inventory, gives the scene kit and marks the take; f02 drops you in survival with a practice dummy. Replay Mod is client-only.\",\"color\":\"gray\"}"])
-    unload = []
-    for i, scene in enumerate(SETS, 1):
-        for n, (cx, cz) in enumerate(CHUNKS[scene]):
-            key = f"#studio_{scene}_{n}"
-            unload.append(f"execute if score #scene studio_scene matches {i} if score {key} studio_chunk matches 0 run forceload remove {cx * 16} {cz * 16}")
-    write("data/studio/function/unload_active.mcfunction", unload)
-    for index, (scene, commands) in enumerate(SETS.items(), 1):
+    # Persist actual acquired coordinates: a later build can relocate the same scene IDs.
+    write("data/studio/function/release_one.mcfunction", ["$execute in minecraft:overworld run forceload remove $(x) $(z)"])
+    write("data/studio/function/release_added.mcfunction", [
+        "execute unless data storage studio:runtime loads[0] run return 0",
+        "function studio:release_one with storage studio:runtime loads[0]",
+        "data remove storage studio:runtime loads[0]",
+        "return run function studio:release_added",
+    ])
+    write("data/studio/function/load.mcfunction", [
+        "scoreboard objectives add studio_scene dummy", "scoreboard objectives add studio_ready dummy",
+        "scoreboard objectives add studio_force dummy", "scoreboard objectives add studio_owner_id dummy", "function studio:stop_schedules",
+        "function studio:release_added", "scoreboard players set #ready studio_ready 0",
+        "scoreboard players set #scene studio_scene 0",
+        'tellraw @a[tag=studio_owner] {"text":"Studio recargado; ejecuta setup. No se borro el mundo.","color":"yellow"}',
+    ])
+    write("data/studio/function/help.mcfunction", [
+        'tellraw @s {"text":"Studio: scene/f02/setup (colinas), f03/setup (santuario), f04/setup (ribera). Luego start, reset, next o stop. Inventario conservado.","color":"gold"}',
+        'tellraw @s {"text":"Estado: scoreboard players get #ready studio_ready. 0=cargando, 1=listo, -1=fallo. Solo se edita la caja 192x192 autorizada.","color":"gray"}',
+    ])
+    write("data/studio/function/claim.mcfunction", operator_guard() + [
+        "execute unless entity @s[type=minecraft:player] run return 0",
+        "execute unless score #claimed studio_ready matches 1 run scoreboard players add #serial studio_ready 1",
+        "execute unless score #claimed studio_ready matches 1 run scoreboard players operation #owner studio_ready = #serial studio_ready",
+        "scoreboard players operation @s studio_owner_id = #owner studio_ready",
+        "tag @s add studio_owner", "scoreboard players set #claimed studio_ready 1",
+        "scoreboard players operation @s studio_scene = #scene studio_scene",
+    ])
+    cleanup = ["function studio:stop_schedules", "function studio:release_added",
+               "scoreboard players set #scene studio_scene 0", "scoreboard players set #ready studio_ready 0"]
+    write("data/studio/function/stop.mcfunction", operator_guard() + cleanup + [
+        "tag @s remove studio_owner", "scoreboard players set #claimed studio_ready 0",
+        'tellraw @s {"text":"Studio detenido. Paisaje e inventario conservados.","color":"yellow"}',
+    ])
+    write("data/studio/function/admin/release.mcfunction", cleanup + [
+        "tag @a[tag=studio_owner] remove studio_owner", "scoreboard players set #claimed studio_ready 0",
+        'tellraw @a {"text":"Operador de studio liberado por administrador.","color":"yellow"}',
+    ])
+    manifest = {"seed": SEED, "version": "1.21.11", "origins": origins(), "scenes": {}}
+    schedules = []
+    for index, scene in enumerate(SCENES, 1):
+        ox, oz = origins()[scene]
+        commands = landscape.terrain_commands(scene, SEED, (ox, oz)) + landscape.feature_commands(scene, SEED, (ox, oz))
+        ticks, total = schedule_ticks(commands)
+        info = landscape.metadata(scene, SEED, (ox, oz))
+        info.update(tick_count=total, command_count=len(commands), write_y=[-63, 143], chunk_count=len(chunks(scene)))
+        manifest["scenes"][scene] = info
+        prefix = f"data/studio/function/scene/{scene}/"
+        schedules.append(f"schedule clear studio:scene/{scene}/build0")
+        schedules.append(f"schedule clear studio:scene/{scene}/build1")
+        schedules.append(f"schedule clear studio:scene/{scene}/build2")
         force = []
-        for n, (cx, cz) in enumerate(CHUNKS[scene]):
-            key = f"#studio_{scene}_{n}"
-            force += [f"execute in minecraft:overworld store success score {key} studio_chunk run forceload query {cx * 16} {cz * 16}", f"execute in minecraft:overworld if score {key} studio_chunk matches 0 run forceload add {cx * 16} {cz * 16}"]
-        setup = guard()+["function studio:reset", "function studio:unload_active", f"scoreboard players set @s studio_scene {index}", f"scoreboard players set #scene studio_scene {index}", "scoreboard players set @s studio_run 0"] + force + [f"schedule function studio:scene/{scene}/setup_apply 2t replace", f"tellraw @s {{\"text\":\"{scene.upper()} loading its bounded set.\",\"color\":\"yellow\"}}"]
-        write(f"data/studio/function/scene/{scene}/setup.mcfunction", setup)
-        initial = [f"execute in minecraft:overworld run {c}" for c in BASE+commands]
-        write(f"data/studio/function/scene/{scene}/setup_apply.mcfunction", [f"execute unless score #scene studio_scene matches {index} run return 0", "execute as @a at @s in minecraft:overworld run function studio:scene/"+scene+"/setup_apply_actor"])
-        write(f"data/studio/function/scene/{scene}/setup_apply_actor.mcfunction", initial + [f"tellraw @s {{\"text\":\"Representa: {BRIEFS[scene][0]}\",\"color\":\"aqua\"}}", f"tellraw @s {{\"text\":\"Hacé: {BRIEFS[scene][1]}\",\"color\":\"yellow\"}}", f"tellraw @s {{\"text\":\"{scene.upper()} ready ({DURATIONS[scene]} frames at 30 fps). Use /function studio:start.\",\"color\":\"green\"}}"])
-        # Reapply the full bounded SET, so reset is repeatable instead of
-        # merely deleting leftovers.
-        write(f"data/studio/function/scene/{scene}/reset.mcfunction", ["function studio:stop_schedules"] + [f"execute in minecraft:overworld run {c}" for c in KILLS.get(scene, [])] + initial + ["tellraw @s {\"text\":\"Studio scene reset to its initial state.\",\"color\":\"yellow\"}"])
-    write("data/studio/function/stop_schedules.mcfunction", [f"schedule clear studio:scene/{scene}/setup_apply" for scene in SETS])
-    write("data/studio/function/start.mcfunction", guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "execute unless score @s studio_scene matches 1.. run return 0", "scoreboard players set @s studio_run 1"] + [f"execute if score @s studio_scene matches {i} run function studio:scene/{s}/start" for i,s in enumerate(SETS,1)] + ["return 1"])
-    for scene in SETS:
-        kit = [f"give @s {item} 1" for item in KITS.get(scene, [])]
-        survival = ["gamemode survival @s"] if scene == "f02" else []
-        lines = guard()+[f"execute unless score @s studio_scene matches {list(SETS).index(scene)+1} run return 0", "clear @s"] + survival + kit + [f"tellraw @s {{\"text\":\"{scene.upper()} started. Kit given. Action is manual.\",\"color\":\"aqua\"}}"]
-        write(f"data/studio/function/scene/{scene}/start.mcfunction", lines)
-    write("data/studio/function/reset.mcfunction", guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "execute unless score @s studio_scene matches 1.. run return 0"]+[f"execute if score @s studio_scene matches {i} run function studio:scene/{s}/reset" for i,s in enumerate(SETS,1)] + ["return 1"])
-    write("data/studio/function/stop.mcfunction", guard()+["function studio:reset", "function studio:unload_active", "scoreboard players set #scene studio_scene 0", "scoreboard players set @s studio_scene 0", "scoreboard players set @s studio_run 0", "gamemode creative @s", "tellraw @s {\"text\":\"Studio released; world data was not deleted.\",\"color\":\"yellow\"}"])
-    next_lines=guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "execute unless score @s studio_scene matches 1.. run return 0", "scoreboard players set @s studio_run 0"]
-    for i, scene in enumerate(SETS,1):
-        target = list(SETS)[i % len(SETS)]
-        next_lines += [f"execute if score @s studio_scene matches {i} run function studio:scene/{target}/setup"]
-    next_lines += ["return 1"]
-    write("data/studio/function/next.mcfunction", next_lines)
+        for n, (cx, cz) in enumerate(chunks(scene)):
+            force += [f"scoreboard players set #force_{scene}_{n} studio_force 0",
+                      f"execute in minecraft:overworld store success score #had_{scene}_{n} studio_force run forceload query {cx * 16} {cz * 16}",
+                      f"execute if score #had_{scene}_{n} studio_force matches 0 in minecraft:overworld store success score #force_{scene}_{n} studio_force run forceload add {cx * 16} {cz * 16}",
+                      f"execute if score #force_{scene}_{n} studio_force matches 1 run data modify storage studio:runtime loads append value {{x:{cx * 16},z:{cz * 16}}}",
+                      f"execute if score #had_{scene}_{n} studio_force matches 0 unless score #force_{scene}_{n} studio_force matches 1 run scoreboard players set #force_failed studio_ready 1"]
+        kill = [f"execute in minecraft:overworld run kill @e[type=minecraft:armor_stand,tag=studio_dummy,x={ox - 96},y=73,z={oz - 96},dx=191,dy=70,dz=191]"] if scene == "f02" else []
+        write(prefix + "setup.mcfunction", operator_guard() + [
+            "function studio:stop_schedules", "function studio:release_added",
+            "data modify storage studio:runtime loads set value []",
+            "tag @a[tag=studio_owner] remove studio_owner",
+            "execute if entity @s[type=minecraft:player] run gamemode creative @s",
+            f"execute if entity @s[type=minecraft:player] run tp @s {ox + 6} 145 {oz - 15} 0 65",
+            f"scoreboard players set #scene studio_scene {index}",
+            "function studio:claim",
+            "scoreboard players set #ready studio_ready 0", "scoreboard players set #wait studio_ready 0",
+            "scoreboard players set #force_failed studio_ready 0",
+            "scoreboard players set #cursor studio_ready -1",
+            f'tellraw @s {{"text":"Construyendo {scene.upper()}: relieve, estructura y vegetacion, semilla {SEED}. Espera el aviso listo.","color":"yellow"}}',
+        ] + kill + force + [
+            "execute if score #force_failed studio_ready matches 1 run scoreboard players set #ready studio_ready -1",
+            "execute if score #force_failed studio_ready matches 1 run tellraw @a[tag=studio_owner] {\"text\":\"Studio fallo: forceload rechazado. Revisa logs y repeti setup.\",\"color\":\"red\"}",
+            "execute if score #force_failed studio_ready matches 1 run return 0",
+            f"schedule function studio:scene/{scene}/build0 1t replace",
+        ])
+        nchunks = len(chunks(scene))
+        # Three chained parts: one pass evaluates every line of its file, and
+        # each guarded `execute` costs several chain slots, so the ~80k lines
+        # of a scene are split until every part stays under ~30k evaluated
+        # lines (proven live against the engine's 65k chain cap).
+        ordered = sorted(ticks.items())
+        sizes = [(tick, len(group) + (1 if tick and tick % 25 == 0 else 0)) for tick, group in ordered]
+        third = sum(n for _, n in sizes) / 3
+        splits, acc = [], 0
+        for tick, n in sizes:
+            acc += n
+            if len(splits) < 2 and acc >= third * (len(splits) + 1) and total - (tick + 1) >= 2 - len(splits):
+                splits.append(tick + 1)
+        while len(splits) < 2:
+            splits.append(total - (2 - len(splits)))
+        s1, s2 = splits
+        if not 0 < s1 < s2 < total:
+            raise ValueError(f"Cannot split {scene} into three safe parts")
 
-def validate() -> None:
-    assert list(SETS) == ["g11", "g12", "g13", "f02", "f03", "f04"]
-    assert all(DURATIONS[s] in (120,150,180) for s in SETS)
-    assert set(DURATIONS) == set(SETS) == set(CHUNKS)
-    assert any("minecraft:ladder[facing=west]" in c for c in SETS["g11"])
-    assert any("minecraft:oak_planks" in c for c in SETS["g12"])
-    assert any("minecraft:sea_lantern" in c for c in SETS["g13"])
-    assert any("minecraft:quartz_block" in c for c in SETS["f02"])
-    assert any("168 81 14" in c for c in SETS["f03"])
-    assert any("minecraft:soul_sand" in c for c in SETS["f04"])
-    assert any("armor_stand" in c for c in SETS["f02"])
-    assert set(BRIEFS) == set(SETS)
-    assert all(len(v) == 2 and all(isinstance(t, str) and t.strip() for t in v) for v in BRIEFS.values())
-    assert KITS["f02"] == ["minecraft:mace", "minecraft:trident"]
-    assert any("armor_stand" in c for c in KILLS["f02"])
-    assert not any("half=" in c for xs in SETS.values() for c in xs)
+        def slices(lo, hi):
+            lines = []
+            for tick, group in ordered:
+                if not lo <= tick < hi:
+                    continue
+                for command in group:
+                    lines.append(f"execute if score #cursor studio_ready matches {tick} in minecraft:overworld run {command}")
+                if tick and tick % 25 == 0:
+                    lines.append(f"execute if score #cursor studio_ready matches {tick} run tellraw @a[tag=studio_owner] {{\"text\":\"{scene.upper()}: {tick * 100 // total}%\",\"color\":\"gray\"}}")
+            return lines
+
+        def advance(name, hi, nxt):
+            return [
+                f"execute unless score #cursor studio_ready matches {hi}.. run scoreboard players add #cursor studio_ready 1",
+                f"execute if score #cursor studio_ready matches {hi}.. if score #ready studio_ready matches 0 run schedule function studio:scene/{scene}/{nxt} 1t replace",
+                f"execute if score #ready studio_ready matches 0 unless score #cursor studio_ready matches {hi}.. run schedule function studio:scene/{scene}/{name} 1t replace",
+            ]
+
+        info.update(splits=[s1, s2])
+        part0 = [f"execute unless score #scene studio_scene matches {index} run return 0",
+                 "execute if score #cursor studio_ready matches -1 run scoreboard players set #loaded studio_ready 0"]
+        part0 += [f"execute if score #cursor studio_ready matches -1 in minecraft:overworld if loaded {cx * 16 + 8} 80 {cz * 16 + 8} run scoreboard players add #loaded studio_ready 1" for cx, cz in chunks(scene)]
+        part0 += [
+            f"execute if score #cursor studio_ready matches -1 if score #loaded studio_ready matches {nchunks} run scoreboard players set #cursor studio_ready 0",
+            "execute if score #cursor studio_ready matches -1 run scoreboard players add #wait studio_ready 1",
+            "execute if score #cursor studio_ready matches -1 if score #wait studio_ready matches 60.. run scoreboard players set #ready studio_ready -1",
+            f"execute if score #cursor studio_ready matches -1 if score #wait studio_ready matches 60.. run tellraw @a[tag=studio_owner] {{\"text\":\"{scene.upper()} fallo: chunks sin cargar. Revisa logs y repeti setup.\",\"color\":\"red\"}}",
+            "execute if score #cursor studio_ready matches -1 if score #wait studio_ready matches 60.. run return 0",
+            f"execute if score #cursor studio_ready matches -1 run schedule function studio:scene/{scene}/build0 10t replace",
+            "execute if score #cursor studio_ready matches -1 run return 0",
+        ]
+        part0 += slices(0, s1) + advance("build0", s1, "build1")
+        write(prefix + "build0.mcfunction", part0)
+        part1 = [f"execute unless score #scene studio_scene matches {index} run return 0"]
+        part1 += slices(s1, s2) + advance("build1", s2, "build2")
+        write(prefix + "build1.mcfunction", part1)
+        part2 = [f"execute unless score #scene studio_scene matches {index} run return 0"]
+        part2 += slices(s2, total)
+        nchecks = len(info["checkpoints"])
+        part2.append(f"execute unless score #cursor studio_ready matches {total}.. run scoreboard players add #cursor studio_ready 1")
+        part2.append(f"execute if score #cursor studio_ready matches {total}.. run scoreboard players set #checks studio_ready 0")
+        for point in info["checkpoints"].values():
+            x, y, z = point["pos"]
+            part2.append(f"execute if score #cursor studio_ready matches {total}.. in minecraft:overworld if block {x} {y} {z} {point['block']} run scoreboard players add #checks studio_ready 1")
+        part2 += [
+            f"execute if score #cursor studio_ready matches {total}.. unless score #checks studio_ready matches {nchecks} run scoreboard players set #ready studio_ready -1",
+            f"execute if score #cursor studio_ready matches {total}.. unless score #checks studio_ready matches {nchecks} run tellraw @a[tag=studio_owner] {{\"text\":\"{scene.upper()} fallo: verificacion. Revisa logs y repeti setup.\",\"color\":\"red\"}}",
+            f"execute if score #cursor studio_ready matches {total}.. if score #checks studio_ready matches {nchecks} run scoreboard players set #ready studio_ready 1",
+            f"execute if score #cursor studio_ready matches {total}.. if score #checks studio_ready matches {nchecks} as @a[tag=studio_owner] if score @s studio_owner_id = #owner studio_ready in minecraft:overworld run tp @s {ox + 6.5} 81 {oz + 1.5} 0 0",
+            f"execute if score #cursor studio_ready matches {total}.. if score #checks studio_ready matches {nchecks} run tellraw @a[tag=studio_owner] {{\"text\":\"{scene.upper()} listo. Usa studio:start.\",\"color\":\"green\"}}",
+            f"execute if score #ready studio_ready matches 0 run schedule function studio:scene/{scene}/build2 1t replace",
+        ]
+        for part in (part0, part1, part2):
+            if len(part) > 32000:
+                raise ValueError(f"{scene} part exceeds safe evaluated lines per pass")
+        write(prefix + "build2.mcfunction", part2)
+        write(prefix + "start.mcfunction", operator_guard() + [
+            f"execute unless score #scene studio_scene matches {index} run return 0",
+            "execute unless score #ready studio_ready matches 1 run return 0",
+            "function studio:claim",
+            f"tp @s {ox + 6.5} 81 {oz + 1.5} 0 0",
+        ] + (["gamemode survival @s"] if scene == "f02" else ["gamemode creative @s"]) +
+            [f"give @s {item} 1" for item in KITS[scene]] +
+            [f'tellraw @s {{"text":"{BRIEFS[scene]} Inventario conservado.","color":"aqua"}}'])
+        write(prefix + "reset.mcfunction", operator_guard() + [f"return run function studio:scene/{scene}/setup"])
+    write("manifest.json", [json.dumps(manifest, indent=2, sort_keys=True)])
+    write("data/studio/function/stop_schedules.mcfunction", schedules)
+    for action in ("start", "reset", "next"):
+        lines = operator_guard()
+        for i, scene in enumerate(SCENES, 1):
+            target = f"{SCENES[i % len(SCENES)]}/setup" if action == "next" else f"{scene}/{action}"
+            lines.append(f"execute if score #scene studio_scene matches {i} run return run function studio:scene/{target}")
+        write(f"data/studio/function/{action}.mcfunction", lines + ["return 0"])
+
+
+def validate():
+    if PITCH < landscape.SIZE or len(ORIGIN) != 2:
+        raise ValueError("Pitch must cover the landscape size; origin requires X Z")
+    for scene, (ox, oz) in origins().items():
+        if max(abs(ox), abs(oz)) + landscape.HALF >= 29999984 or len(chunks(scene)) > 256:
+            raise ValueError("Scene exceeds world or chunk loading bounds")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("build", "validate"), nargs="?", default="build")
+    parser.add_argument("--origin", nargs=2, type=int, default=ORIGIN, help="Action terrace origin X Z")
+    parser.add_argument("--pitch", type=int, default=PITCH, help="Scene spacing (minimum 192)")
+    parser.add_argument("--seed", type=int, default=SEED, help="Deterministic terrain and vegetation seed")
     args = parser.parse_args()
+    ORIGIN[:] = args.origin
+    PITCH, SEED = args.pitch, args.seed
     validate()
     if args.command == "build":
         build()
