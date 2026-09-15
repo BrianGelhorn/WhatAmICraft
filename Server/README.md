@@ -24,11 +24,10 @@ Antes de un rodaje, con el contenedor parado, copia `Server/data/world` a una ca
 
 ## Operacion dentro del juego
 
-Un operador debe estar en la zona reservada del laboratorio (Overworld, x -16..384, y 64..144, z -32..32) y tener permisos de operador. El pack no se ejecuta automaticamente: despues de `build`, entra al mundo y ejecuta `/reload` una vez si el servidor ya estaba encendido. Primero usa creativo y `/tp @s 0 90 -8`; despues ejecuta `claim`. RCON queda desactivado; para bootstrap de OP usa la consola local con `docker compose -f Server/docker-compose.yaml attach mc`, escribe `op TuJugador`, y separa con `Ctrl-P`, `Ctrl-Q` sin parar el servidor.
+Un operador debe estar en la zona reservada del laboratorio (Overworld, x -16..384, y 64..144, z -32..32) y tener permisos de operador. El pack no se ejecuta automaticamente: despues de `build`, entra al mundo y ejecuta `/reload` una vez si el servidor ya estaba encendido. Primero usa creativo y `/tp @s 0 90 -8`; despues ejecuta el `setup` de la escena. RCON queda desactivado; para bootstrap de OP usa la consola local con `docker compose -f Server/docker-compose.yaml attach mc`, escribe `op TuJugador`, y separa con `Ctrl-P`, `Ctrl-Q` sin parar el servidor.
 
 ```mcfunction
 /function studio:help
-/function studio:claim
 /function studio:scene/g11/setup
 /function studio:scene/f02/setup
 /function studio:start
@@ -37,7 +36,7 @@ Un operador debe estar en la zona reservada del laboratorio (Overworld, x -16..3
 /function studio:stop
 ```
 
-`claim` crea un bloqueo persistente por ID de scoreboard, incluso si el operador se desconecta. Si ese operador no puede volver, un OP que haya confirmado que esta offline puede ejecutar `/function studio:admin/release`. `setup` selecciona, forceloads y construye solo su caja reservada antes de avisar que esta lista. `start` limpia el inventario, da el kit real de la toma y marca el inicio (f02 ademas te pasa a survival frente a un armor stand para golpear de verdad y ver la durabilidad real en HUD). `reset` reconstruye el SET completo de la escena activa. `stop` cancela tareas, resetea, y elimina solamente el forceload de la caja de estudio activa. `next` usa retorno temprano y prepara exactamente una escena posterior G11..G13,F02..F04.
+Estudio de un solo operador, sin lock: `setup` selecciona, forceloads y construye solo su caja reservada antes de avisar que esta lista. `start` limpia el inventario, da el kit real de la toma y marca el inicio (f02 ademas te pasa a survival frente a un armor stand para golpear de verdad y ver la durabilidad real en HUD). `reset` reconstruye el SET completo de la escena activa. `stop` cancela tareas, resetea, y elimina solamente el forceload de la caja de estudio activa. `next` usa retorno temprano y prepara exactamente una escena posterior G11..G13,F02..F04.
 
 F02, F03 y F04 son escenarios de prueba correlacionados con sus familias: F02 carril de prueba para armas con durabilidad (mace/trident), F03 cuarto oscuro para bloques de luz (sea_lantern/soul_lantern) y F04 parcelas de sustrato para cultivos (nether_wart/sugar_cane): universos `provisional`, sin captura vanilla ni prueba mecanica. La actuacion es manual; el usuario sostiene y muestra los items el mismo.
 
