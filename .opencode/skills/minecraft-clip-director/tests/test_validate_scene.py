@@ -81,11 +81,11 @@ class FamilyTests(unittest.TestCase):
 
     def test_rejects_bad_audiovisual_and_versions(self):
         family = copy.deepcopy(self.family)
-        del family["forbidden_audiovisual_attributes"]["montage"]
+        del family["audiovisual_design"]["montage"]
         with self.assertRaises(ValueError):
             validator.validate(family)
         family = copy.deepcopy(self.family)
-        family["forbidden_audiovisual_attributes"]["texture"] = "  "
+        family["audiovisual_design"]["texture"] = "  "
         with self.assertRaises(ValueError):
             validator.validate(family)
         family = copy.deepcopy(self.family)

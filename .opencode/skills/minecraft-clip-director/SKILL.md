@@ -16,7 +16,7 @@ No leas ni migres `docs/scenes/`: los briefs históricos genéricos no son compa
 
 ## Contrato de familia
 
-Usa `resources/scene.example.json`. Incluye predicado, >=2 targets, universo conjunto de candidatos y una cita por target (`episode_id`, texto literal, versión, fuente; `fact_ids` si existen). Declara por separado: parte ilustrada, no demostrada y estos atributos audiovisuales prohibidos: textura, sonido, entorno, cantidades y montaje. No uses HUD ni target visible para “probar” una propiedad de otro objeto.
+Usa `resources/scene.example.json`. Incluye predicado, >=2 targets, universo conjunto de candidatos y una cita por target (`episode_id`, texto literal, versión, fuente; `fact_ids` si existen). Declara por separado: parte ilustrada, límites de lo no cubierto y el diseño audiovisual correlacionado (textura, sonido, entorno, cantidades, montaje). Mostrá con el objeto real: HUD, inventario y target visible están permitidos; prohibido usar un objeto para probar la propiedad de otro, y falsear con montaje.
 
 Las etiquetas son literales: `documented`, `mechanics_pending`, `candidate_preservation_pending`, `visual_pending`. Una declaración no es prueba mecánica: nunca marques `verified`. Registra versiones no vacías por caso: contenido generado nuevo exige Java 26.1; el ejemplo histórico usa 1.21.5 y captura Server 1.21.11. No hay migración automática.
 

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import sys
 
-FORBIDDEN_ATTRIBUTES = {"texture", "sound", "environment", "quantities", "montage"}
+AUDIOVISUAL_DESIGN = {"texture", "sound", "environment", "quantities", "montage"}
 NO_BANK = object()
 STATUS = {
     "documentation": "documented",
@@ -105,7 +105,7 @@ def validate(family, bank=NO_BANK):
     require(isinstance(family, dict), "family: expected object")
     if bank is not NO_BANK:
         validate_episode_bank(bank)
-    allowed = {"id", "title", "predicate", "targets", "source_cases", "candidate_universe", "illustrated_part", "not_demonstrated", "forbidden_audiovisual_attributes", "case_versions", "status", "assignment"}
+    allowed = {"id", "title", "predicate", "targets", "source_cases", "candidate_universe", "illustrated_part", "not_demonstrated", "audiovisual_design", "case_versions", "status", "assignment"}
     required = allowed - {"assignment"}
     require(required <= set(family) <= allowed, "family: unsupported or missing fields; historical scene briefs are not compatible")
     require(text(family["id"]) and family["id"].startswith("F"), "id: expected family ID beginning F")
@@ -120,8 +120,8 @@ def validate(family, bank=NO_BANK):
     require(text(universe["scope"]), "candidate_universe.scope: explain coverage without cherry-picking")
     require(text(family["illustrated_part"]), "illustrated_part: required")
     require(isinstance(family["not_demonstrated"], list) and family["not_demonstrated"] and all(text(item) for item in family["not_demonstrated"]), "not_demonstrated: required concrete limits")
-    forbidden = family["forbidden_audiovisual_attributes"]
-    require(isinstance(forbidden, dict) and set(forbidden) == FORBIDDEN_ATTRIBUTES and all(text(explanation) for explanation in forbidden.values()), "forbidden_audiovisual_attributes: require nonempty explanations for texture, sound, environment, quantities and montage")
+    design = family["audiovisual_design"]
+    require(isinstance(design, dict) and set(design) == AUDIOVISUAL_DESIGN and all(text(explanation) for explanation in design.values()), "audiovisual_design: require nonempty explanations for texture, sound, environment, quantities and montage")
     fields(family["case_versions"], "generated_content historical_bank server_capture", "case_versions")
     require(all(text(version) for version in family["case_versions"].values()), "case_versions: each case version must be nonempty")
     fields(family["status"], "documentation mechanics candidate_preservation visual", "status")
