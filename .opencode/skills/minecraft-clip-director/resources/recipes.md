@@ -1,6 +1,6 @@
 # Familias de propiedades compartidas
 
-Una familia es un predicado aplicable a varios targets, no una escena ni una promesa de demostrar una mecánica. Rechazar rellenar con búsqueda, esfuerzo, celebración, textura, sonido, entorno, cantidades o montaje.
+Una familia es un predicado aplicable a varios targets, no una escena ni una promesa de demostrar una mecánica. Rechazar búsqueda, esfuerzo o celebración como sustituto de la propiedad. Textura, sonido y entorno pueden enriquecer la representación, pero no cuentan como evidencia mecánica. Para el paisaje y la puesta en escena usa `minibiomes.md`, sin alterar este contrato JSON.
 
 ## Proceso
 

@@ -141,10 +141,28 @@ class FamilyTests(unittest.TestCase):
 
     def test_skill_size_and_resources(self):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("minecraft-clip-director", skill)
+        self.assertTrue(skill.startswith("---\nname: minecraft-clip-director\n"))
+        metadata = skill.split("---", 2)[1]
+        self.assertIn("\ndescription: ", metadata)
+        self.assertIn("minibiomes", metadata)
         self.assertLess(len(skill.split()), 600)
-        for file in ("recipes.md", "scene.example.json", "server.md", "usage.md", "template.md"):
+        for file in ("recipes.md", "scene.example.json", "server.md", "usage.md", "template.md", "minibiomes.md"):
             self.assertTrue((ROOT / "resources" / file).is_file())
+        self.assertIn("resources/minibiomes.md", skill)
+        command = (ROOT.parents[1] / "commands/escena.md").read_text(encoding="utf-8")
+        self.assertIn("$ARGUMENTS", command)
+        self.assertIn("resources/minibiomes.md", command)
+        self.assertNotIn("crear produce un brief", command)
+
+    def test_minibiome_guidance_is_reachable_and_requires_visual_review(self):
+        for file in ("recipes.md", "server.md", "usage.md"):
+            resource = (ROOT / "resources" / file).read_text(encoding="utf-8")
+            self.assertIn("minibiomes.md", resource)
+        guide = (ROOT / "resources/minibiomes.md").read_text(encoding="utf-8")
+        for section in ("Disenar desde la camara", "Relieve antes que detalle", "Vegetacion, materiales y luz", "Tres composiciones de referencia", "Plan minimo antes de construir", "Puerta de calidad"):
+            self.assertIn("## " + section, guide)
+        self.assertIn("h(x,z)+1", guide)
+        self.assertIn("visual_pending", guide)
 
 
 if __name__ == "__main__":
