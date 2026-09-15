@@ -20,11 +20,19 @@ SETS = {
 "g11": ["fill 0 80 14 12 80 22 minecraft:stone_bricks", "fill 5 81 18 7 90 18 minecraft:stone_bricks", "fill 4 81 18 4 89 18 minecraft:ladder[facing=west]", "fill 2 90 16 8 90 20 minecraft:stone_bricks", "setblock 4 90 18 minecraft:air", "setblock 7 91 19 minecraft:sea_lantern", "tp @s 2.5 81 18.5 -90 10"],
 "g12": ["fill 40 80 14 43 80 22 minecraft:stone_bricks", "fill 49 80 14 52 80 22 minecraft:stone_bricks", "fill 44 71 14 48 79 22 minecraft:air", "fill 44 70 14 48 70 22 minecraft:black_concrete", "fill 44 80 17 48 80 18 minecraft:oak_planks", "tp @s 41.5 81 17.5 -90 0"],
 "g13": ["fill 80 80 14 92 80 22 minecraft:stone_bricks", "fill 80 81 14 80 84 22 minecraft:gray_concrete", "fill 92 81 14 92 84 22 minecraft:gray_concrete", "fill 80 85 14 92 85 17 minecraft:gray_concrete", "fill 80 81 18 84 84 18 minecraft:gray_concrete", "fill 87 81 18 92 84 18 minecraft:gray_concrete", "setblock 81 82 21 minecraft:sea_lantern", "setblock 91 82 21 minecraft:sea_lantern", "tp @s 85.5 81 15.5 0 0"],
-"f02": ["fill 120 80 14 132 80 22 minecraft:stone_bricks", "fill 125 81 18 127 90 18 minecraft:stone_bricks", "fill 124 81 18 124 89 18 minecraft:ladder[facing=west]", "fill 122 90 16 128 90 20 minecraft:stone_bricks", "setblock 124 90 18 minecraft:air", "setblock 127 91 19 minecraft:sea_lantern", "tp @s 122.5 81 18.5 -90 10"],
-"f03": ["fill 160 80 14 163 80 22 minecraft:stone_bricks", "fill 169 80 14 172 80 22 minecraft:stone_bricks", "fill 164 71 14 168 79 22 minecraft:air", "fill 164 70 14 168 70 22 minecraft:black_concrete", "fill 164 80 17 168 80 18 minecraft:oak_planks", "tp @s 161.5 81 17.5 -90 0"],
-"f04": ["fill 200 80 14 212 80 22 minecraft:stone_bricks", "fill 200 81 14 200 84 22 minecraft:gray_concrete", "fill 212 81 14 212 84 22 minecraft:gray_concrete", "fill 200 85 14 212 85 17 minecraft:gray_concrete", "fill 200 81 18 204 84 18 minecraft:gray_concrete", "fill 207 81 18 212 84 18 minecraft:gray_concrete", "setblock 201 82 21 minecraft:sea_lantern", "setblock 211 82 21 minecraft:sea_lantern", "tp @s 205.5 81 15.5 0 0"],
+"f02": ["fill 120 80 14 132 80 22 minecraft:stone_bricks", "fill 120 81 14 132 86 22 minecraft:air", "fill 122 80 14 122 80 22 minecraft:quartz_block", "fill 126 80 14 126 80 22 minecraft:quartz_block", "fill 130 80 14 130 80 22 minecraft:quartz_block", "summon minecraft:armor_stand 126 81 18 {ShowArms:1b,NoBasePlate:1b}", "tp @s 121.5 81 18.5 -90 10"],
+"f03": ["fill 160 80 14 172 80 22 minecraft:stone_bricks", "fill 160 81 14 160 84 22 minecraft:stone_bricks", "fill 172 81 14 172 84 22 minecraft:stone_bricks", "fill 160 85 14 172 85 22 minecraft:stone_bricks", "fill 160 81 22 172 84 22 minecraft:stone_bricks", "fill 160 81 14 164 84 14 minecraft:stone_bricks", "fill 168 81 14 172 84 14 minecraft:stone_bricks", "fill 165 84 14 167 84 14 minecraft:stone_bricks", "setblock 166 81 18 minecraft:stone_bricks", "tp @s 166.5 81 11.5 0 0"],
+"f04": ["fill 200 80 14 205 80 22 minecraft:soul_sand", "fill 206 80 13 206 80 22 minecraft:stone_bricks", "fill 207 80 15 212 80 22 minecraft:sand", "fill 207 80 14 211 80 14 minecraft:water", "fill 207 80 13 211 80 13 minecraft:stone_bricks", "setblock 212 80 14 minecraft:stone_bricks", "tp @s 203.5 81 18.5 -90 0"],
 }
 DURATIONS = {"g11":180,"g12":180,"g13":180,"f02":180,"f03":180,"f04":180}
+KITS = {
+"f02": ["minecraft:mace", "minecraft:trident"],
+"f03": ["minecraft:sea_lantern", "minecraft:soul_lantern"],
+"f04": ["minecraft:nether_wart", "minecraft:sugar_cane"],
+}
+KILLS = {
+"f02": ["kill @e[type=minecraft:armor_stand,x=119,y=79,z=13,dx=14,dy=10,dz=10]"],
+}
 CHUNKS = {"g11":[(0,0),(0,1)], "g12":[(2,0),(2,1),(3,0),(3,1)], "g13":[(5,0),(5,1)], "f02":[(7,0),(7,1),(8,0),(8,1)], "f03":[(10,0),(10,1),(11,0),(11,1)], "f04":[(12,0),(12,1),(13,0),(13,1)]}
 
 def write(rel: str, lines: list[str]) -> None:
@@ -44,7 +52,7 @@ def build() -> None:
     write("pack.mcmeta", [json.dumps({"pack":{"pack_format":PACK_FORMAT,"description":"WhatAmICraft isolated filming studio (Java 1.21.11)"}}, indent=2)])
     write("data/minecraft/tags/function/load.json", ['{"values":["studio:load"]}'])
     write("data/studio/function/load.mcfunction", ["scoreboard objectives add studio_scene dummy", "scoreboard objectives add studio_run dummy", "scoreboard objectives add studio_owner_id dummy", "scoreboard objectives add studio_lock dummy"])
-    write("data/studio/function/help.mcfunction", ["tellraw @s {\"text\":\"Studio: claim -> scene/g11..g13,f02..f04/setup -> start; reset; next; stop. OP only.\",\"color\":\"gold\"}", "tellraw @s {\"text\":\"Manual acting: G11 climb, G12 crossing, G13 threshold. F02/F03/F04 are neutral test stages (F02 mace/trident, F03 lectern/composter, F04 crossbow/fishing_rod). No automated events: start only marks the take. Replay Mod is client-only.\",\"color\":\"gray\"}"])
+    write("data/studio/function/help.mcfunction", ["tellraw @s {\"text\":\"Studio: claim -> scene/g11..g13,f02..f04/setup -> start; reset; next; stop. OP only.\",\"color\":\"gold\"}", "tellraw @s {\"text\":\"Manual acting: G11 climb, G12 crossing, G13 threshold. F02/F03/F04 are correlated test stages (F02 mace/trident, F03 sea_lantern/soul_lantern, F04 nether_wart/sugar_cane). Start clears inventory, gives the scene kit and marks the take; f02 drops you in survival with a practice dummy. Replay Mod is client-only.\",\"color\":\"gray\"}"])
     write("data/studio/function/claim.mcfunction", guard()+["execute if score #owner studio_lock matches 1.. run tellraw @s {\"text\":\"Studio is locked, including when its owner is offline.\",\"color\":\"red\"}", "execute if score #owner studio_lock matches 1.. run return 0", "scoreboard players add #serial studio_lock 1", "scoreboard players operation #owner studio_lock = #serial studio_lock", "scoreboard players operation @s studio_owner_id = #owner studio_lock", "tag @s add studio_owner", "tellraw @s {\"text\":\"Studio claimed. Choose a setup.\",\"color\":\"green\"}"])
     write("data/studio/function/admin/release.mcfunction", ["function studio:stop_schedules", "function studio:unload_active", "scoreboard players set #owner studio_lock 0", "scoreboard players set #scene studio_scene 0", "tag @a[tag=studio_owner] remove studio_owner", "tellraw @s {\"text\":\"Studio lock released. Use only after confirming the previous owner is offline.\",\"color\":\"yellow\"}"])
     unload = []
@@ -65,18 +73,21 @@ def build() -> None:
         write(f"data/studio/function/scene/{scene}/setup_apply_actor.mcfunction", initial + [f"tellraw @s {{\"text\":\"{scene.upper()} ready ({DURATIONS[scene]} frames at 30 fps). Use /function studio:start.\",\"color\":\"green\"}}"])
         # Reapply the full bounded SET, so reset is repeatable instead of
         # merely deleting leftovers.
-        write(f"data/studio/function/scene/{scene}/reset.mcfunction", ["function studio:stop_schedules"] + initial + ["tellraw @s {\"text\":\"Studio scene reset to its initial state.\",\"color\":\"yellow\"}"])
+        write(f"data/studio/function/scene/{scene}/reset.mcfunction", ["function studio:stop_schedules"] + [f"execute in minecraft:overworld run {c}" for c in KILLS.get(scene, [])] + initial + ["tellraw @s {\"text\":\"Studio scene reset to its initial state.\",\"color\":\"yellow\"}"])
     write("data/studio/function/stop_schedules.mcfunction", [f"schedule clear studio:scene/{scene}/setup_apply" for scene in SETS])
-    write("data/studio/function/start.mcfunction", owner_guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "scoreboard players set @s studio_run 1"] + [f"execute if score @s studio_scene matches {i} run return run function studio:scene/{s}/start" for i,s in enumerate(SETS,1)])
+    write("data/studio/function/start.mcfunction", owner_guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "execute unless score @s studio_scene matches 1.. run return 0", "scoreboard players set @s studio_run 1"] + [f"execute if score @s studio_scene matches {i} run function studio:scene/{s}/start" for i,s in enumerate(SETS,1)] + ["return 1"])
     for scene in SETS:
-        lines=owner_guard()+[f"execute unless score @s studio_scene matches {list(SETS).index(scene)+1} run return 0", f"tellraw @s {{\"text\":\"{scene.upper()} started. Action is manual.\",\"color\":\"aqua\"}}"]
+        kit = [f"give @s {item} 1" for item in KITS.get(scene, [])]
+        survival = ["gamemode survival @s"] if scene == "f02" else []
+        lines = owner_guard()+[f"execute unless score @s studio_scene matches {list(SETS).index(scene)+1} run return 0", "clear @s"] + survival + kit + [f"tellraw @s {{\"text\":\"{scene.upper()} started. Kit given. Action is manual.\",\"color\":\"aqua\"}}"]
         write(f"data/studio/function/scene/{scene}/start.mcfunction", lines)
-    write("data/studio/function/reset.mcfunction", owner_guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0"]+[f"execute if score @s studio_scene matches {i} run return run function studio:scene/{s}/reset" for i,s in enumerate(SETS,1)])
-    write("data/studio/function/stop.mcfunction", owner_guard()+["function studio:reset", "function studio:unload_active", "tag @s remove studio_owner", "scoreboard players set #owner studio_lock 0", "scoreboard players set #scene studio_scene 0", "scoreboard players set @s studio_scene 0", "scoreboard players set @s studio_run 0", "tellraw @s {\"text\":\"Studio released; world data was not deleted.\",\"color\":\"yellow\"}"])
-    next_lines=owner_guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "scoreboard players set @s studio_run 0"]
+    write("data/studio/function/reset.mcfunction", owner_guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "execute unless score @s studio_scene matches 1.. run return 0"]+[f"execute if score @s studio_scene matches {i} run function studio:scene/{s}/reset" for i,s in enumerate(SETS,1)] + ["return 1"])
+    write("data/studio/function/stop.mcfunction", owner_guard()+["function studio:reset", "function studio:unload_active", "tag @s remove studio_owner", "scoreboard players set #owner studio_lock 0", "scoreboard players set #scene studio_scene 0", "scoreboard players set @s studio_scene 0", "scoreboard players set @s studio_run 0", "gamemode creative @s", "tellraw @s {\"text\":\"Studio released; world data was not deleted.\",\"color\":\"yellow\"}"])
+    next_lines=owner_guard()+["execute unless score @s studio_scene = #scene studio_scene run return 0", "execute unless score @s studio_scene matches 1.. run return 0", "scoreboard players set @s studio_run 0"]
     for i, scene in enumerate(SETS,1):
         target = list(SETS)[i % len(SETS)]
-        next_lines += [f"execute if score @s studio_scene matches {i} run return run function studio:scene/{target}/setup"]
+        next_lines += [f"execute if score @s studio_scene matches {i} run function studio:scene/{target}/setup"]
+    next_lines += ["return 1"]
     write("data/studio/function/next.mcfunction", next_lines)
 
 def validate() -> None:
@@ -86,9 +97,12 @@ def validate() -> None:
     assert any("minecraft:ladder[facing=west]" in c for c in SETS["g11"])
     assert any("minecraft:oak_planks" in c for c in SETS["g12"])
     assert any("minecraft:sea_lantern" in c for c in SETS["g13"])
-    assert any("minecraft:ladder[facing=west]" in c for c in SETS["f02"])
-    assert any("minecraft:oak_planks" in c for c in SETS["f03"])
-    assert any("minecraft:sea_lantern" in c for c in SETS["f04"])
+    assert any("minecraft:quartz_block" in c for c in SETS["f02"])
+    assert any("168 81 14" in c for c in SETS["f03"])
+    assert any("minecraft:soul_sand" in c for c in SETS["f04"])
+    assert any("armor_stand" in c for c in SETS["f02"])
+    assert KITS["f02"] == ["minecraft:mace", "minecraft:trident"]
+    assert any("armor_stand" in c for c in KILLS["f02"])
     assert not any("half=" in c for xs in SETS.values() for c in xs)
 
 if __name__ == "__main__":
