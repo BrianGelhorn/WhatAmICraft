@@ -5,6 +5,7 @@ services:
     volumes:
       - ./:/studio
       - "../aV1- REALISTIC MUSHROOMS - an EREMILIONS Bundle.zip:/studio/source-bundle.zip:ro"
+      - ./uploads:/studio/uploads:ro
 
   mc:
     # Java 21 runtime; the server version and Fabric loader are pinned below.
@@ -33,3 +34,13 @@ services:
       - ./data:/data
       # Read-only generated pack; it is installed only into this world's datapacks.
       - ./generated/studio:/data/world/datapacks/studio:ro
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    profiles: ["dashboard"]
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - ./:/studio

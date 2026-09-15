@@ -82,3 +82,9 @@ docker logs --tail 30 server-mc-1
 ```
 
 La consola solo inicia setups sin un operador reclamado; no mueve jugadores ajenos. Las pruebas cubren continuidad del suelo, relieve, semillas, colocacion de arboles, contencion de agua, riego, limites por tick, referencias de funciones y cancelacion. Repetir setup/reset en Minecraft y revisar desde el cliente real sigue siendo necesario para juzgar la imagen, sombras y colisiones.
+
+## Dashboard local
+
+Con Docker Desktop activo, desde `Server` ejecuta `docker compose --profile dashboard up -d --build dashboard` y abre `http://127.0.0.1:8765`. Solo escucha en loopback. Permite ver el estado del contenedor y de una tarea, enviar `setup` de una escena, `start`, `reset`, `stop`, regenerar el datapack y pedir `/reload`; las tareas largas quedan en segundo plano y se consulta el resultado con **Actualizar**. Para cerrarlo: `docker compose --profile dashboard stop dashboard`.
+
+La carga acepta ZIPs de plantillas legacy `.schematic` (máximo 128 MiB comprimidos, 512 MiB extraídos y 2.000 entradas). Cada ZIP queda en `Server/uploads` sin tocar el mundo ni ejecutar comandos; el catálogo acumulado se guarda en `Server/catalogs` (no versionado). **Aplicar todos los ZIPs al generador** reconstruye el datapack usando todos los ZIPs cargados y falla si encuentra bloques legacy sin conversión segura; después corresponde `Reload Minecraft` y `Setup`. ZIPs de mundos, `.litematic`, `.schem` y `.nbt` no se importan: conservarlos y extraerlos/revisarlos manualmente evita fingir una conversión o reemplazar el mundo activo.
