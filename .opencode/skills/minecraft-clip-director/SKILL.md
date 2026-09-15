@@ -24,6 +24,8 @@ No confundas neutro con plano. Mantén despejada la acción y compón primer pla
 
 Usa `resources/minibiomes.md` para medidas, ejemplos y criterios de rechazo. HUD y objetos reales sirven en pruebas explícitas; en un quiz no reveles la respuesta antes de tiempo. Decoración y entorno tampoco deben descartar candidatos compatibles.
 
+El propósito de la escena decide su contexto, no una paleta global: anota atmósfera, composición, acción, hora, clima, dificultad/reglas necesarias, riesgos y restauración en el plan Markdown. No agregues esos campos al JSON estricto de familia. Una prueba puede mostrar el bloque/acción real; un quiz conserva el spoiler hasta la pista correspondiente. `visual_pending` significa que aún faltan captura y revisión desde cámara, no que la escena esté aprobada.
+
 ## Contrato de familia
 
 Incluye predicado, >=2 targets, universo conjunto y una cita por target (`episode_id`, texto literal, versión, fuente; `fact_ids` si existen). Separa parte ilustrada, límites y `audiovisual_design` (textura, sonido, entorno, cantidades, montaje). Nunca uses un objeto para probar otro ni falsees causalidad con montaje.

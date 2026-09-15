@@ -4,6 +4,7 @@ services:
     profiles: ["tools"]
     volumes:
       - ./:/studio
+      - "../aV1- REALISTIC MUSHROOMS - an EREMILIONS Bundle.zip:/studio/source-bundle.zip:ro"
 
   mc:
     # Java 21 runtime; the server version and Fabric loader are pinned below.

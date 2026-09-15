@@ -3,3 +3,4 @@
 !Dockerfile
 !scene_controller.py
 !landscape.py
+!asset_importer.py
