@@ -458,7 +458,10 @@ def placement_commands(scene: str, seed: int, origin: tuple[int, int], catalog: 
         return [], None
     selected = []
     families = set()
-    ordered = sorted(catalog, key=lambda item: (item.get("archive", ""), item["family"], item["id"]))
+    tree_assets = [item for item in catalog if any(word in item.get("archive", "").lower() for word in ("tree", "desert"))]
+    if not tree_assets:
+        return [], None
+    ordered = sorted(tree_assets, key=lambda item: (item.get("archive", ""), item["family"], item["id"]))
     for asset in ordered:
         if asset["family"] in families:
             continue

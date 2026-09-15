@@ -73,6 +73,14 @@ class DashboardTests(unittest.TestCase):
             self.assertEqual({asset["archive"] for asset in merged["assets"]}, {"old.zip", "new.zip"})
         dashboard.CATALOGS = old_catalogs
 
+    def test_asset_placement_uses_trees_not_mushrooms(self):
+        catalog = [
+            {"id": "mushroom_1", "family": "mushroom", "archive": "mushrooms.zip"},
+            {"id": "tree_1", "family": "tree", "archive": "desert-trees.zip"},
+        ]
+        _, info = asset_importer.placement_commands("f11", 1, (0, 0), catalog, lambda *_: 64)
+        self.assertEqual(info["assets"], ["tree_1"])
+
     def test_upload_status_api(self):
         old = dashboard.UPLOADS, dashboard.CATALOGS, dashboard.STATE
         with tempfile.TemporaryDirectory() as temp:

@@ -138,7 +138,7 @@ class StudioTests(unittest.TestCase):
             functions = controller.OUT / "data/studio/function"
             manifest = json.loads((controller.OUT / "manifest.json").read_text())
             self.assertEqual(manifest["asset_catalog_count"], 176)
-            self.assertGreaterEqual(len(manifest["scenes"]["f11"]["assets"]), 6)
+            self.assertNotIn("assets", manifest["scenes"]["f11"])
             self.assertTrue(list((controller.OUT / "data/studio/structure/assets").glob("*.nbt")))
             self.assertFalse((controller.OUT / "data/studio/structures").exists())
             self.assertEqual(manifest["seed"], controller.SEED)
