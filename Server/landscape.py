@@ -11,7 +11,7 @@ BASE_Y = -63
 EDGE_Y = 72
 KEEP = {"f02": (0, 0, 12, 8), "f03": (0, 0, 12, 14), "f04": (0, 0, 12, 9), "f08": (0, 0, 12, 8), "f09": (0, 0, 12, 8), "f10": (0, -4, 12, 9), "f11": (0, 0, 12, 8)}
 PALETTES = {
-    "f02": ("minecraft:grass_block", "minecraft:dirt", "minecraft:oak_log", "minecraft:oak_leaves"),
+    "f02": ("minecraft:coarse_dirt", "minecraft:dirt", "minecraft:dark_oak_log", "minecraft:dark_oak_leaves"),
     "f03": ("minecraft:podzol", "minecraft:stone", "minecraft:spruce_log", "minecraft:spruce_leaves"),
     "f04": ("minecraft:grass_block", "minecraft:dirt", "minecraft:birch_log", "minecraft:birch_leaves"),
     "f08": ("minecraft:stone", "minecraft:tuff", "minecraft:oak_log", "minecraft:oak_leaves"),
@@ -146,8 +146,8 @@ def _scatter(scene: str, seed: int, tag: str, zmin: int, zmax: int, target: int,
 
 def _tree_candidates(scene: str, seed: int) -> list[tuple[int, int]]:
     """Clustered rear/side woodland plus a dense background band; foreground stays a camera corridor."""
-    main = {"f02": 75, "f03": 65, "f04": 72, "f08": 70, "f09": 72, "f10": 68, "f11": 64}[scene]
-    back = {"f02": 30, "f03": 28, "f04": 30, "f08": 28, "f09": 30, "f10": 28, "f11": 32}[scene]
+    main = {"f02": 75, "f03": 0, "f04": 72, "f08": 70, "f09": 72, "f10": 68, "f11": 64}[scene]
+    back = {"f02": 30, "f03": 0, "f04": 30, "f08": 28, "f09": 30, "f10": 28, "f11": 32}[scene]
     points = _scatter(scene, seed, "wood", -10, 91, main, 64, [])
     return points + _scatter(scene, seed, "back", 55, 91, back, 36, points)
 
@@ -249,14 +249,50 @@ def _birch(ox: int, oz: int, seed: int, x: int, z: int, scene: str, hero: bool =
     return commands
 
 
+def _charred(ox: int, oz: int, seed: int, x: int, z: int, scene: str, hero: bool = False) -> list[str]:
+    """Burnt trunk with one or two bare branches; no leaves on a battlefield."""
+    base = height(scene, seed, x, z)
+    h = 4 + (abs(x * 3 - z + seed) % 4)
+    if hero:
+        h += 2
+    h = max(4, min(h, 124 - base))
+    log = "minecraft:dark_oak_log"
+    commands = [_fill(ox + x, base + 1, oz + z, ox + x, base + h, oz + z, log)]
+    commands.append(f"setblock {ox+x+1} {base+h-1} {oz+z} {log}")
+    if hero or (x + z + seed) % 2 == 0:
+        commands.append(f"setblock {ox+x-1} {base+h-2} {oz+z} {log}")
+    return commands
+
+
 def _f02_features(ox: int, oz: int, seed: int) -> list[str]:
-    # The clear terrace is the real, hazard-free attack lane; damage stays beyond it.
+    # The clear terrace stays the real, hazard-free attack lane; drama lives beyond it.
     commands = [_fill(ox + lane, 80, oz, ox + lane, 80, oz + 8, "minecraft:dirt_path") for lane in (2, 6, 10)]
+    # Jagged basalt spikes: hostile silhouettes, clear of lane, arena and camera corridor.
+    for x, z, h in ((-40, -30, 14), (42, -24, 17), (-58, 28, 12), (58, 36, 15), (-32, 62, 11), (34, 72, 13), (0, -52, 16)):
+        base = height("f02", seed, x, z)
+        width, y = 2, base + 1
+        while width >= 0 and y < base + h:
+            top = min(y + 2, base + h)
+            block = "minecraft:basalt" if (y - base) % 6 < 3 else "minecraft:blackstone"
+            commands.append(_fill(ox + x - width, y, oz + z - width, ox + x + width, top, oz + z + width, block))
+            y = top + 1
+            width -= 1
+        for dx, dz in ((3, 0), (-3, 1)):
+            ey = height("f02", seed, x + dx, z + dz)
+            commands.append(f"setblock {ox+x+dx} {ey+1} {oz+z+dz} minecraft:crying_obsidian")
+    # Scorched craters: flat blackstone discs with a coal heart, trunk-safe at surface level.
+    for cx, cz in ((-20, -18), (26, 30), (-8, 48)):
+        cy = height("f02", seed, cx, cz)
+        for dx in range(-3, 4):
+            for dz in range(-3, 4):
+                if dx * dx + dz * dz <= 10:
+                    commands.append(f"setblock {ox+cx+dx} {cy} {oz+cz+dz} minecraft:blackstone")
+        commands.append(f"setblock {ox+cx} {cy} {oz+cz} minecraft:coal_block")
     commands += [f"setblock {ox+x} {height('f02', seed, x, z)} {oz+z} minecraft:coarse_dirt"
                  for z in (-4, 20, 21) for x in range(-12, -7)]
     for x in (-10, -9, -8, 15, 16, 17):
         base = height("f02", seed, x, 18)
-        commands.append(_fill(ox+x, base+1, oz+18, ox+x, base+2, oz+18, "minecraft:oak_log"))
+        commands.append(_fill(ox+x, base+1, oz+18, ox+x, base+2, oz+18, "minecraft:dark_oak_log"))
     commands += [f"setblock {ox+x} {height('f02', seed, x, z)+1} {oz+z} minecraft:cracked_stone_bricks"
                  for x, z in ((-13, 17), (-12, 18), (14, 18), (16, 19), (-30, 8), (28, 12))]
     # Grounded ruined gate and rubble read as a battlefield, never as a trap.
@@ -264,7 +300,7 @@ def _f02_features(ox: int, oz: int, seed: int) -> list[str]:
     for x, z in ((-24, 13), (-18, 13)):
         base = height("f02", seed, x, z)
         commands.append(_fill(ox + x, base + 1, oz + z, ox + x, top, oz + z, "minecraft:stone_bricks"))
-    commands.append(_fill(ox - 23, top, oz + 13, ox - 19, top, oz + 13, "minecraft:mossy_stone_bricks"))
+    commands.append(_fill(ox - 23, top, oz + 13, ox - 19, top, oz + 13, "minecraft:blackstone"))
     commands.append(f"setblock {ox-24} {top+1} {oz+13} minecraft:cracked_stone_bricks")
     for x, z, extra in ((-16, 17, 1), (-15, 17, 2), (-16, 18, 2), (-17, 17, 1)):
         base = height("f02", seed, x, z)
@@ -274,23 +310,90 @@ def _f02_features(ox: int, oz: int, seed: int) -> list[str]:
 
 
 def _f03_features(ox: int, oz: int) -> list[str]:
-    # No emissive block is installed: the back pedestals compare player-placed real lights.
-    # The offset entrance/baffle keeps direct skylight away from the covered test room.
-    return [
-        _fill(ox, 81, oz + 6, ox + 12, 86, oz + 18, "minecraft:air"),
-        _fill(ox, 80, oz + 6, ox + 12, 80, oz + 18, "minecraft:stone_bricks"),
-        _fill(ox, 87, oz + 6, ox + 12, 87, oz + 18, "minecraft:deepslate_tiles"),
-        _fill(ox, 81, oz + 6, ox, 86, oz + 18, "minecraft:deepslate_tiles"),
-        _fill(ox + 12, 81, oz + 6, ox + 12, 86, oz + 18, "minecraft:deepslate_tiles"),
-        _fill(ox, 81, oz + 18, ox + 12, 86, oz + 18, "minecraft:deepslate_tiles"),
-        _fill(ox, 81, oz + 6, ox + 4, 86, oz + 6, "minecraft:deepslate_tiles"),
-        _fill(ox + 8, 81, oz + 6, ox + 12, 86, oz + 6, "minecraft:deepslate_tiles"),
-        _fill(ox + 5, 85, oz + 6, ox + 7, 86, oz + 6, "minecraft:chiseled_stone_bricks"),
-        _fill(ox + 5, 81, oz + 8, ox + 6, 84, oz + 8, "minecraft:deepslate_tiles"),
-        _fill(ox + 3, 80, oz + 13, ox + 4, 81, oz + 15, "minecraft:polished_deepslate"),
-        _fill(ox + 8, 80, oz + 13, ox + 9, 81, oz + 15, "minecraft:polished_deepslate"),
-        _fill(ox + 5, 80, oz + 13, ox + 7, 81, oz + 15, "minecraft:stone_bricks"),
+    # A real cave, not a built room: organic hall (overlapping elliptical
+    # carves, uneven ceiling, raw mountain walls), arched mouth, stepped
+    # descent, S-turn corridor (no straight skylight), stalactite clusters,
+    # a full dripstone column, calcite streaks and a kidney pool. Zero
+    # emissive blocks: player light is the only light.
+    commands = [
+        _fill(ox, 73, oz + 8, ox + 16, 75, oz + 28, "minecraft:deepslate"),
+        _fill(ox - 1, 89, oz + 7, ox + 17, 92, oz + 29, "minecraft:stone"),
+        _fill(ox - 2, 70, oz + 4, ox + 18, 90, oz + 8, "minecraft:stone"),
+        _fill(ox - 2, 86, oz + 4, ox + 18, 90, oz + 8, "minecraft:deepslate"),
+        _fill(ox - 2, 74, oz + 4, ox - 1, 90, oz + 8, "minecraft:stone"),
+        _fill(ox + 17, 74, oz + 4, ox + 18, 90, oz + 8, "minecraft:stone"),
+        # entry corridor with a jog: in at x4-6, out at x6-8, stepping down
+        _fill(ox + 4, 77, oz + 4, ox + 8, 88, oz + 7, "minecraft:air"),
+        _fill(ox + 4, 79, oz + 4, ox + 6, 79, oz + 4, "minecraft:stone"),
+        _fill(ox + 4, 78, oz + 5, ox + 6, 78, oz + 5, "minecraft:stone"),
+        _fill(ox + 4, 77, oz + 6, ox + 6, 77, oz + 6, "minecraft:stone"),
+        _fill(ox + 4, 76, oz + 7, ox + 8, 76, oz + 7, "minecraft:stone"),
+        _fill(ox + 7, 74, oz + 4, ox + 8, 88, oz + 5, "minecraft:deepslate_bricks"),
+        _fill(ox + 4, 74, oz + 6, ox + 5, 88, oz + 7, "minecraft:deepslate_bricks"),
+        _fill(ox + 6, 75, oz + 8, ox + 8, 79, oz + 8, "minecraft:air"),
+        _fill(ox + 6, 74, oz + 8, ox + 8, 74, oz + 8, "minecraft:deepslate"),
+        # mouth arch: tall dark center, stepped sides
+        _fill(ox + 4, 83, oz + 4, ox + 6, 88, oz + 4, "minecraft:stone"),
+        _fill(ox + 4, 81, oz + 4, ox + 4, 82, oz + 4, "minecraft:stone"),
+        _fill(ox + 6, 81, oz + 4, ox + 6, 82, oz + 4, "minecraft:stone"),
     ]
+    ellipses = ((8, 18, 8, 10), (4, 12, 5, 5), (12, 24, 5, 6))
+    carved = [(x, z) for x in range(17) for z in range(8, 29)
+              if any(((x - cx) / rx) ** 2 + ((z - cz) / rz) ** 2 <= 1 for cx, cz, rx, rz in ellipses)]
+    carved_set = set(carved)
+    for x, z in carved:
+        ceil = min(88, 86 + round(1.5 * math.sin(x / 4.1) + 1.5 * math.cos(z / 3.7)))
+        commands.append(_fill(ox + x, 76, oz + z, ox + x, ceil, oz + z, "minecraft:air"))
+    for x, z, length in ((7, 18, 7), (7, 17, 5), (8, 19, 4), (12, 23, 6), (13, 22, 4), (4, 13, 5), (3, 14, 3)):
+        commands.append(_fill(ox + x, 89 - length, oz + z, ox + x, 88, oz + z, "minecraft:dripstone_block"))
+        commands.append(f"setblock {ox+x} {88-length} {oz+z} minecraft:pointed_dripstone[vertical_direction=down]")
+    commands.append(_fill(ox + 10, 76, oz + 16, ox + 10, 88, oz + 16, "minecraft:dripstone_block"))
+    for x, z, tall in ((2, 20, 2), (12, 10, 3), (12, 25, 2), (4, 22, 1)):
+        commands.append(_fill(ox + x, 76, oz + z, ox + x, 75 + tall, oz + z, "minecraft:dripstone_block"))
+        commands.append(f"setblock {ox+x} {76+tall} {oz+z} minecraft:pointed_dripstone[vertical_direction=up]")
+    for x, z, top in ((2, 16, 86), (14, 20, 85)):
+        commands.append(_fill(ox + x, 76, oz + z, ox + x, top, oz + z, "minecraft:calcite"))
+    reserved = {(x, z) for x in range(3, 10) for z in range(13, 16)}
+    reserved |= {(x, z) for x in range(6, 9) for z in range(8, 16)}
+    reserved |= {(2, 20), (12, 10), (12, 25), (4, 22), (10, 16), (2, 16), (14, 20)}
+    discs = ((11, 21, 2), (13, 22, 2))
+    water = {(x, z) for x in range(17) for z in range(8, 29)
+             if (x, z) in carved_set and any((x - cx) ** 2 + (z - cz) ** 2 <= r * r + 1 for cx, cz, r in discs)}
+    rim = {(x + dx, z + dz) for x, z in water for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1))}
+    rim = {cell for cell in rim if cell in carved_set and cell not in water and cell not in reserved}
+    for x, z in sorted(rim):
+        commands.append(f"setblock {ox+x} 76 {oz+z} minecraft:stone")
+    for x, z in sorted(water):
+        commands.append(f"setblock {ox+x} 76 {oz+z} minecraft:water")
+    reserved |= water
+    commands += [
+        _fill(ox + 3, 76, oz + 13, ox + 4, 77, oz + 15, "minecraft:polished_deepslate"),
+        _fill(ox + 8, 76, oz + 13, ox + 9, 77, oz + 15, "minecraft:polished_deepslate"),
+        _fill(ox + 5, 76, oz + 13, ox + 7, 77, oz + 15, "minecraft:stone_bricks"),
+        f"setblock {ox+2} 76 {oz+24} minecraft:bone_block",
+        f"setblock {ox+2} 77 {oz+24} minecraft:bone_block",
+        f"setblock {ox+15} 76 {oz+17} minecraft:bone_block",
+        f"setblock {ox+1} 76 {oz+10} minecraft:cobblestone",
+        f"setblock {ox+6} 76 {oz+25} minecraft:mossy_cobblestone",
+        f"setblock {ox+13} 76 {oz+15} minecraft:cobblestone",
+        f"setblock {ox+4} 76 {oz+12} minecraft:mossy_cobblestone",
+        f"setblock {ox+15} 76 {oz+26} minecraft:cobblestone",
+        f"setblock {ox+1} 76 {oz+18} minecraft:mossy_cobblestone",
+        f"setblock {ox+6} 76 {oz+20} minecraft:moss_carpet",
+        f"setblock {ox+13} 76 {oz+26} minecraft:moss_carpet",
+    ]
+    rng = random.Random("f03:cavefloor")
+    free = sorted(carved_set - reserved - water)
+    for tag, block, count in (("gravel", "minecraft:gravel", 8), ("tuff", "minecraft:tuff", 6), ("dirt", "minecraft:coarse_dirt", 4)):
+        for _ in range(count):
+            if not free:
+                break
+            cx, cz = free[rng.randrange(len(free))]
+            for dx, dz in ((0, 0), (1, 0), (0, 1)):
+                cell = (cx + dx, cz + dz)
+                if cell in carved_set and cell not in reserved and cell not in water:
+                    commands.append(f"setblock {ox+cell[0]} 76 {oz+cell[1]} {block}")
+    return commands
 
 
 def _f08_features(ox: int, oz: int) -> list[str]:
@@ -357,21 +460,40 @@ def _f04_features(ox: int, oz: int, seed: int) -> list[str]:
                  _fill(ox + 7, 80, oz + 1, ox + 12, 80, oz + 1, "minecraft:water"),
                  f"setblock {ox+2} 81 {oz+3} minecraft:nether_wart[age=0]",
                  f"setblock {ox+8} 81 {oz+2} minecraft:sugar_cane"]
+    # Golden raised beds west of the parcels: grounded platform, twin water
+    # channels so every farmland row stays hydrated, mature crops for color.
+    commands.append(_fill(ox - 10, 78, oz, ox - 2, 80, oz + 12, "minecraft:dirt"))
+    for cx in (-10, -2):
+        commands.append(_fill(ox + cx, 80, oz + 1, ox + cx, 80, oz + 11, "minecraft:water"))
+    bands = ((0, 3, "minecraft:wheat"), (4, 7, "minecraft:carrots"), (8, 11, "minecraft:potatoes"))
+    for z1, z2, crop in bands:
+        commands.append(_fill(ox - 9, 81, oz + z1, ox - 3, 81, oz + z2, "minecraft:farmland"))
+        for x in range(-9, -2):
+            for z in range(z1, z2 + 1):
+                commands.append(f"setblock {ox+x} 82 {oz+z} {crop}[age=7]")
+    for x, z, flower in ((-7, 12, "minecraft:poppy"), (-6, 12, "minecraft:cornflower"), (-5, 12, "minecraft:dandelion"), (-4, 12, "minecraft:poppy")):
+        commands.append(f"setblock {ox+x} 81 {oz+z} {flower}")
+    commands += [_fill(ox - 9, 81, oz + 12, ox - 8, 81, oz + 12, "minecraft:hay_block"),
+                 f"setblock {ox-9} 82 {oz+12} minecraft:hay_block",
+                 f"setblock {ox-3} 81 {oz+12} minecraft:composter"]
+    for hx, hz in ((-10, 0), (-2, 12)):
+        commands.append(_fill(ox + hx, 81, oz + hz, ox + hx, 82, oz + hz, "minecraft:oak_fence"))
+        commands.append(f"setblock {ox+hx} 83 {oz+hz} minecraft:beehive")
     return commands
 
 
 def _accents(scene: str, ox: int, oz: int, seed: int) -> list[str]:
     points = {
         "f02": [(-7, 18), (16, 21), (-31, 4), (-52, -14), (34, 34), (48, -4), (-12, -16)],
-        "f03": [(-12, 28), (-34, 18), (26, 31), (-56, -12), (44, 6), (10, -18)],
+        "f03": [],
         "f08": [(-9, 4), (21, 4), (-16, -10), (28, 16), (0, -14), (12, 22)],
         "f09": [(-9, 4), (21, 4), (-14, -8), (26, 14), (2, -14), (10, 20)],
         "f10": [(-9, 2), (21, 2), (-12, -12), (24, 16), (4, -16), (8, 20)],
         "f11": [(-20, 12), (20, 18), (-30, 42), (30, 54), (-8, 66), (22, 72)],
         "f04": [(-9, 17), (-21, 27), (7, 17), (-46, -14), (38, 38), (-4, -20)],
     }[scene]
-    blocks = {"f02": "minecraft:poppy", "f03": "minecraft:brown_mushroom", "f04": "minecraft:cornflower", "f08": "minecraft:tuff", "f09": "minecraft:short_grass", "f10": "minecraft:azure_bluet", "f11": "minecraft:brown_mushroom"}
-    want = {"f02": "minecraft:grass_block", "f03": "minecraft:podzol", "f04": "minecraft:grass_block", "f08": "minecraft:stone", "f09": "minecraft:grass_block", "f10": "minecraft:moss_block", "f11": "minecraft:podzol"}[scene]
+    blocks = {"f02": "minecraft:dead_bush", "f03": "minecraft:brown_mushroom", "f04": "minecraft:cornflower", "f08": "minecraft:tuff", "f09": "minecraft:short_grass", "f10": "minecraft:azure_bluet", "f11": "minecraft:brown_mushroom"}
+    want = {"f02": "minecraft:coarse_dirt", "f03": "minecraft:podzol", "f04": "minecraft:grass_block", "f08": "minecraft:stone", "f09": "minecraft:grass_block", "f10": "minecraft:moss_block", "f11": "minecraft:podzol"}[scene]
     commands = []
     for x, z in points:
         y = height(scene, seed, x, z)
@@ -416,12 +538,12 @@ def _undergrowth_spot(scene: str, seed: int, x: int, z: int) -> bool:
 
 def _undergrowth(scene: str, ox: int, oz: int, seed: int, points: list[tuple[int, int]]) -> list[str]:
     _, _, _, leaves = PALETTES[scene]
-    tuft = {"f02": "minecraft:short_grass", "f03": "minecraft:moss_carpet", "f04": "minecraft:short_grass", "f08": "minecraft:short_grass", "f09": "minecraft:short_grass", "f10": "minecraft:short_grass", "f11": "minecraft:fern"}[scene]
+    tuft = {"f02": "minecraft:dead_bush", "f03": "minecraft:moss_carpet", "f04": "minecraft:short_grass", "f08": "minecraft:short_grass", "f09": "minecraft:short_grass", "f10": "minecraft:short_grass", "f11": "minecraft:fern"}[scene]
     rocks = ["minecraft:stone", "minecraft:cobblestone", "minecraft:mossy_cobblestone"]
     commands = []
     rng = random.Random(f"{scene}:{seed}:under")
     for i, (x, z) in enumerate(points):
-        if i % 2 == 0:
+        if i % 2 == 0 and scene != "f02":
             ux, uz = x + rng.randint(-6, 6), z + rng.randint(-6, 6)
             if (abs(ux) <= 90 and abs(uz) <= 90
                     and _undergrowth_spot(scene, seed, ux, uz)
@@ -461,8 +583,8 @@ def _undergrowth(scene: str, ox: int, oz: int, seed: int, points: list[tuple[int
 def feature_commands(scene: str, seed: int, origin: tuple[int, int]) -> list[str]:
     ox, oz = origin
     points = trees(scene, seed)
-    landmark = hero_index(scene, seed)
-    builders = {"f02": _oak, "f03": _spruce, "f04": _birch, "f08": _oak, "f09": _oak, "f10": _birch, "f11": _spruce}
+    landmark = hero_index(scene, seed) if points else -1
+    builders = {"f02": _charred, "f03": _spruce, "f04": _birch, "f08": _oak, "f09": _oak, "f10": _birch, "f11": _spruce}
     commands: list[str] = []
     for i, (x, z) in enumerate(points):
         commands.extend(builders[scene](ox, oz, seed, x, z, scene, hero=(i == landmark)))
@@ -492,23 +614,29 @@ def _peak(scene: str, seed: int) -> tuple[int, int, int]:
 def metadata(scene: str, seed: int, origin: tuple[int, int]) -> dict:
     ox, oz = origin
     peak_y, peak_x, peak_z = _peak(scene, seed)
-    tx, tz = trees(scene, seed)[0]
+    pts = trees(scene, seed)
     checkpoints = {
         "soil": {"block": "minecraft:soul_sand" if scene == "f04" else PALETTES[scene][0], "pos": [ox + 1, 80, oz + 1]},
         "foundation": {"block": PALETTES[scene][1], "pos": [ox + 1, BASE_Y, oz + 1]},
-        "tree_trunk": {"block": PALETTES[scene][2], "pos": [ox + tx, height(scene, seed, tx, tz) + 1, oz + tz]},
         "peak": {"block": _surface(scene, seed, peak_x, peak_z, peak_y), "pos": [ox + peak_x, peak_y, oz + peak_z]},
         "camera": {"block": "minecraft:air", "pos": [ox + 6, 81, oz + 1]},
     }
+    if pts:
+        tx, tz = pts[0]
+        checkpoints["tree_trunk"] = {"block": PALETTES[scene][2], "pos": [ox + tx, height(scene, seed, tx, tz) + 1, oz + tz]}
     if scene == "f02":
         checkpoints["structure"] = {"block": "minecraft:stone_bricks", "pos": [ox - 24, height(scene, seed, -24, 13) + 1, oz + 13]}
     elif scene == "f03":
-        checkpoints["structure"] = {"block": "minecraft:stone_bricks", "pos": [ox + 6, 80, oz + 14]}
-        checkpoints["roof"] = {"block": "minecraft:deepslate_tiles", "pos": [ox + 6, 87, oz + 14]}
-        checkpoints["pedestal"] = {"block": "minecraft:polished_deepslate", "pos": [ox + 3, 81, oz + 14]}
+        checkpoints["structure"] = {"block": "minecraft:stone_bricks", "pos": [ox + 6, 76, oz + 14]}
+        checkpoints["roof"] = {"block": "minecraft:stone", "pos": [ox + 6, 89, oz + 14]}
+        checkpoints["pedestal"] = {"block": "minecraft:polished_deepslate", "pos": [ox + 3, 77, oz + 14]}
+        checkpoints["fang"] = {"block": "minecraft:pointed_dripstone", "pos": [ox + 7, 81, oz + 18]}
+        checkpoints["pool"] = {"block": "minecraft:water", "pos": [ox + 12, 76, oz + 22]}
     elif scene == "f04":
         checkpoints["water"] = {"block": "minecraft:water", "pos": [ox + 23, 80, oz]}
         checkpoints["plant"] = {"block": "minecraft:sugar_cane", "pos": [ox + 8, 81, oz + 2]}
+        checkpoints["crop"] = {"block": "minecraft:wheat", "pos": [ox - 6, 82, oz + 2]}
+        checkpoints["hive"] = {"block": "minecraft:beehive", "pos": [ox - 2, 83, oz + 12]}
     elif scene == "f08":
         checkpoints["display"] = {"block": "minecraft:amethyst_block", "pos": [ox + 4, 82, oz + 4]}
     elif scene == "f09":

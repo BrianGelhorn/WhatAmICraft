@@ -1,4 +1,4 @@
 FROM python:3.12-alpine
 WORKDIR /studio
-COPY dashboard.py scene_controller.py landscape.py asset_importer.py ./
+COPY dashboard.py scene_controller.py landscape.py asset_importer.py curate_assets.py ./
 ENTRYPOINT ["python", "dashboard.py"]

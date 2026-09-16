@@ -4,7 +4,6 @@ services:
     profiles: ["tools"]
     volumes:
       - ./:/studio
-      - "../aV1- REALISTIC MUSHROOMS - an EREMILIONS Bundle.zip:/studio/source-bundle.zip:ro"
       - ./uploads:/studio/uploads:ro
 
   mc:

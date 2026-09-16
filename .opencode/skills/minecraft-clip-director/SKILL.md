@@ -1,39 +1,60 @@
 ---
 name: minecraft-clip-director
-description: Use when creating, reviewing or improving Minecraft scenes, minibiomes, terrain, filming compositions or visual-property families, and implementing authorized studio datapacks.
+description: Use when designing, reviewing, blockouting, detailing, validating or implementing Minecraft scenes, minibiomes, filming compositions or visual-property families.
 ---
 
 # Minecraft Clip Director
 
-Responde en español. Distingue **familia de propiedades**, **diseño de escena** y **construcción instalada**. Una familia expresa un predicado compartido por >=2 targets con citas; no es un decorado. Nunca rebautices una escalera o puente como demostración de durabilidad.
+Responde en español. Distingue **familia**, **diseño**, **revisión visual** y **construcción instalada**. Un decorado no demuestra por sí solo una propiedad.
 
-## Etapas y alcance
+## Rutas
 
-Ejecuta las etapas que el usuario pidió explícitamente, sin pedir otra vez el mismo permiso. Diseñar no autoriza instalar; pedir una prueba en Docker sí autoriza esa implementación de prueba, no publicación ni certificación. No cambies modelo, proveedor o permisos.
+Ejecuta solo lo pedido. No añadas episodios, candidatos, familias, lore, contexto narrativo ni implementación no solicitados.
 
-- **Diseñar familia:** lee `resources/recipes.md`, `resources/scene.example.json` y solo los casos necesarios del banco. No requiere duración.
-- **Crear/mejorar escena o minibioma:** lee `resources/minibiomes.md`. Diseña desde la cámara: relieve, foco, profundidad, acción y ensayo. No exige inventar episodio ni conjuntos de candidatos si solo se prueba un decorado.
-- **Asignar a pistas:** lee `resources/template.md` y los intervalos reales. No fijes 155 frames ni inventes tres beats por familia.
-- **Implementar/probar:** lee `resources/server.md`, el generador y sus tests actuales. Una prueba visual puede seguir provisional; no equivale a una asignación certificada.
+- **Diseñar familia:** lee `resources/recipes.md` y `resources/scene.example.json`; usa citas y solo el banco necesario.
+- **Asignar pistas:** lee `resources/template.md` y los intervalos reales; no impongas duración universal.
+- **Diseñar escena:** lee `resources/minibiomes.md`; entrega intención, cámara, blockout, acción, assets, ritmo y rechazo. No edites Server.
+- **Revisar escena:** compara propósito y resultado. Por defecto no edites; devuelve defectos observables y corrección mínima.
+- **Crear blockout:** implementa solo masas, recorrido, cámara y foco; sin decoración.
+- **Detallar escena:** conserva geometría, cámara y acción aprobadas; añade solo elementos pertinentes.
+- **Implementar/probar:** lee `resources/server.md`, generador, catálogo, manifest y tests actuales. Edita Server solo ante `genera`, `implementa`, `instala` o `prueba en Docker`.
+- **Validar escena:** prueba geometría, mecánica, assets y carga. Sin capturas conserva `visual_pending`.
 
-No migres automáticamente `docs/scenes/`: sus briefs históricos no cumplen el contrato de familia. El plan de construcción es un documento aparte; no agregues campos al JSON que su validador no acepta.
+Si se piden varias rutas, ejecútalas en orden. Diseñar no autoriza instalar; implementar no autoriza publicar ni ejecutar setup sin permiso. No cambies modelo, proveedor o permisos.
 
-## Calidad visual
+## Contrato de escena
 
-No confundas neutro con plano. Mantén despejada la acción y compón primer plano, plano de acción y fondo; relieve asimétrico visible, vegetación agrupada y siluetas diferentes. Más superficie, ruido o árboles idénticos no mejoran el plano. En varias escenas cambia topografía, encuadre y distribución, no solo materiales.
+Antes del bioma fija: propósito, emoción concreta, acción y consecuencia reales, un elemento héroe, prohibidos, cámara, punto de interés y recorrido. El propósito decide el entorno: una cueva empieza por volumen, techo, acceso y oscuridad; los árboles no son candidatos por defecto.
 
-Usa `resources/minibiomes.md` para medidas, ejemplos y criterios de rechazo. HUD y objetos reales sirven en pruebas explícitas; en un quiz no reveles la respuesta antes de tiempo. Decoración y entorno tampoco deben descartar candidatos compatibles.
+## Puertas
 
-El propósito de la escena decide su contexto, no una paleta global: anota atmósfera, composición, acción, hora, clima, dificultad/reglas necesarias, riesgos y restauración en el plan Markdown. No agregues esos campos al JSON estricto de familia. Una prueba puede mostrar el bloque/acción real; un quiz conserva el spoiler hasta la pista correspondiente. `visual_pending` significa que aún faltan captura y revisión desde cámara, no que la escena esté aprobada.
+Corrige la primera que falle:
 
-## Contrato de familia
+1. **Relevancia:** cada elemento apoya acción, pertenencia ambiental, profundidad, silueta o guía; si no, elimínalo.
+2. **Blockout:** masas, horizonte, recorrido y foco se leen desde cámara antes del detalle.
+3. **Jugabilidad:** camino, línea visual, soporte, espacio y acción segura.
+4. **Assets:** tags exactos, escala, cantidad, exclusiones y zona; nunca orden alfabético ni sustitución silenciosa.
+5. **Ritmo:** anticipación, acción y consecuencia producen cambios visibles; ruido no equivale a impacto.
+6. **Prueba:** tests demuestran funcionamiento; capturas reales demuestran imagen.
 
-Incluye predicado, >=2 targets, universo conjunto y una cita por target (`episode_id`, texto literal, versión, fuente; `fact_ids` si existen). Separa parte ilustrada, límites y `audiovisual_design` (textura, sonido, entorno, cantidades, montaje). Nunca uses un objeto para probar otro ni falsees causalidad con montaje.
+Usa `resources/minibiomes.md` para arquetipos, medidas y rechazo. `visual_pending` significa que faltan capturas, no aprobación.
 
-Las etiquetas son literales: `documented`, `mechanics_pending`, `candidate_preservation_pending`, `visual_pending`. Una declaración no es prueba mecánica: nunca marques `verified`. Registra versiones no vacías por caso: contenido generado nuevo exige Java 26.1; el ejemplo histórico usa 1.21.5 y captura Server 1.21.11. No hay migración automática.
+## Fuentes vivas
 
-El universo no se recorta para fabricar 3→2→1. En asignación, `clue_index` elige un `M_i` y exige solo `M_i ⊆ V`, con `M_1` siempre subconjunto estricto del universo (la pista 1 debe descartar a alguien); los tres `M_i` aún se validan con >=2, reducción estricta, >=2 tras dos pistas y target único tras tres. Universo `provisional` rechaza certificación. El validador solo comprueba estructura, citas y conjuntos declarados, no verdad semántica.
+No dupliques presets aquí. Lee `Server/scene_controller.py`, `Server/generated/studio/manifest.json`, el catálogo de assets y `Server/README.md`. Los briefs históricos no son fallback. El plan Markdown de escena no pertenece al JSON de familia.
+
+## Familias
+
+Una familia es un predicado compartido por >=2 targets con citas. Incluye universo y una cita por target (`episode_id`, texto, versión, fuente y `fact_ids` si existen). Separa ilustración, límites y `audiovisual_design`; no falsees causalidad.
+
+Estados: `documented`, `mechanics_pending`, `candidate_preservation_pending`, `visual_pending`; nunca `verified` por una declaración. No recortes el universo para fabricar 3→2→1; `M_1` debe ser subconjunto estricto y un universo `provisional` no certifica.
 
 ## Entrega
 
-Para familias ejecuta `scripts/validate_scene.py <familia> --episode-bank data/quiz-copy-episodes.json`. Para escenas entrega plan, diferencias visuales y ensayo pendiente; para implementación añade tests y evidencia de carga. Sin capturas desde la cámara prevista no declares calidad visual comprobada. `resources/usage.md` contiene comandos. No despliegues al mejorar solo esta skill.
+- Diseño: contrato, blockout, assets, diferencias, ritmo y rechazo.
+- Revisión: hallazgos por impacto, sin puntuaciones inventadas.
+- Implementación: archivos, tests, manifest y carga.
+- Validación: separa técnica de visual; sin capturas, `visual_pending`.
+- Familia: ejecuta `scripts/validate_scene.py <familia> --episode-bank data/quiz-copy-episodes.json`.
+
+`resources/usage.md` contiene comandos. No despliegues al mejorar solo esta skill.

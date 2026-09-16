@@ -1,36 +1,83 @@
-# Implementación posterior
+# Implementación y prueba
 
-Leer únicamente tras autorización expresa de representación/implementación. Una familia o su validación no consume Server, no instala datapacks, no captura vanilla y no aprueba render real.
+Lee este recurso únicamente cuando el usuario autoriza crear, implementar, instalar o probar. Diseñar o revisar no autoriza cambios en Server, Docker ni mundo. Aplica primero `minibiomes.md`.
 
-La captura Server del ejemplo es Java 1.21.11; el banco histórico del ejemplo es 1.21.5 y contenido generado nuevo exige 26.1. Registrar versiones por caso, sin valores globales automáticos ni migración mecánica. Cualquier cambio en `Server`, Docker, mundo o Remotion requiere una etapa y autorización distintas.
+## Estado vivo antes de editar
 
-## Antes de generar comandos
+No uses ejemplos históricos como estado actual. Lee:
 
-- Lee el generador, tests y compose actuales; no tomes una escena antigua ni este documento como prueba del estado instalado. Aplica `minibiomes.md` a la composición, no copies una plataforma plana cambiando su ID.
-- Comprueba versión del servidor, runtime, formato del pack, IDs y estados de bloques. Si el destino no soporta la versión requerida, informa la incompatibilidad; no actualices servidor/mundo silenciosamente. Una prueba explícita sobre una versión histórica debe identificarse como tal, no como contenido nuevo validado para 26.1.
-- Declara dimension y límites reales de escritura, limpieza, chunks y cámara. Una zona de control no limita los `fill`; comprobar solapamientos entre sets. Respalda el mundo con el servidor parado antes de reemplazar construcciones; no uses `down -v` ni borres fuera de la zona reservada.
-- El plan Markdown de cada escena incluye: **atmósfera, composición, acción, hora, clima, dificultad/reglas, riesgos, snapshot/restauración y estado visual**. No cambies el JSON estricto de familia para transportarlo. Reutiliza una tabla simple del generador para presets; no inventes coordenadas con un modelo.
+1. `Server/scene_controller.py`: IDs, origen, seed, kits, contexto y ciclo de vida.
+2. `Server/landscape.py`: geometría y features reales.
+3. `Server/generated/studio/manifest.json`: límites, checkpoints, revisión y assets instalados.
+4. `Server/generated/studio/asset_catalog.json` o `Server/catalogs/all_assets.json`: tags, tamaños y fuentes.
+5. `Server/docker-compose.yaml` y `Server/README.md`: versión, mounts y comandos.
+6. `Server/tests/`: comportamiento que ya está protegido.
 
-### Contextos concretos
+Registra la versión real por prueba. No migres servidor, mundo, formato de pack ni contenido silenciosamente.
 
-| escena | contexto y composición | acción/riesgo |
-| --- | --- | --- |
-| f02 armas | crepúsculo congelado, ruinas, barricadas, cicatrices y árboles dañados fuera de una arena despejada | dummy real y ruta de ataque libre; sin mobs automáticos, fuego, TNT ni pérdida forzada de inventario |
-| f03 luz | noche congelada, santuario sobrio de piedra cubierto, baffle de entrada y pedestales sin bloques emisivos | el jugador coloca la luz real y compara antes/después; comprobar techo/volumen y no prometer nivel de luz o captura sin ensayo |
-| f04 cultivo | día congelado, ribera tranquila, parcela con agua, arena de almas y arena separadas | wart solo en arena de almas y caña junto al agua; no sugerir que crecen naturalmente juntas |
+## Alcance de implementación
 
-Captura una vez, antes del primer preset, solo los valores que se modifican. Restaura en `stop`/liberación y tras fallo de setup; no sobrescribas el snapshot al cambiar escena. Si no hay una API/consulta reversible para clima o dificultad, no los cambies y documenta el límite. En Java 1.21.11 verifica los IDs contra el servidor actual: los usados aquí son `minecraft:advance_time` y `minecraft:spawn_mobs` (snake_case); no supongas nombres camelCase. Reload/crash puede dejar el preset activo: conserva el snapshot y requiere una liberación explícita, no restablezcas reglas a ciegas al cargar.
+- **Blockout:** masas, volumen, acceso, recorrido, cámara y foco. Materiales simples; sin assets decorativos ni microdetalle.
+- **Detalle:** conserva blockout, cámara y acción aprobados. Añade paleta, vegetación, assets, sonido y acentos pertinentes.
+- **Prueba técnica:** compila, valida manifest/referencias y carga el datapack; no construye una escena sin autorización para setup.
+- **Prueba en mundo:** setup/reset/acción/stop dentro de la caja autorizada. Requiere respaldo y ausencia de una toma activa.
 
-## Construcción acotada
+No mezcles etapas para ahorrar una revisión. Una escena rectangular detallada sigue siendo una escena rectangular.
 
-1. Calcula chunks afectados y bloques por comando según los límites de la versión/configuración real. No fuerces miles de chunks ni eleves límites globales para una toma pequeña. Divide en lotes y libera solo las cargas añadidas por esta prueba.
-2. Limpia únicamente bloques/entidades propiedad del set en su caja autorizada. Construye base y volumen, superficie con relieve, elementos funcionales, vegetación sobre altura final y detalles, en ese orden. Reutiliza helpers existentes si resuelven esas operaciones.
-3. Usa variación determinista; verifica soporte de plantas, agua, hojas y bloques afectados por gravedad. Mantén libres cámara y recorrido del actor. Las coordenadas de adornos deben seguir la superficie final, no una Y fija heredada.
-4. Señala listo después del último lote ejecutado; un `schedule` o una espera fija no prueba que `fill`/`forceload` funcionaron. Revisa errores de carga, comandos y chunks en logs/consola. No confundas segundos, ticks y frames de vídeo.
-5. Reset debe cancelar tareas pendientes, asegurar chunks requeridos y restaurar estado reproducible; su firma incluye revisión de generador/contenido y escena, además de semilla/origen/pitch. Una firma vieja obliga build completo. Cambiar escena no puede encadenar varias selecciones en la misma llamada. No teletransportes jugadores ajenos; conserva bloqueos/propiedad existentes. La ejecución interna/consola no puede saltar el claim de propietario.
+## Seguridad
 
-## Ensayo y entrega
+- Declara dimensión, caja X/Y/Z, chunks, cámara, recorrido y limpieza. Comprueba solapamientos entre sets.
+- Antes de setup destructivo, detén o consulta el estado del operador, para el servidor si el respaldo lo requiere y respalda `Server/data/world` y el datapack.
+- Nunca uses `down -v`, borres `Server/data` ni limpies fuera de la caja reservada.
+- No teletransportes jugadores ajenos. Conserva claim, owner y cargas previas de terceros.
+- Captura una sola vez los valores de contexto modificados y restaura en `stop`, liberación y fallo. No restablezcas reglas a ciegas tras reload/crash.
+- Un montaje o `/reload` no autoriza `setup`.
 
-Ejecuta tests del generador y valida referencias del datapack. Después verifica dentro del servidor: setup dos veces, acción, reset, cambio de escena y stop; sin restos, tareas tardías ni cargas abandonadas. Consulta primero jugador/owner/escena: no hagas reload o setup sobre una toma activa. Montar archivos no demuestra que Minecraft aceptó las funciones.
+## Construcción
 
-Revisa desde la cámara prevista los criterios de `minibiomes.md`, con capturas reales y overlays cuando corresponda. Replay Mod es del cliente: especifica por separado construcción, actuación manual, cámara y exportación. Entrega versión, comandos realmente instalados, resultado de tests/logs y lo que falta ensayar. No declares render, mecánica o calidad visual aprobados por un PASS estructural.
+1. Reutiliza helpers existentes; no copies miles de comandos ni inventes coordenadas de cada árbol.
+2. Construye base, masas/volumen, superficie, elementos funcionales, assets grandes y detalle, en ese orden.
+3. Usa variación determinista y registra seed/origen/revisión.
+4. Coloca decoración sobre altura final y verifica soporte, gravedad, agua, hojas y colisiones.
+5. Mantén libres cámara, línea visual, recorrido y zona de acción.
+6. Filtra assets por política semántica, tamaño y zona antes de leer/colocar estructuras. Si no hay candidato, usa ninguno.
+7. Divide por límites reales de comandos/bloques. Señala listo solo tras último lote y checkpoints.
+8. Reset cancela tareas, asegura chunks y compara firma completa; una revisión distinta obliga build completo.
+
+## Pruebas automáticas
+
+Ejecuta las pruebas existentes y añade la prueba mínima que falle por el cambio. Cubre según aplique:
+
+- continuidad de base, límites y volumen de `fill`;
+- recorrido con suelo y dos bloques de aire;
+- línea cámara-foco;
+- ausencia de peligros no pedidos en la acción;
+- techo/oclusión de cielo en cuevas;
+- contención de agua y soporte de plantas;
+- tags, tamaño, cantidad, exclusiones y zonas de assets en manifest;
+- referencias de funciones y cancelación de schedules;
+- setup/reset repetibles y checkpoints finales.
+
+Los checks de un bloque no demuestran naturalidad. Para formas orgánicas prueba también variación de planta, anchura o techo; una gran caja de aire con cuatro estalactitas no pasa como cueva.
+
+## Secuencia de verificación
+
+1. Ejecuta unit tests del generador y skill.
+2. Compila el datapack.
+3. Revisa `manifest.json`: límites, comandos, assets, tags, fuentes y checkpoints.
+4. Confirma que Docker ve exactamente las escenas y estructuras esperadas.
+5. Consulta owner/escena activa antes de `/reload` o setup.
+6. Recarga y revisa logs por funciones, IDs o estados rechazados.
+7. Si fue autorizado: setup dos veces, recorrido, acción, reset, cambio de escena y stop.
+8. Captura entrada, cámara principal, acción/consecuencia, lateral y 9:16 con overlays.
+
+Entrega por separado:
+
+- versión y comandos realmente ejecutados;
+- tests y logs;
+- manifest y política de assets;
+- observaciones por captura;
+- pendientes técnicos;
+- `visual_pending` mientras falte revisión desde cliente.
+
+Replay Mod pertenece al cliente. Construcción, actuación, cámara y exportación son etapas distintas. No declares render, mecánica ni calidad visual aprobados por un PASS estructural.

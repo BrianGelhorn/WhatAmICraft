@@ -14,9 +14,21 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-SOURCE_PATTERN = "*MUSHROOM*.zip"
-MOUNTED_SOURCE = ROOT / "source-bundle.zip"
 STRUCTURE_DIR = "data/studio/structure/assets"
+SCENE_ASSET_POLICY = {
+    "f02": {
+        "slots": (("dead_organic", (-54, -8)), ("rock", (48, -8)), ("rock", (-42, 48))),
+        "max_size": (18, 32, 18), "max_blocks": 5_000,
+    },
+    "f03": {
+        "slots": (("rock", (-16, 4)), ("rock", (22, 8))),
+        "max_size": (14, 14, 14), "max_blocks": 2_000,
+    },
+    "f04": {
+        "slots": (("farm_tree", (-42, 18)), ("farm_tree", (46, 34)), ("shrub", (-34, 58))),
+        "exclude_tags": ("dead_organic",), "max_size": (18, 32, 18), "max_blocks": 3_000,
+    },
+}
 
 
 class UnsupportedSchematic(ValueError):
@@ -218,6 +230,30 @@ def _name_info(filename: str) -> tuple[str, str, int]:
     return _safe_id(family), variant.lower(), int(count)
 
 
+def _asset_tags(family: str, source: str, archive: str) -> list[str]:
+    text = _safe_id(" ".join((family, source, archive)))
+    tags = {"organic", "bundle"}
+    shrub = bool(re.search(r"(^|_)(bush|shr|shrub)(_|$)", text))
+    dead = bool(re.search(r"(^|_)(dead|deadtree|stump)(_|$)", text))
+    if re.search(r"(^|_)(roc|rock|rocks|stone|boulder)(_|$)", text) or "epic_rocks" in text:
+        tags.add("rock")
+    if shrub:
+        tags.add("shrub")
+    if dead:
+        tags.add("dead_organic")
+        if not shrub:
+            tags.update(("tree", "dead_tree"))
+    elif re.search(r"(^|_)(bir|birch|oak|che|cherry|wil|willow)(_|$)", text):
+        tags.update(("tree", "temperate_tree", "farm_tree"))
+    elif re.search(r"(^|_)(pin|pine|fir)(_|$)", text):
+        tags.update(("tree", "temperate_tree", "conifer"))
+    elif re.search(r"(^|_)(bao|baobab|jung|jungle|pal|palm|mang|tree)(_|$)", text) or "tree_bundle" in text:
+        tags.add("tree")
+    if any(word in text for word in ("mushroom", "amanita", "morel", "boletus", "parasol")):
+        tags.add("mushroom")
+    return sorted(tags)
+
+
 def _legacy_schematic(blob: bytes) -> tuple[dict, dict]:
     root = NBT(gzip.decompress(blob)).root()
     width, height, length = (int(root[key]) for key in ("Width", "Height", "Length"))
@@ -295,7 +331,7 @@ def _typed(value):
     if isinstance(value, bool):
         return (1, int(value))
     if isinstance(value, int):
-        return (3, value)
+        return (3 if -(2**31) <= value < 2**31 else 4, value)
     if isinstance(value, float):
         return (6, value)
     if isinstance(value, str):
@@ -330,14 +366,13 @@ def find_sources() -> list[Path]:
         paths = []
         for value in selected.split(os.pathsep):
             candidate = Path(value)
-            if candidate.parent != ROOT / "uploads" or candidate.suffix.lower() != ".zip" or not candidate.is_file():
-                raise ValueError("STUDIO_ASSET_ZIPS must name ZIPs in /studio/uploads")
+            if (candidate.parent != ROOT / "uploads" or not candidate.name.endswith("-compatible.zip")
+                    or not candidate.is_file()):
+                raise ValueError("STUDIO_ASSET_ZIPS must name *-compatible.zip files in /studio/uploads")
             paths.append(candidate)
         return paths
-    if MOUNTED_SOURCE.is_file() and zipfile.is_zipfile(MOUNTED_SOURCE):
-        return [MOUNTED_SOURCE]
-    candidates = [path for path in sorted(ROOT.parent.glob(SOURCE_PATTERN)) if zipfile.is_zipfile(path)]
-    return candidates[:1]
+    uploads = [path for path in sorted((ROOT / "uploads").glob("*-compatible.zip")) if zipfile.is_zipfile(path)]
+    return uploads
 
 
 def _read_structure(path: Path) -> dict:
@@ -378,9 +413,11 @@ def inspect_bundle(source: Path) -> dict:
                 while asset_id in used:
                     asset_id = f"{family}_{variant}_{suffix}"
                     suffix += 1
+                tags = _asset_tags(family, name, source.name)
                 catalog.append({"id": asset_id, "family": family, "variant": variant,
                                 "source": name, "filename_blocks": filename_count, **meta,
-                                "scenes": ["f03", "f09", "f10", "f11"]})
+                                "tags": tags, "scenes": [scene for scene, policy in SCENE_ASSET_POLICY.items()
+                                                           if any(tag in tags for tag, _ in policy["slots"])]})
             except Exception as error:
                 warnings.append(f"{name}: not imported ({error})")
     world = bool(summary["level_dat"] or summary["region_files"])
@@ -442,7 +479,13 @@ def import_bundles(out: Path, sources: list[Path]) -> list[dict]:
                     asset_id = f"{asset_id}_{suffix}"
                     target = structure_root / f"{asset_id}.nbt"
                 target.write_bytes(_encode_structure(structure))
-                catalog.append({"id": asset_id, "archive": source.name, "family": family, "variant": variant, "source": Path(info.filename).name, "filename_blocks": filename_count, **meta, "tags": ["organic", "bundle"], "scenes": ["f03", "f09", "f10", "f11"]})
+                source_name = Path(info.filename).name
+                tags = _asset_tags(family, source_name, source.name)
+                catalog.append({"id": asset_id, "archive": source.name, "family": family,
+                                "variant": variant, "source": source_name,
+                                "filename_blocks": filename_count, **meta, "tags": tags,
+                                "scenes": [scene for scene, policy in SCENE_ASSET_POLICY.items()
+                                           if any(tag in tags for tag, _ in policy["slots"])]})
     catalog.sort(key=lambda item: item["id"])
     names = [source.name for source in sources]
     (out / "asset_catalog.json").write_text(json.dumps({"source": names[0] if len(names) == 1 else names, "count": len(catalog), "assets": catalog}, indent=2, sort_keys=True), encoding="utf-8")
@@ -454,24 +497,32 @@ def import_bundle(out: Path) -> list[dict]:
 
 
 def placement_commands(scene: str, seed: int, origin: tuple[int, int], catalog: list[dict], height_fn, structure_root: Path | None = None) -> tuple[list[str], dict | None]:
-    if scene != "f11" or not catalog:
+    policy = SCENE_ASSET_POLICY.get(scene)
+    if not policy or not catalog:
         return [], None
-    selected = []
-    families = set()
-    tree_assets = [item for item in catalog if any(word in item.get("archive", "").lower() for word in ("tree", "desert"))]
-    if not tree_assets:
-        return [], None
-    ordered = sorted(tree_assets, key=lambda item: (item.get("archive", ""), item["family"], item["id"]))
-    for asset in ordered:
-        if asset["family"] in families:
+    selected, used_ids, used_families = [], set(), set()
+    max_width, max_height, max_length = policy["max_size"]
+    for tag, point in policy["slots"]:
+        candidates = [item for item in catalog
+                      if tag in item.get("tags", ())
+                      and not set(item.get("tags", ())).intersection(policy.get("exclude_tags", ()))
+                      and item["id"] not in used_ids
+                      and item["family"] not in used_families
+                      and item.get("blocks", 0) <= policy["max_blocks"]
+                      and item.get("size", [10**9] * 3)[0] <= max_width
+                      and item.get("size", [10**9] * 3)[1] <= max_height
+                      and item.get("size", [10**9] * 3)[2] <= max_length]
+        if not candidates:
             continue
-        families.add(asset["family"])
-        selected.append(asset)
-        if len(selected) == 8:
-            break
-    points = [(-18, 8), (18, 12), (-28, 34), (30, 42), (-8, 54), (22, 66), (-42, 58), (44, 24)]
+        asset = min(candidates, key=lambda item: hashlib.sha256(
+            f"{scene}:{seed}:{tag}:{item['archive']}:{item['id']}".encode()).digest())
+        selected.append((asset, point, tag))
+        used_ids.add(asset["id"])
+        used_families.add(asset["family"])
+    if not selected:
+        return [], None
     commands = []
-    for index, (asset, (x, z)) in enumerate(zip(selected, points)):
+    for index, (asset, (x, z), _tag_name) in enumerate(selected):
         y = height_fn(scene, seed, x, z) + 1
         rotation = ("none", "clockwise_90", "counterclockwise_90")[(seed + index) % 3]
         if structure_root is None:
@@ -485,4 +536,8 @@ def placement_commands(scene: str, seed: int, origin: tuple[int, int], catalog: 
                 commands.append(f"setblock {origin[0] + x + tx} {y + block['pos'][1]} {origin[1] + z + tz} {_state_text(state)}")
     marker = [origin[0] + 14, 81, origin[1] + 1]
     commands.append(f"setblock {marker[0]} {marker[1]} {marker[2]} minecraft:structure_void")
-    return commands, {"block": "minecraft:structure_void", "pos": marker, "assets": [asset["id"] for asset in selected], "placement": "blocks" if structure_root else "templates"}
+    return commands, {"block": "minecraft:structure_void", "pos": marker,
+                      "assets": [asset["id"] for asset, _, _ in selected],
+                      "asset_tags": [tag for _, _, tag in selected],
+                      "sources": sorted({asset["archive"] for asset, _, _ in selected}),
+                      "placement": "blocks" if structure_root else "templates"}

@@ -59,7 +59,8 @@ class StudioTests(unittest.TestCase):
                 self.assertEqual(len(columns), landscape.SIZE * landscape.SIZE)
                 self.assertTrue(all(columns[x, z] == y - 1 for (x, z), y in h.items()))
                 self.assertEqual(commands, landscape.terrain_commands(scene, controller.SEED, (0, 0)))
-                self.assertNotEqual(landscape.trees(scene, 11), landscape.trees(scene, 22))
+                if landscape.trees(scene, controller.SEED):
+                    self.assertNotEqual(landscape.trees(scene, 11), landscape.trees(scene, 22))
         self.assertGreaterEqual(landscape.metadata("f03", controller.SEED, (0, 0))["heightmap"]["peak"], 100)
 
     def test_features_match_terrain_and_runtime_checkpoints(self):
@@ -70,10 +71,10 @@ class StudioTests(unittest.TestCase):
             for name, point in info["checkpoints"].items():
                 with self.subTest(scene=scene, point=name):
                     self.assertEqual(placed_block(commands, point["pos"]), point["block"])
-            totals = {"f02": 105, "f03": 93, "f04": 102, "f08": 98, "f09": 102, "f10": 96, "f11": 96}
+            totals = {"f02": 105, "f03": 0, "f04": 102}
             points = landscape.trees(scene, seed)
             self.assertEqual(len(points), totals[scene])
-            build = {"f02": landscape._oak, "f03": landscape._spruce, "f04": landscape._birch, "f08": landscape._oak, "f09": landscape._oak, "f10": landscape._birch, "f11": landscape._spruce}[scene]
+            build = {"f02": landscape._charred, "f03": landscape._spruce, "f04": landscape._birch}[scene]
             log = landscape.PALETTES[scene][2]
             for x, z in points:
                 y = landscape.height(scene, seed, x, z)
@@ -84,26 +85,53 @@ class StudioTests(unittest.TestCase):
                                                and int(p[3]) <= z <= int(p[6]))(c.split())
                     for c in own), (scene, x, z))
                 self.assertGreaterEqual(landscape._plot_distance(scene, x, z), 10)
-            tuft = {"f03": "minecraft:moss_carpet", "f08": "minecraft:tuff", "f10": "minecraft:azure_bluet", "f11": "minecraft:fern"}.get(scene, "minecraft:short_grass")
-            self.assertGreaterEqual(sum(1 for c in commands if c.endswith(tuft)), 6)
+            tuft = {"f02": "minecraft:dead_bush", "f03": "minecraft:moss_carpet", "f08": "minecraft:tuff", "f10": "minecraft:azure_bluet", "f11": "minecraft:fern"}.get(scene, "minecraft:short_grass")
+            if points:
+                self.assertGreaterEqual(sum(1 for c in commands if c.endswith(tuft)), 6)
             self.assertGreaterEqual(sum(1 for c in commands if c.endswith("minecraft:cobblestone") or "mossy_cobblestone" in c), 6)
             for p in ((6, 81, 1), (6, 82, 1)):
                 self.assertEqual(placed_block(commands, p), "minecraft:air")
         f03 = landscape.terrain_commands("f03", seed, (0, 0)) + landscape.feature_commands("f03", seed, (0, 0))
-        self.assertEqual(placed_block(f03, (6, 87, 14)), "minecraft:deepslate_tiles")
-        self.assertEqual(placed_block(f03, (3, 81, 14)), "minecraft:polished_deepslate")
+        self.assertEqual(placed_block(f03, (6, 89, 14)), "minecraft:stone")
+        self.assertEqual(placed_block(f03, (3, 77, 14)), "minecraft:polished_deepslate")
+        self.assertEqual(placed_block(f03, (12, 76, 22)), "minecraft:water")
+        self.assertEqual(placed_block(f03, (7, 81, 18)), "minecraft:pointed_dripstone")
         self.assertFalse(any("lantern" in command or "glowstone" in command for command in f03))
+
+    def test_scene_semantics_path_occlusion_and_safe_action(self):
+        seed = controller.SEED
+        cave = landscape.terrain_commands("f03", seed, (0, 0)) + landscape.feature_commands("f03", seed, (0, 0))
+        path = ((5, 80, 4), (5, 79, 5), (6, 78, 6), (6, 77, 7), (7, 75, 8))
+        for x, feet, z in path:
+            self.assertNotIn(placed_block(cave, (x, feet - 1, z)), (None, "minecraft:air", "minecraft:water"))
+            self.assertEqual(placed_block(cave, (x, feet, z)), "minecraft:air")
+            self.assertEqual(placed_block(cave, (x, feet + 1, z)), "minecraft:air")
+        cave_columns = [line.split() for line in cave if line.startswith("fill ")]
+        organic_air = [p for p in cave_columns if p[1] == p[4] and p[7] == "minecraft:air"
+                       and 0 <= int(p[1]) <= 16 and 8 <= int(p[3]) <= 28]
+        self.assertGreater(len(organic_air), 200)
+        self.assertGreaterEqual(len({int(p[5]) for p in organic_air}), 4)
+        for x, z in ((3, 12), (8, 18), (12, 24)):
+            self.assertEqual(placed_block(cave, (x, 89, z)), "minecraft:stone")
+
+        battlefield = landscape.terrain_commands("f02", seed, (0, 0)) + landscape.feature_commands("f02", seed, (0, 0))
+        hazards = ("minecraft:lava", "minecraft:fire", "minecraft:soul_fire", "minecraft:magma_block",
+                   "minecraft:cactus", "minecraft:campfire")
+        self.assertFalse(any(any(hazard in line for hazard in hazards) for line in battlefield))
+        for z in range(1, 5):
+            self.assertEqual(placed_block(battlefield, (6, 82, z)), "minecraft:air")
 
     def test_tree_variants_hero_and_undergrowth(self):
         seed = controller.SEED
         for scene in controller.SCENES:
             points = landscape.trees(scene, seed)
-            self.assertEqual(
-                {landscape.variant(scene, seed, x, z) for x, z in points}, {0, 1, 2})
-            hero = landscape.hero_index(scene, seed)
-            bases = [landscape.height(scene, seed, x, z) for x, z in points]
-            self.assertTrue(0 <= hero < len(points))
-            self.assertEqual(bases[hero], max(bases))
+            if points:
+                self.assertEqual(
+                    {landscape.variant(scene, seed, x, z) for x, z in points}, {0, 1, 2})
+                hero = landscape.hero_index(scene, seed)
+                bases = [landscape.height(scene, seed, x, z) for x, z in points]
+                self.assertTrue(0 <= hero < len(points))
+                self.assertEqual(bases[hero], max(bases))
         bush = landscape._bush(0, 0, 5, 80, 5, "minecraft:oak_leaves")
         self.assertEqual(len(bush), 6)
         self.assertTrue(all("persistent=true" in line for line in bush))
@@ -111,7 +139,7 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(len(logs), 4)
         for k, line in enumerate(logs):
             y = landscape.height("f02", seed, 20 + k, 20) + 1
-            self.assertIn(f"setblock {20+k} {y} 20 minecraft:oak_log", line)
+            self.assertIn(f"setblock {20+k} {y} 20 minecraft:dark_oak_log", line)
         self.assertFalse(landscape._undergrowth_spot("f02", seed, 6, 4))
         self.assertFalse(landscape._undergrowth_spot("f03", seed, 6, 14))
         self.assertFalse(landscape._undergrowth_spot("f04", seed, 23, 0))
@@ -137,8 +165,14 @@ class StudioTests(unittest.TestCase):
             controller.build()
             functions = controller.OUT / "data/studio/function"
             manifest = json.loads((controller.OUT / "manifest.json").read_text())
-            self.assertEqual(manifest["asset_catalog_count"], 176)
-            self.assertNotIn("assets", manifest["scenes"]["f11"])
+            catalog = json.loads((controller.OUT / "asset_catalog.json").read_text())["assets"]
+            self.assertEqual(manifest["asset_catalog_count"], len(catalog))
+            allowed = {"f02": {"dead_organic", "rock"}, "f03": {"rock"},
+                       "f04": {"farm_tree", "shrub"}}
+            for scene_name, info in manifest["scenes"].items():
+                self.assertLessEqual(len(info.get("assets", [])),
+                                     len(asset_importer.SCENE_ASSET_POLICY[scene_name]["slots"]))
+                self.assertTrue(set(info.get("asset_tags", ())) <= allowed[scene_name])
             self.assertTrue(list((controller.OUT / "data/studio/structure/assets").glob("*.nbt")))
             self.assertFalse((controller.OUT / "data/studio/structures").exists())
             self.assertEqual(manifest["seed"], controller.SEED)
@@ -171,7 +205,6 @@ class StudioTests(unittest.TestCase):
                     if match:
                         ticks.setdefault(int(match.group(1)), []).append((match.group(2), match.group(3)))
                 self.assertEqual(sorted(ticks), list(range(info["tick_count"])))
-                catalog = asset_importer.import_bundle(controller.OUT)
                 expected_commands = landscape.terrain_commands(scene, controller.SEED, controller.origins()[scene]) + landscape.feature_commands(scene, controller.SEED, controller.origins()[scene])
                 expected_commands += asset_importer.placement_commands(scene, controller.SEED, controller.origins()[scene], catalog, landscape.height, controller.OUT / asset_importer.STRUCTURE_DIR)[0]
                 expected = [(c.split()[0], " ".join(c.split()[1:])) for c in expected_commands]
@@ -265,7 +298,7 @@ class StudioTests(unittest.TestCase):
             self.assertNotIn("clear @s", alltext)
             self.assertNotIn("tp @a", alltext)
             self.assertIn("if loaded", alltext)
-            self.assertEqual((functions / "next.mcfunction").read_text().count("run return run function studio:scene/"), 7)
+            self.assertEqual((functions / "next.mcfunction").read_text().count("run return run function studio:scene/"), 3)
             self.assertNotIn("studio:reset", (functions / "stop.mcfunction").read_text())
             self.assertIn("with storage studio:runtime loads[0]", (functions / "release_added.mcfunction").read_text())
             self.assertIn("$(x) $(z)", (functions / "release_one.mcfunction").read_text())
@@ -303,7 +336,8 @@ class StudioTests(unittest.TestCase):
         self.assertIn("!landscape.py", (ROOT / ".dockerignore").read_text())
         self.assertIn("landscape.py", (ROOT / "Dockerfile").read_text())
         self.assertIn("asset_importer.py", (ROOT / "Dockerfile").read_text())
-        self.assertIn("source-bundle.zip", compose)
+        self.assertIn("curate_assets.py", (ROOT / "Dockerfile.dashboard").read_text())
+        self.assertNotIn("source-bundle.zip", compose)
 
 
 if __name__ == "__main__":

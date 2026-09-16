@@ -17,9 +17,11 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 import asset_importer
+import curate_assets
 
 ROOT = Path(__file__).parent
 UPLOADS, CATALOGS, STATE = ROOT / "uploads", ROOT / "catalogs", ROOT / "dashboard_state.json"
+LIBRARY_BUNDLES = ROOT / "library" / "bundles"
 MASTER_CATALOG = "all_assets.json"
 MAX_UPLOAD = 128 * 1024 * 1024
 MAX_MEMBERS, MAX_UNPACKED = 2_000, 512 * 1024 * 1024
@@ -134,7 +136,7 @@ def _merged_catalog(source: Path, result: dict) -> dict:
     }
 
 
-def scan(source: Path) -> None:
+def scan(source: Path, active: Path | None = None) -> None:
     if not JOB_LOCK.acquire(blocking=False):
         raise RuntimeError("A scan is already running")
     JOB.update(state="running", message=f"Scanning {source.name}", started=time.time())
@@ -142,7 +144,19 @@ def scan(source: Path) -> None:
     def worker() -> None:
         try:
             result = asset_importer.inspect_bundle(source)
-            result = _merged_catalog(source, result)
+            catalog_source = source
+            if active is not None:
+                curation = curate_assets.curate(source, active)
+                curated = asset_importer.inspect_bundle(active)
+                curated["kind"], curated["members"] = result["kind"], result["members"]
+                curated["warnings"] = [f"Curation omitted {curation['rejected']} incompatible or oversized schematics."] if curation["rejected"] else []
+                result, catalog_source = curated, active
+                if not curation["kept"]:
+                    active.unlink(missing_ok=True)
+                    catalog_source = source
+                save_state({"selected_zip": active.name if active.is_file() else None,
+                            "catalog_file": MASTER_CATALOG})
+            result = _merged_catalog(catalog_source, result)
             CATALOGS.mkdir(exist_ok=True)
             target = CATALOGS / MASTER_CATALOG
             temporary = target.with_suffix(".tmp")
@@ -227,7 +241,7 @@ class Dashboard(BaseHTTPRequestHandler):
             self.error(HTTPStatus.BAD_REQUEST, str(error))
 
     def build(self) -> None:
-        sources = sorted(UPLOADS.glob("*.zip"))
+        sources = sorted(UPLOADS.glob("*-compatible.zip"))
         environment = os.environ.copy()
         environment.pop("STUDIO_ASSET_ZIP", None)
         environment.pop("STUDIO_ASSET_ZIPS", None)
@@ -254,17 +268,22 @@ class Dashboard(BaseHTTPRequestHandler):
             raise ValueError("Upload exceeds 128 MiB")
         safe_zip(raw)
         stem = re.sub(r"[^a-zA-Z0-9._-]+", "_", Path(item.filename).stem).strip("._") or "archive"
-        UPLOADS.mkdir(exist_ok=True)
-        target = UPLOADS / f"{stem}.zip"
+        LIBRARY_BUNDLES.mkdir(parents=True, exist_ok=True)
+        target = LIBRARY_BUNDLES / f"{stem}.zip"
         for number in range(2, 10_000):
             if not target.exists():
                 break
-            target = UPLOADS / f"{stem}-{number}.zip"
+            target = LIBRARY_BUNDLES / f"{stem}-{number}.zip"
         temporary = target.with_suffix(".upload")
         temporary.write_bytes(raw)
         temporary.replace(target)
-        save_state({"selected_zip": target.name, "catalog_file": MASTER_CATALOG})
-        scan(target)
+        UPLOADS.mkdir(exist_ok=True)
+        active = UPLOADS / f"{target.stem}-compatible.zip"
+        for number in range(2, 10_000):
+            if not active.exists():
+                break
+            active = UPLOADS / f"{target.stem}-compatible-{number}.zip"
+        scan(target, active)
         self.send_json(status(), 202)
 
 

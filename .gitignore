@@ -47,3 +47,5 @@ Server/generated/
 Server/dashboard_state.json
 Server/uploads/
 Server/catalogs/
+Server/library/*
+!Server/library/README.md

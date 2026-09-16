@@ -17,34 +17,22 @@ ORIGIN = [120, 14]
 PITCH = 1152
 SEED = 20260915
 CONTENT_REVISION = "scene-assets-1"
-SCENES = ("f02", "f03", "f04", "f08", "f09", "f10", "f11")
+SCENES = ("f02", "f03", "f04")
 KITS = {
     "f02": ["minecraft:mace", "minecraft:trident"],
     "f03": ["minecraft:sea_lantern", "minecraft:soul_lantern"],
     "f04": ["minecraft:nether_wart", "minecraft:sugar_cane"],
-    "f08": ["minecraft:amethyst_block", "minecraft:calcite"],
-    "f09": ["minecraft:goat_horn", "minecraft:recovery_compass"],
-    "f10": ["minecraft:kelp", "minecraft:glow_berries"],
-    "f11": [],
 }
 BRIEFS = {
-    "f02": "Ataca al dummy en la arena despejada. Reset repone el dummy; no certifica mecanicas.",
-    "f03": "Entra al santuario oscuro y coloca una luz real en cada pedestal. Reset retira la anterior.",
-    "f04": "Planta wart en arena de almas y cana en la arena junto al canal de agua; son sustratos distintos.",
-    "f08": "Colocá amethyst y calcita reales en sus pedestales y comparalos. Reset repone la muestra.",
-    "f09": "Sostené y usá cuerno y brújula mostrando el HUD sin barra de durabilidad.",
-    "f10": "Plantá kelp en la arena bajo el agua y mostrá las bayas en mano. Reset restaura la pileta.",
-    "f11": "Recorré el bosque fúngico y compará las variantes colocadas. Los assets vienen del catálogo del bundle.",
+    "f02": "Ataca al dummy en la arena del campo de batalla. Reset repone el dummy; no certifica mecanicas.",
+    "f03": "Desciende a la cueva oscura y coloca una luz real en cada pedestal. Reset retira la anterior.",
+    "f04": "Cosecha en los bancales dorados; wart en arena de almas y cana junto al canal, sustratos distintos.",
 }
 CONTEXTS = {
     # spawn_mobs and advance_time are the Java 1.21.11 namespaced snake-case IDs.
-    "f02": {"atmosphere": "crepusculo de batalla", "composition": "ruinas y barricadas alrededor de arena libre", "action": "ataque real al dummy", "time": 14000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "sin mobs, fuego, TNT ni perdida forzada"},
-    "f03": {"atmosphere": "noche sobria para prueba de luz", "composition": "santuario cubierto, baffle y pedestales oscuros", "action": "colocar luz real y comparar", "time": 18000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "sin decoracion emisiva; requiere ensayo visual"},
-    "f04": {"atmosphere": "dia calmo de cultivo", "composition": "ribera, parcela y canal", "action": "cultivo con sustratos separados", "time": 1000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "wart y cana no comparten sustrato natural"},
-    "f08": {"atmosphere": "mediodía neutro de cantera", "composition": "pedestales de muestra sobre piedra", "action": "comparar bloques reales en pedestales", "time": 6000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "sin mena identificable en el fondo; requiere ensayo visual"},
-    "f09": {"atmosphere": "atardecer de uso en mano", "composition": "senda de pradera sin estructuras", "action": "sostener y usar items mostrando HUD", "time": 14000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "HUD sin barra a la vista; inventario limpio"},
-    "f10": {"atmosphere": "mañana húmeda de ribera", "composition": "pileta contenida con arena", "action": "plantar kelp bajo agua y mostrar bayas", "time": 1000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "bayas en mano, no enredadera; agua contenida"},
-    "f11": {"atmosphere": "bosque húmedo al amanecer", "composition": "claro de podzol con hongos variados", "action": "comparar formas y escalas de los assets", "time": 1000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "escena experimental; assets externos convertidos al build"},
+    "f02": {"atmosphere": "campo de batalla hostil al crepusculo", "composition": "crateres, agujas de basalto, brasas y troncos calcinados alrededor de arena libre", "action": "ataque real al dummy", "time": 14000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "sin lava, fuego ni bloques con dano; arena sin peligros"},
+    "f03": {"atmosphere": "oscuridad total de cueva", "composition": "gran sala de piedra con estalactitas, poza, huesos y pedestales tras acantilado", "action": "entrar en la cueva y colocar luz real", "time": 18000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "oscuridad real; sin decoracion emisiva; requiere ensayo visual"},
+    "f04": {"atmosphere": "manana vibrante de cosecha", "composition": "ribera, parcelas, bancales dorados, colmenas y flores", "action": "cosecha en bancales y cultivo con sustratos separados", "time": 1000, "weather": "unchanged", "difficulty": "unchanged", "gamerules": {"minecraft:advance_time": False, "minecraft:spawn_mobs": False}, "risks": "wart y cana no comparten sustrato natural"},
 }
 
 
@@ -151,7 +139,7 @@ def build():
             *[f"gamerule {rule} {'true' if value else 'false'}" for rule, value in context["gamerules"].items()],
         ])
     write("data/studio/function/help.mcfunction", [
-        'tellraw @s {"text":"Studio: scene/f02/setup (colinas), f03/setup (santuario), f04/setup (ribera), f08/setup (cantera), f09/setup (pradera), f10/setup (pileta), f11/setup (bosque fungico). Luego start, reset, next o stop. Inventario conservado.","color":"gold"}',
+        'tellraw @s {"text":"Studio: scene/f02/setup (colinas), f03/setup (santuario), f04/setup (ribera). Luego start, reset, next o stop. Inventario conservado.","color":"gold"}',
         'tellraw @s {"text":"Estado: scoreboard players get #ready studio_ready. 0=cargando, 1=listo, -1=fallo. Solo se edita la caja 192x192 autorizada.","color":"gray"}',
     ])
     write("data/studio/function/claim.mcfunction", operator_guard() + [
@@ -185,8 +173,9 @@ def build():
         info = landscape.metadata(scene, SEED, (ox, oz))
         if asset_info:
             info["assets"] = asset_info["assets"]
+            info["asset_tags"] = asset_info["asset_tags"]
             info["asset_placement"] = asset_info["placement"]
-            info["asset_source"] = asset_importer.find_source().name if asset_importer.find_source() else None
+            info["asset_source"] = asset_info["sources"]
             info["checkpoints"]["asset_marker"] = {"block": asset_info["block"], "pos": asset_info["pos"]}
         info.update(tick_count=total, command_count=len(commands), write_y=[-63, 131], chunk_count=len(chunks(scene)), context=CONTEXTS[scene], content_revision=CONTENT_REVISION)
         manifest["scenes"][scene] = info

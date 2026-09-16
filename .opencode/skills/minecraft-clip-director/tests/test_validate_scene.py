@@ -4,6 +4,7 @@
 import copy
 import importlib.util
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -159,8 +160,8 @@ class FamilyTests(unittest.TestCase):
             resource = (ROOT / "resources" / file).read_text(encoding="utf-8")
             self.assertIn("minibiomes.md", resource)
         guide = (ROOT / "resources/minibiomes.md").read_text(encoding="utf-8")
-        for section in ("Disenar desde la camara", "Relieve antes que detalle", "Vegetacion, materiales y luz", "Tres composiciones de referencia", "Plan minimo antes de construir", "Puerta de calidad"):
-            self.assertIn("## " + section, guide)
+        for section in ("Promesa visual", "Puerta de relevancia", "Blockout obligatorio", "Contratos por arquetipo", "Política de assets", "Validación automática mínima", "Plan mínimo", "Revisión visual"):
+            self.assertRegex(guide, rf"## (?:\d+\. )?{re.escape(section)}")
         self.assertIn("h(x,z)+1", guide)
         self.assertIn("visual_pending", guide)
 

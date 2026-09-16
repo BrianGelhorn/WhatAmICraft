@@ -4,5 +4,6 @@
 !scene_controller.py
 !landscape.py
 !asset_importer.py
+!curate_assets.py
 !dashboard.py
 !Dockerfile.dashboard
