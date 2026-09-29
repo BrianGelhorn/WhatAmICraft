@@ -878,7 +878,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"ok": True, "service": "dashboard"})
         elif path == "/api/state":
             self.send_json(dashboard_state())
-        elif path in {"/api/clues", "/api/clue-prefabs"}:
+        elif path == "/api/clues":
             if not os.getenv("CLUES_API_URL"):
                 self.send_json({"ok": False, "error": "La API de pistas no está configurada"}, HTTPStatus.SERVICE_UNAVAILABLE)
             else:

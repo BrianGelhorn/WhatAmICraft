@@ -17,8 +17,6 @@ TEMPLATE_PATHS = (
     "package.json",
     "package-lock.json",
     "scripts/produce_quiz_copy.py",
-    "scripts/produce_mystery_v2.py",
-    "scripts/produce_mystery_prefab_gallery.py",
     "scripts/thumbnails.py",
     "scripts/video_formats.py",
 )
