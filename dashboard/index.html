@@ -109,6 +109,7 @@
     .diag-card span { display:block; color:var(--muted); font-size:12px; margin-bottom:6px; }
     .diag-card strong { font-size:21px; }
     .ok { color:var(--green); }
+    .warn { color:var(--yellow); }
     .bad { color:var(--red); }
     .diag-table { margin-top:14px; overflow-x:auto; }
     .diag-log { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
@@ -1098,10 +1099,11 @@
     function renderDiagnostics() {
       if (!diagnostics) return;
       const c = diagnostics.counts, d = diagnostics.disk, db = diagnostics.database;
-      const failingStates = new Set(['failed', 'stopped', 'unhealthy', 'missing']);
-      const healthy = diagnostics.internet && !diagnostics.services.some(service => failingStates.has(service.state));
-      $('live-status').classList.toggle('bad', !healthy);
-      $('live-status-text').textContent = healthy ? 'Sistema operativo' : 'Revisar sistema';
+      const fatal = diagnostics.services.some(service => service.severity === 'fatal');
+      const warning = diagnostics.services.some(service => service.severity === 'warning');
+      const networkDown = !diagnostics.internet;
+      $('live-status').classList.toggle('bad', networkDown || fatal || warning);
+      $('live-status-text').textContent = fatal ? 'Sistema con fallas' : networkDown ? 'Sin salida a internet' : warning ? 'Sistema con advertencias' : 'Sistema operativo';
       $('diag-internet').textContent = diagnostics.internet ? 'OK' : 'Sin salida';
       $('diag-internet').className = diagnostics.internet ? 'ok' : 'bad';
       $('diag-disk').textContent = `${d.freeGb} GB libres`;
@@ -1126,12 +1128,17 @@
       $('diag-video-url').href = diagnostics.access.publicVideos || '#';
 
       const services = diagnostics.services;
-      $('diag-services').innerHTML = services.length ? services.map(service => `
+      const severityLabels = {ok: 'Activo', warning: 'Warning', fatal: 'Fatal'};
+      $('diag-services').innerHTML = services.length ? services.map(service => {
+        const severity = service.severity || (service.state === 'stopped' ? 'fatal' : service.state === 'degraded' || service.state === 'unknown' ? 'warning' : 'ok');
+        const className = severity === 'fatal' ? 'bad' : severity === 'warning' ? 'warn' : 'ok';
+        return `
         <tr>
           <td><strong>${escapeHtml(service.name)}</strong></td>
-          <td class="${service.state === 'running' ? 'ok' : ''}">${escapeHtml(service.state)}</td>
+          <td class="${className}">${escapeHtml(severityLabels[severity] || 'Warning')}</td>
           <td>${escapeHtml(service.status)}</td>
-        </tr>`).join('') : `<tr><td colspan="3">Sin datos de servicios.</td></tr>`;
+        </tr>`;
+      }).join('') : `<tr><td colspan="3">Sin datos de servicios.</td></tr>`;
 
       $('diag-errors').textContent = diagnostics.errors.length
         ? diagnostics.errors.map(item => `${item.episodeId}: ${item.error || item.status}`).join('\n')

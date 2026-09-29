@@ -1,6 +1,6 @@
 # Prefabs visuales aprobados
 
-Consultar `GET /api/clue-prefabs` antes de seleccionar escenas. Usar únicamente registros con `status: approved`; si una relación solo tiene prefabs `draft`, devolver `needs_template_prefab`.
+Este archivo es el catálogo aprobado. Usar únicamente los prefabs documentados aquí; si una relación no tiene prefab aquí, devolver `needs_template_prefab`.
 
 ## `durability-loss`
 

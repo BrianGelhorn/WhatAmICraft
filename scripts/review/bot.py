@@ -33,6 +33,7 @@ MONITORED_LOGS = (
     ROOT / "out/logs/publisher-worker.log",
     ROOT / "out/logs/dashboard.log",
 )
+HEARTBEAT_PATH = ROOT / "out/health/bot"
 MONITOR_STARTED = time.time()
 TELEGRAM_RETRY_INITIAL_SECONDS = 5
 TELEGRAM_RETRY_MAX_SECONDS = 60
@@ -571,6 +572,8 @@ def main() -> None:
     retry_delay = float(TELEGRAM_RETRY_INITIAL_SECONDS)
     telegram_state = {"outage": False}
     while True:
+        HEARTBEAT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        HEARTBEAT_PATH.touch()
         try:
             updates = get_updates(offset)
         except Exception as error:
