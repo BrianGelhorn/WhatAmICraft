@@ -22,8 +22,27 @@ if [ -f "$app_dir/.release-version" ]; then
 fi
 
 drain_timeout="${DEPLOY_DRAIN_TIMEOUT_SECONDS:-1800}"
+production_lock_stale="${PRODUCTION_LOCK_STALE_SECONDS:-180}"
+publishing_lock_stale="${PUBLISH_LOCK_STALE_SECONDS:-21600}"
+clear_stale_lock() {
+  local lock="$1" max_age="$2" age
+  [ -e "$lock" ] || return 0
+  age=$(( $(date +%s) - $(stat -c %Y "$lock") ))
+  if [ "$age" -gt "$max_age" ]; then
+    echo "Removing stale lock: $lock"
+    rmdir "$lock" 2>/dev/null || {
+      echo "Stale lock is not empty: $lock" >&2
+      return 1
+    }
+  fi
+}
 started_at="$(date +%s)"
 while [ -e "$app_dir/out/production.lock" ] || [ -e "$app_dir/out/publishing.lock" ]; do
+  clear_stale_lock "$app_dir/out/production.lock" "$production_lock_stale" || true
+  clear_stale_lock "$app_dir/out/publishing.lock" "$publishing_lock_stale" || true
+  if [ ! -e "$app_dir/out/production.lock" ] && [ ! -e "$app_dir/out/publishing.lock" ]; then
+    break
+  fi
   if [ "$(( $(date +%s) - started_at ))" -ge "$drain_timeout" ]; then
     echo "Timed out waiting for generation/publication tasks to finish" >&2
     exit 1
@@ -63,16 +82,56 @@ if [ -d "$release_dir/data/new-clues-20260815" ]; then
     "$app_dir/data/new-clues-20260815/"
 fi
 
+# Trigger the Debian automount before migrating artifacts or advancing release markers.
+video_path="${VIDEO_STORAGE_PATH:-/srv/minecraft-videos/episodes}"
+for attempt in $(seq 1 36); do
+  [ -d "$video_path" ] && break
+  sleep 5
+done
+[ -d "$video_path" ] || {
+  echo "Production video storage is unavailable: $video_path" >&2
+  exit 1
+}
+
 release_marker="$app_dir/.release-version"
 release_marker_tmp="$release_marker.tmp"
 printf '%s\n' "$DEPLOY_SHA" > "$release_marker_tmp"
 mv -f "$release_marker_tmp" "$release_marker"
 
+runtime_release_marker="$app_dir/out/.release-version"
+runtime_release_marker_tmp="$runtime_release_marker.tmp"
+printf '%s\n' "$DEPLOY_SHA" > "$runtime_release_marker_tmp"
+mv -f "$runtime_release_marker_tmp" "$runtime_release_marker"
+
 active_marker="$app_dir/out/.active-template-version"
+active_release=""
+if [ -f "$active_marker" ]; then
+  active_release="$(<"$active_marker")"
+fi
 if [ ! -f "$active_marker" ]; then
   active_marker_tmp="$active_marker.tmp"
   printf '%s\n' "${previous_release:-legacy}" > "$active_marker_tmp"
   mv -f "$active_marker_tmp" "$active_marker"
+elif [ -n "$active_release" ] && git -C "$GITHUB_WORKSPACE" cat-file -e "$active_release^{commit}" 2>/dev/null; then
+  template_paths=(
+    src/
+    templates/
+    public/mc-assets/
+    remotion.config.ts
+    package.json
+    package-lock.json
+    scripts/produce_quiz_copy.py
+    scripts/thumbnails.py
+    scripts/video_formats.py
+  )
+  # A previous deploy may contain an unpromoted change or its later revert.
+  if git -C "$GITHUB_WORKSPACE" diff --quiet "$active_release" "$DEPLOY_SHA" -- "${template_paths[@]}"; then
+    python3 "$GITHUB_WORKSPACE/scripts/migrate_compatible_artifacts.py" \
+      --episodes-dir "$video_path" --repo "$GITHUB_WORKSPACE" --release "$DEPLOY_SHA"
+    active_marker_tmp="$active_marker.tmp"
+    printf '%s\n' "$DEPLOY_SHA" > "$active_marker_tmp"
+    mv -f "$active_marker_tmp" "$active_marker"
+  fi
 fi
 
 # Keep the user-level maintenance timer under the same GitHub-controlled release.
@@ -88,17 +147,6 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
 systemctl --user daemon-reload
 systemctl --user enable --now docker-disk-cleanup.timer
-
-# Trigger the Debian automount before Docker creates bind mounts into it.
-video_path="${VIDEO_STORAGE_PATH:-/srv/minecraft-videos/episodes}"
-for attempt in $(seq 1 36); do
-  [ -d "$video_path" ] && break
-  sleep 5
-done
-[ -d "$video_path" ] || {
-  echo "Production video storage is unavailable: $video_path" >&2
-  exit 1
-}
 
 sudo -n /usr/local/sbin/whatamicraft-up
 

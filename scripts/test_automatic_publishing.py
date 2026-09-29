@@ -19,6 +19,7 @@ import publish  # noqa: E402
 import publish_worker as worker  # noqa: E402
 import job_status  # noqa: E402
 from template_artifacts import release_version, render_props_path, write_artifact  # noqa: E402
+from test_deploy_publishing_recovery import main as check_deploy_publishing_recovery  # noqa: E402
 
 
 def check_generation_lane_guard() -> None:
@@ -64,22 +65,38 @@ def check_stale_generation_job_recovery() -> None:
     fixture.mkdir(parents=True)
     generation = fixture / "generation.json"
     main = fixture / "main.json"
-    job = {"status": "running", "source": "automatic", "pid": 999999, "owner": "", "lines": []}
+    job = {"status": "running", "source": "automatic", "pid": 999999, "owner": "", "lines": [], "updatedAt": "2026-01-01T00:00:00+00:00"}
     generation.write_text(json.dumps(job), encoding="utf-8")
     main.write_text(json.dumps({**job, "source": "manual"}), encoding="utf-8")
     original_paths = job_status.JOB_PATHS
     original_owner = os.environ.get("JOB_OWNER")
     original_alive = job_status._process_alive
+    original_start = job_status._process_start
     try:
         job_status.JOB_PATHS = {"main": main, "generation": generation, "publishing": fixture / "publishing.json"}
         os.environ["JOB_OWNER"] = "publisher-worker"
         job_status._process_alive = lambda _pid: False
         assert job_status.read_job("generation")["status"] == "failed"
         assert json.loads(generation.read_text(encoding="utf-8"))["status"] == "failed"
+        generation.write_text(json.dumps({**job, "pid": None}), encoding="utf-8")
+        assert job_status.read_job("generation")["status"] == "failed"
+        assert json.loads(generation.read_text(encoding="utf-8"))["status"] == "failed"
         assert job_status.read_job("main")["status"] == "running"
+
+        generation.write_text(json.dumps({**job, "pid": 42, "processStart": "old"}), encoding="utf-8")
+        job_status._process_alive = lambda _pid: True
+        job_status._process_start = lambda _pid: "new"
+        assert job_status.read_job("generation")["status"] == "failed"
+
+        generation.write_text(json.dumps({**job, "pid": 42, "processStart": "old"}), encoding="utf-8")
+        job_status.finish_job("completed", 0, lane="generation")
+        finished = json.loads(generation.read_text(encoding="utf-8"))
+        assert finished["status"] == "completed"
+        assert not any("interrumpida" in line for line in finished["lines"])
     finally:
         job_status.JOB_PATHS = original_paths
         job_status._process_alive = original_alive
+        job_status._process_start = original_start
         if original_owner is None:
             os.environ.pop("JOB_OWNER", None)
         else:
@@ -87,9 +104,276 @@ def check_stale_generation_job_recovery() -> None:
         shutil.rmtree(fixture, ignore_errors=True)
 
 
+
+def check_run_logged_tracks_child_pid() -> None:
+    fixture = ROOT / "out/test-worker-pid"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    recorded: dict[str, object] = {}
+    original = {
+        "log_dir": worker.LOG_DIR,
+        "cpusets": worker.CPUSETS,
+        "begin": worker.begin_job,
+        "set_pid": worker.set_job_pid,
+        "append": worker.append_job_line,
+        "finish": worker.finish_job,
+    }
+    try:
+        worker.LOG_DIR = fixture
+        worker.CPUSETS = {}
+        worker.begin_job = lambda *_args: None
+        worker.set_job_pid = lambda pid, lane="main": recorded.update(pid=pid, lane=lane)
+        worker.append_job_line = lambda *_args: None
+        worker.finish_job = lambda status, code, error=None, lane="main": recorded.update(
+            status=status, code=code, error=error, lane=lane
+        )
+        result = worker.run_logged(
+            [sys.executable, "-c", "print('ok')"],
+            "pid-tracking.log",
+            "PID tracking fixture",
+            "generation",
+        )
+        assert result.returncode == 0
+        assert isinstance(recorded.get("pid"), int)
+        assert recorded["lane"] == "generation"
+        assert recorded["status"] == "completed"
+
+        def fail_tracking(pid, lane="main"):
+            recorded.update(pid=pid, lane=lane)
+            raise RuntimeError("tracking failed")
+
+        worker.set_job_pid = fail_tracking
+        result = worker.run_logged(
+            [sys.executable, "-c", "import time; time.sleep(60)"],
+            "pid-tracking-failure.log",
+            "PID tracking failure fixture",
+            "generation",
+        )
+        assert result.returncode == 1
+        try:
+            os.kill(recorded["pid"], 0)
+        except ProcessLookupError:
+            pass
+        else:
+            raise AssertionError("tracking failure left the render child running")
+    finally:
+        worker.LOG_DIR = original["log_dir"]
+        worker.CPUSETS = original["cpusets"]
+        worker.begin_job = original["begin"]
+        worker.set_job_pid = original["set_pid"]
+        worker.append_job_line = original["append"]
+        worker.finish_job = original["finish"]
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
+def check_inventory_quarantines_stale_queue() -> None:
+    fixture = ROOT / "out/test-inventory-legacy"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    stale = {"id": "mc-stale", "format": "clues", "target": {"id": "stone", "kind": "item"}}
+    legacy = {"id": "mc-legacy", "format": "clues", "target": {"id": "dirt", "kind": "item"}}
+    legacy_video = fixture / "mc-legacy-old.mp4"
+    legacy_video.write_bytes(b"legacy-video")
+    videos = {"mc-stale": fixture / "missing.mp4", "mc-legacy": legacy_video}
+    updates: list[tuple[str, str, str | None]] = []
+    original = {
+        "episodes": worker.episodes,
+        "video_for": worker.video_for,
+        "names": worker.current_template_video_names,
+        "state": worker.publishing_state,
+        "queue_ids": worker.pending_queue_ids,
+        "queue_items": worker.queue_items,
+        "queue_status": worker.set_queue_status,
+    }
+    try:
+        worker.episodes = lambda: [stale, legacy]
+        worker.video_for = lambda episode: videos[episode["id"]]
+        worker.current_template_video_names = lambda: set()
+        worker.publishing_state = lambda: {"videos": {}}
+        worker.pending_queue_ids = lambda: ["mc-stale", "mc-legacy"]
+        worker.queue_items = lambda: []
+        worker.set_queue_status = lambda episode_id, status, error=None: updates.append((episode_id, status, error))
+        result = worker.inventory()
+        assert result["pending"] == []
+        assert result["legacy"] == ["mc-legacy"]
+        assert result["formats"]["clues"]["missing"] == ["mc-stale"]
+        assert updates == [
+            ("mc-legacy", "failed", "Video faltante o no corresponde a la plantilla activa"),
+            ("mc-stale", "failed", "Video faltante o no corresponde a la plantilla activa"),
+        ]
+    finally:
+        for name, value in original.items():
+            setattr(worker, {"episodes": "episodes", "video_for": "video_for", "names": "current_template_video_names", "state": "publishing_state", "queue_ids": "pending_queue_ids", "queue_items": "queue_items", "queue_status": "set_queue_status"}[name], value)
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
+
+
+def check_inventory_requeues_provider_failures() -> None:
+    fixture = ROOT / "out/test-inventory-retry"
+    shutil.rmtree(fixture, ignore_errors=True)
+    fixture.mkdir(parents=True)
+    episode = {"id": "mc-77", "format": "clues", "target": {"id": "stone", "kind": "item"}}
+    video = fixture / "mc-77-stone.mp4"
+    video.write_bytes(b"current-video")
+    error = "youtube: Token has been expired or revoked."
+    updates: list[tuple[str, str, str | None]] = []
+    original = {
+        "episodes": worker.episodes,
+        "video_for": worker.video_for,
+        "names": worker.current_template_video_names,
+        "state": worker.publishing_state,
+        "queue_ids": worker.pending_queue_ids,
+        "queue_items": worker.queue_items,
+        "queue_status": worker.set_queue_status,
+    }
+    try:
+        worker.episodes = lambda: [episode]
+        worker.video_for = lambda _episode: video
+        worker.current_template_video_names = lambda: {video.name}
+        worker.publishing_state = lambda: {"videos": {}}
+        worker.pending_queue_ids = lambda: []
+        worker.queue_items = lambda: [{"episodeId": "mc-77", "status": "failed", "error": error}]
+        worker.set_queue_status = lambda episode_id, status, value=None: updates.append((episode_id, status, value))
+        result = worker.inventory()
+        assert result["pending"] == ["mc-77"]
+        assert updates == [("mc-77", "pending", error)]
+    finally:
+        worker.episodes = original["episodes"]
+        worker.video_for = original["video_for"]
+        worker.current_template_video_names = original["names"]
+        worker.publishing_state = original["state"]
+        worker.pending_queue_ids = original["queue_ids"]
+        worker.queue_items = original["queue_items"]
+        worker.set_queue_status = original["queue_status"]
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
+def check_empty_stock_retries_without_waiting_hours() -> None:
+    config = {
+        "schedule": {"enabled": False},
+        "generation": {
+            "enabled": True,
+            "intervalMinutes": 180,
+            "targetStock": 8,
+            "lowStockThreshold": 5,
+            "publishGuardMinutes": 90,
+        },
+    }
+    stock = {
+        "pending": [],
+        "candidates": [],
+        "stock": [],
+        "formats": {"clues": {"missing": ["mc-01"], "pending": [], "candidates": []}},
+    }
+    saved: list[str] = []
+    original = {
+        "generation_schedule": worker.load_generation_schedule,
+        "save_generation_schedule": worker.save_generation_schedule,
+        "active_template": worker.active_template_version,
+        "release": worker.release_version,
+        "read_job": worker.read_job,
+        "publishing_active": worker.publishing_active,
+        "generation_window": worker.generation_window_open,
+        "choose_format": worker.choose_generation_format,
+        "run_logged": worker.run_logged,
+        "log": worker.log,
+    }
+    try:
+        worker.load_generation_schedule = lambda: {"nextRunAt": "2026-01-01T00:00:00+00:00"}
+        worker.save_generation_schedule = saved.append
+        worker.active_template_version = lambda: "current"
+        worker.release_version = lambda: "current"
+        worker.read_job = lambda _lane: {"status": "idle"}
+        worker.publishing_active = lambda: False
+        worker.generation_window_open = lambda *_args: True
+        worker.choose_generation_format = lambda *_args: "clues"
+        worker.run_logged = lambda *_args: SimpleNamespace(returncode=1)
+        worker.log = lambda *_args: None
+        worker.maybe_generate(config, stock)
+        retry = datetime.fromisoformat(saved[-1])
+        assert 0 < (retry - datetime.now(timezone.utc)).total_seconds() <= 5 * 60 + 5
+    finally:
+        worker.load_generation_schedule = original["generation_schedule"]
+        worker.save_generation_schedule = original["save_generation_schedule"]
+        worker.active_template_version = original["active_template"]
+        worker.release_version = original["release"]
+        worker.read_job = original["read_job"]
+        worker.publishing_active = original["publishing_active"]
+        worker.generation_window_open = original["generation_window"]
+        worker.choose_generation_format = original["choose_format"]
+        worker.run_logged = original["run_logged"]
+        worker.log = original["log"]
+
+
+def check_worker_startup_wakes_empty_stock() -> None:
+    config = {"schedule": {"enabled": False}, "generation": {"enabled": True, "lowStockThreshold": 5}}
+    saved: list[str] = []
+    original = {
+        "config": worker.load_config,
+        "runtime": worker.apply_runtime,
+        "inventory": worker.inventory,
+        "save_generation_schedule": worker.save_generation_schedule,
+        "alert": worker.alert_low_stock,
+        "is_due": worker.is_due,
+        "schedule": worker.load_schedule,
+        "maybe_generate": worker.maybe_generate,
+        "sleep": worker.time.sleep,
+    }
+    try:
+        worker.load_config = lambda: config
+        worker.apply_runtime = lambda _config: None
+        worker.inventory = lambda: {"pending": [], "stock": []}
+        worker.save_generation_schedule = saved.append
+        worker.alert_low_stock = lambda *_args: None
+        worker.is_due = lambda *_args: False
+        worker.load_schedule = lambda: {}
+        worker.maybe_generate = lambda *_args: None
+        worker.time.sleep = lambda _seconds: (_ for _ in ()).throw(KeyboardInterrupt())
+        try:
+            worker.main()
+        except KeyboardInterrupt:
+            pass
+        assert len(saved) == 1
+        assert datetime.fromisoformat(saved[0]) <= datetime.now(timezone.utc)
+    finally:
+        worker.load_config = original["config"]
+        worker.apply_runtime = original["runtime"]
+        worker.inventory = original["inventory"]
+        worker.save_generation_schedule = original["save_generation_schedule"]
+        worker.alert_low_stock = original["alert"]
+        worker.is_due = original["is_due"]
+        worker.load_schedule = original["schedule"]
+        worker.maybe_generate = original["maybe_generate"]
+        worker.time.sleep = original["sleep"]
+
+
+
+def check_corrupt_audio_manifest_is_discarded() -> None:
+    fixture = ROOT / "out/test-audio-manifest-recovery"
+    manifest = fixture / "public/audio/quiz-copy/mc-54/manifest.json"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        manifest.write_text("", encoding="utf-8")
+        assert worker.discard_invalid_audio_manifest("mc-54", fixture)
+        assert not manifest.exists()
+        manifest.write_text("{}", encoding="utf-8")
+        assert not worker.discard_invalid_audio_manifest("mc-54", fixture)
+        assert manifest.exists()
+    finally:
+        shutil.rmtree(fixture, ignore_errors=True)
+
+
 def main() -> None:
+    check_deploy_publishing_recovery()
+    check_corrupt_audio_manifest_is_discarded()
+    check_empty_stock_retries_without_waiting_hours()
+    check_worker_startup_wakes_empty_stock()
     check_generation_lane_guard()
+    check_inventory_quarantines_stale_queue()
+    check_inventory_requeues_provider_failures()
     check_stale_generation_job_recovery()
+    check_run_logged_tracks_child_pid()
     fixture = ROOT / "out/test-automatic-publishing"
     shutil.rmtree(fixture, ignore_errors=True)
     output = fixture / "out/episodes"
@@ -231,7 +515,8 @@ def main() -> None:
             worker.main()
         except KeyboardInterrupt:
             pass
-        assert queue["status"] == "failed"
+        assert queue["status"] == "pending"
+        assert queue["ids"] == ["mc-01"]
         assert "fake provider unavailable" in (queue["error"] or "")
         assert len(saved_schedules) == 2
     finally:

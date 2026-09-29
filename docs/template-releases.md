@@ -6,7 +6,7 @@ La plantilla no se cambia directamente en producción. Cada render queda asociad
 
 1. Trabajar en una rama sobre `src/`, `templates/quiz-copy/` y los assets necesarios.
 2. Ejecutar los checks de CI y revisar un render corto representativo.
-3. Mergear a `main`; el deploy guarda el commit como `.release-version` y espera a que terminen los renders/publicaciones activos.
+3. Mergear a `main`; el deploy guarda el commit como `.release-version`. Si no cambiaron archivos de plantilla, promueve automáticamente la plantilla activa; los cambios normales no pausan la generación. Si cambió la plantilla, espera el canary.
 4. En el mini PC revisar la release instalada:
 
    ```bash

@@ -29,6 +29,7 @@ const episode = (id, target, overrides = {}) => ({
   status: 'Sin generar',
   queueStatus: null,
   platforms: [],
+  historicalPlatforms: [],
   answer: target,
   clueDetails: [],
   revealText: '',
@@ -51,12 +52,16 @@ const preview = {
   revealText: 'It is the Wind Charge!',
 };
 
+const recentSnapshot = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
 const state = {
   episodes: [
     episode('mc-01', 'Crossbow'),
     episode('mc-02', 'Wind Charge', {...preview, status: 'Esperando aprobación'}),
     episode('mc-03', 'Recovery Compass', {...preview, status: 'En cola', queueStatus: 'pending'}),
     episode('mc-04', 'Golden Apple', {...preview, kind: 'Food', status: 'Publicado', platforms: ['youtube']}),
+    episode('mc-05', 'Old Template', {status: 'Publicado', historicalPlatforms: ['youtube', 'instagram']}),
+    episode('mc-06', 'Legacy Unpublished', {status: 'Histórico', hasLegacyVideo: true}),
   ],
   formats: [{id: 'clues', label: 'Quiz definitivo', enabled: true, priority: 5, sharePct: 100, targetStock: 8, total: 4, rendered: 3, stock: 2, review: 1, queued: 1}],
   music: {
@@ -68,7 +73,7 @@ const state = {
     generatedAt: '2026-08-21T12:00:00Z',
     summary: {videos: 1, views: 100, engagements: 12, engagementRateByViews: 12},
     platforms: [{platform: 'youtube', videos: 1, views: 100, engagements: 12, error: null, syncedAt: '2026-08-21T12:00:00Z'}],
-    series: [{platform: 'youtube', capturedAt: '2026-08-21T12:00:00Z', views: 100, engagements: 12}],
+    series: [{platform: 'youtube', capturedAt: recentSnapshot, views: 100, engagements: 12}],
     cohorts: [{dimension: 'formatLabel', platform: 'youtube', value: 'Quiz definitivo', videos: 1, measuredVideos: 1, viewsPerVideo: 100, lifetimeViewsPerHour: 10, engagementRateByViews: 12, completionRate: 70}],
     quality: [{platform: 'youtube', videos: 1, measuredVideos: 1, reachPerView: 0.9, averageWatchSeconds: 18, completionRate: 70, coveragePercent: 100, warnings: []}],
     trends: [{platform: 'youtube', trend: 'up', viewsPerHour: 10}],
@@ -243,7 +248,10 @@ try {
   assert.equal(await evaluate(() => document.querySelector('#job-error').hidden), false);
   await click('[data-dismiss-job-error]');
   assert.equal(await evaluate(() => document.querySelector('#job-error').hidden), true);
-  assert.deepEqual(await evaluate(() => ['review', 'queued', 'to-generate-total', 'published-total'].map((id) => document.getElementById(id).textContent)), ['1', '1', '1', '1']);
+  assert.deepEqual(await evaluate(() => ['review', 'queued', 'to-generate-total', 'published-total'].map((id) => document.getElementById(id).textContent)), ['1', '1', '1', '2']);
+  await click('[data-video-filter="all"]');
+  assert.equal(await evaluate(() => document.querySelector('tr[data-id="mc-05"] .row-actions').textContent.includes('Generar')), false);
+  assert.equal(await evaluate(() => document.querySelector('tr[data-id="mc-06"] .row-actions').textContent.includes('Generar')), false);
 
   await click('[data-video-filter="all"]');
   await setValue('#video-search', 'crossbow');

@@ -62,6 +62,9 @@ def telegram_messages(server: ThreadingHTTPServer) -> list[dict]:
 
 
 def main() -> None:
+    compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+    bot_compose = compose.split("  bot:\n", 1)[1].split("\n  dashboard:\n", 1)[0]
+    assert "    dns:\n      - 1.1.1.1\n      - 8.8.8.8" in bot_compose
     fixture = ROOT / "out/test-telegram-bot"
     shutil.rmtree(fixture, ignore_errors=True)
     (fixture / "videos").mkdir(parents=True)
@@ -69,10 +72,14 @@ def main() -> None:
     video.write_bytes(b"telegram-review-video")
     published_video = fixture / "videos/mc-04-apple.mp4"
     published_video.write_bytes(b"telegram-published-video")
+    legacy_video = fixture / "videos/mc-05-dirt.mp4"
+    legacy_video.write_bytes(b"telegram-legacy-video")
     episodes = [
         {"id": "mc-02", "target": {"id": "diamond", "kind": "item", "display_name": "Diamond"}},
         {"id": "mc-03", "target": {"id": "stone", "kind": "block", "display_name": "Stone"}},
         {"id": "mc-04", "target": {"id": "apple", "kind": "food", "display_name": "Apple"}},
+        {"id": "mc-05", "target": {"id": "dirt", "kind": "block", "display_name": "Dirt"}},
+        {"id": "mc-06", "target": {"id": "kelp", "kind": "item", "display_name": "Kelp"}},
     ]
     queue: list[dict] = []
     hints: list[dict] = []
@@ -100,6 +107,7 @@ def main() -> None:
         "logs": bot.MONITORED_LOGS,
         "episodes": bot.all_episodes,
         "video_path": bot.video_path,
+        "current_template_video_names": bot.current_template_video_names,
         "queue_items": bot.queue_items,
         "queue_episode": bot.queue_episode,
         "remove_queue_item": bot.remove_queue_item,
@@ -141,6 +149,7 @@ def main() -> None:
         bot.MONITORED_LOGS = (fixture / "logs/generator.log",)
         bot.all_episodes = lambda: episodes
         bot.video_path = lambda episode, _root: fixture / "videos" / f"{episode['id']}-{episode['target']['id']}.mp4"
+        bot.current_template_video_names = lambda _root: {"mc-02-diamond.mp4", "mc-03-stone.mp4", "mc-04-apple.mp4", "mc-06-kelp.mp4"}
         bot.queue_items = lambda: list(queue)
         bot.queue_episode = queue_episode
         bot.remove_queue_item = remove_queue_item
@@ -162,16 +171,23 @@ def main() -> None:
         assert ("/api/action", {"episodeId": "mc-02", "action": "audio"}) in dashboard_server.requests
 
         bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
-        assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
+        approval_text = telegram_messages(telegram_server)[-1]["text"]
+        assert "mc-03" in approval_text
+        assert "mc-04" not in approval_text
+        assert "mc-05" not in approval_text
         bot.handle_callback({"id": "cb-send", "message": {"chat": {"id": 42}}, "data": "sendvideo:mc-03"})
         assert any(path.endswith("/sendVideo") and b"telegram-review-video" in body for path, body in telegram_server.requests)
         bot.handle_callback({"id": "cb-accept", "message": {"chat": {"id": 42}}, "data": "accept:mc-03"})
         assert queue and queue[0]["status"] == "pending"
+        bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
+        assert "mc-03" not in telegram_messages(telegram_server)[-1]["text"]
 
         bot.handle_message({"chat": {"id": 42}, "text": "/cola"})
         assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 42}, "text": "/sacar mc-03"})
         assert not queue
+        bot.handle_message({"chat": {"id": 42}, "text": "/por_aprobar"})
+        assert "mc-03" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 42}, "text": "/aprobar mc-03"})
         bot.handle_message({"chat": {"id": 42}, "text": "/pistas mc-03"})
         assert hints == [{"episodeId": "mc-03"}]
@@ -189,7 +205,10 @@ def main() -> None:
         generated = fixture / "videos/mc-02-diamond.mp4"
         generated.write_bytes(b"telegram-generated-video")
         jobs["generation"] = {"status": "completed", "label": "Generación automática mc-02", "lines": []}
-        bot.notify_generation_done(jobs["generation"], {})
+        notification_state = bot.read_alert_state()
+        bot.notify_generation_done(jobs["generation"], notification_state)
+        assert notification_state["sentForReview"]["mc-02"] == bot.sha256(generated)
+        bot.write_alert_state(notification_state)
         assert any(path.endswith("/sendVideo") and b"mc-02" in body for path, body in telegram_server.requests)
         assert "Terminó Generación automática mc-02" in telegram_messages(telegram_server)[-1]["text"]
         bot.handle_message({"chat": {"id": 99}, "text": "/start"})
@@ -201,12 +220,41 @@ def main() -> None:
         error_log = fixture / "logs/generator.log"
         error_log.parent.mkdir(parents=True, exist_ok=True)
         bot.monitor_errors()
+        orphan = fixture / "videos/mc-06-kelp.mp4"
+        orphan.write_bytes(b"orphaned-completed-video")
+        videos_before = len([path for path, _body in telegram_server.requests if path.endswith("/sendVideo")])
         error_log.write_text("ERROR render synthetic failure\n", encoding="utf-8")
         bot.monitor_errors()
+        videos_after = [body for path, body in telegram_server.requests if path.endswith("/sendVideo")]
+        assert len(videos_after) == videos_before + 1
+        assert b"orphaned-completed-video" in videos_after[-1]
+        bot.monitor_errors()
+        assert len([path for path, _body in telegram_server.requests if path.endswith("/sendVideo")]) == len(videos_after)
         assert "ERROR DETECTADO" in telegram_messages(telegram_server)[-1]["text"]
 
         bot.handle_callback({"id": "cb-unknown", "message": {"chat": {"id": 42}}, "data": "unknown:value"})
         assert "Error:" in telegram_messages(telegram_server)[-1]["text"]
+
+        sent = []
+        original_tell = bot.tell
+        original_log = bot.log
+        bot.tell = lambda chat_id, text, keyboard=None: sent.append((chat_id, text))
+        bot.log = lambda _text: None
+        try:
+            outage = {}
+            bot.notify_telegram_failure(RuntimeError("dns"), outage)
+            bot.notify_telegram_failure(RuntimeError("dns"), outage)
+            assert len(sent) == 1
+            bot.notify_telegram_recovery(outage)
+            assert len(sent) == 1
+            bot.notify_telegram_recovery(outage)
+            assert len(sent) == 2 and "restaurada" in sent[-1][1]
+            bot.notify_telegram_recovery(outage)
+            assert len(sent) == 2
+            assert [bot.next_retry_delay(delay) for delay in (5, 10, 20, 40, 60)] == [10, 20, 40, 60, 60]
+        finally:
+            bot.tell = original_tell
+            bot.log = original_log
     finally:
         telegram_server.shutdown()
         dashboard_server.shutdown()
@@ -215,7 +263,7 @@ def main() -> None:
         for name, value in original.items():
             setattr(bot, {
                 "root": "ROOT", "offset": "OFFSET_PATH", "log_path": "LOG_PATH", "alert_state": "ALERT_STATE_PATH",
-                "dashboard": "DASHBOARD_URL", "logs": "MONITORED_LOGS", "episodes": "all_episodes", "video_path": "video_path",
+                "dashboard": "DASHBOARD_URL", "logs": "MONITORED_LOGS", "episodes": "all_episodes", "video_path": "video_path", "current_template_video_names": "current_template_video_names",
                 "queue_items": "queue_items", "queue_episode": "queue_episode", "remove_queue_item": "remove_queue_item",
                 "pending_hints": "pending_hints_items", "pend_hints": "pend_hints", "clear_hints": "clear_hints",
                 "published": "publishing_state", "read_job": "read_job", "generation_schedule": "load_generation_schedule",

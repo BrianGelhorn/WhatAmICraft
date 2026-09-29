@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import subprocess
 
+from test_linux_recovery import main as check_linux_recovery
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,7 +27,8 @@ def main() -> None:
     assert not [path for path in tracked if path and media_pattern.search(path)]
 
     assert "scripts/backup_state.py --quiet" in start
-    assert "docker compose up -d" in start
+    assert "sudo -n /usr/local/sbin/whatamicraft-up" in start
+    assert "docker compose" not in start
     assert "ip link" in watchdog and "getent ahostsv4" in watchdog and "curl --ipv4" in watchdog
     assert "FAILS_BEFORE_RECOVERY:-6" in watchdog
     assert "has_local_network" in watchdog and "systemctl restart networking.service" in watchdog
@@ -36,6 +39,22 @@ def main() -> None:
     assert "CLUES_API_URL: http://clues-api:8790" in compose
     assert "CLUES_SOURCE_DIR: /app/data/new-clues-20260815" in compose
     assert "MONITOR_CLUES_URL: http://clues-api:8790" in compose
+    assert "x-stable-dns: &stable-dns\n  - 1.1.1.1\n  - 8.8.8.8" in compose
+    for service in (
+        "producer",
+        "dashboard",
+        "clues-api",
+        "analytics-api",
+        "publisher",
+        "publisher-worker",
+        "backup-rollback",
+        "media",
+        "monitor",
+        "tunnel",
+    ):
+        section = compose.split(f"\n  {service}:", 1)[1]
+        section = re.split(r"\n(?=  [A-Za-z0-9_-]+:)", section, maxsplit=1)[0]
+        assert "dns: *stable-dns" in section
     assert "backup-rollback:" in staging
     assert "BACKUP_ADMIN_TOKEN" in staging
     assert "dockerfile: Dockerfile.media" in compose
@@ -66,6 +85,7 @@ def main() -> None:
     assert "whatamicraft-staging-${GITHUB_RUN_ID}" in staging_ci
     assert "down -v --remove-orphans" in staging_ci
     assert "production" not in staging_ci.lower()
+    check_linux_recovery()
     print("ok: mini PC restart, Wi-Fi recovery, backup, isolated staging, and CI cleanup contracts")
 
 

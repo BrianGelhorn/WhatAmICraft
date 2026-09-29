@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -16,12 +18,12 @@ from publishing.settings import (
     save_generation_schedule,
     save_schedule,
 )
-from review.storage import pending_queue_ids, read_json
+from review.storage import pending_queue_ids, queue_items, read_json, set_queue_status
 from review.storage import publishing_state, save_stock_alert_state, stock_alert_state
 from review.telegram import configured as telegram_configured
 from review.telegram import send_message
 from publishing.common import sha256
-from template_artifacts import active_template_version, release_version
+from template_artifacts import active_template_version, release_version, validate_artifact
 from video_formats import (
     current_template_video_names,
     format_id_for,
@@ -30,7 +32,7 @@ from video_formats import (
     ready_episodes,
     video_path,
 )
-from job_status import append_job_line, begin_job, finish_job, read_job
+from job_status import append_job_line, begin_job, finish_job, read_job, set_job_pid
 
 ROOT = Path(__file__).resolve().parents[1]
 BANK_PATH = ROOT / "data/quiz-copy-episodes.json"
@@ -52,6 +54,22 @@ def log(path: Path, text: str) -> None:
         file.write(line + "\n")
 
 
+
+def _stop_child(process: subprocess.Popen) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+
+
 def run_logged(command: list[str], log_name: str, label: str, lane: str = "main") -> subprocess.CompletedProcess:
     if lane in CPUSETS and shutil.which("taskset"):
         command = ["taskset", "-c", CPUSETS[lane], *command]
@@ -62,6 +80,7 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
         log(path, "skip: another task is already running")
         return subprocess.CompletedProcess(command, 1)
     log(path, "run: " + " ".join(command))
+    process = None
     try:
         process = subprocess.Popen(
             command,
@@ -71,7 +90,9 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
             text=True,
             encoding="utf-8",
             errors="replace",
+            start_new_session=True,
         )
+        set_job_pid(process.pid, lane)
         assert process.stdout
         for line in process.stdout:
             log(path, line.rstrip())
@@ -81,6 +102,8 @@ def run_logged(command: list[str], log_name: str, label: str, lane: str = "main"
         finish_job("completed" if code == 0 else "failed", code, lane=lane)
         return subprocess.CompletedProcess(command, code)
     except Exception as error:
+        if process is not None:
+            _stop_child(process)
         log(path, f"error: {error}")
         finish_job("failed", 1, str(error), lane)
         return subprocess.CompletedProcess(command, 1)
@@ -106,8 +129,14 @@ def generation_window_open(config: dict, schedule: dict, now: datetime | None = 
     due = _date(schedule.get("nextRunAt"))
     if due is None:
         return False
+    now = now or datetime.now(timezone.utc)
+    last_publish = read_job("publishing")
+    # A failed automatic attempt schedules a short retry, not a normal publish window.
+    # The caller still checks the publishing lock before starting generation.
+    if due > now and last_publish.get("source") == "automatic" and last_publish.get("status") == "failed":
+        return True
     guard = timedelta(minutes=config["generation"]["publishGuardMinutes"])
-    return due - (now or datetime.now(timezone.utc)) > guard
+    return due - now > guard
 
 
 def publishing_active() -> bool:
@@ -122,6 +151,20 @@ def video_for(episode: dict) -> Path:
     return video_path(episode)
 
 
+def discard_invalid_audio_manifest(episode_id: str, root: Path = ROOT) -> bool:
+    path = root / "public/audio/quiz-copy" / episode_id / "manifest.json"
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return False
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        value = None
+    if isinstance(value, dict):
+        return False
+    path.unlink(missing_ok=True)
+    return True
+
+
 def inventory() -> dict[str, list[str]]:
     current = episodes()
     current_names = current_template_video_names()
@@ -130,6 +173,11 @@ def inventory() -> dict[str, list[str]]:
         for episode in current
         if video_for(episode).exists() and video_for(episode).name in current_names
     }
+    legacy = {
+        episode["id"]
+        for episode in current
+        if video_for(episode).exists() and video_for(episode).name not in current_names
+    }
     published_state = publishing_state()["videos"]
     published = {
         episode["id"]
@@ -137,7 +185,29 @@ def inventory() -> dict[str, list[str]]:
         if video_for(episode).exists()
         and published_state.get(episode["id"], {}).get("sha256") == sha256(video_for(episode))
     }
-    approved = set(pending_queue_ids()).intersection(videos)
+    pending = pending_queue_ids()
+    for item in queue_items():
+        if item.get("status") != "failed" or item.get("episodeId") not in videos:
+            continue
+        error = str(item.get("error") or "")
+        if error == "Video faltante o no corresponde a la plantilla activa":
+            episode = next(episode for episode in current if episode["id"] == item["episodeId"])
+            try:
+                artifact = validate_artifact(video_for(episode), episode_id=episode["id"], require_active=True, root=ROOT)
+            except (OSError, RuntimeError, ValueError):
+                continue
+            if artifact.get("legacy"):
+                continue
+            error = None
+        elif not error.startswith(("youtube:", "tiktok:", "instagram:", "facebook:")):
+            continue
+        set_queue_status(item["episodeId"], "pending", error)
+        if item["episodeId"] not in pending:
+            pending.append(item["episodeId"])
+    stale = sorted(set(pending) - videos)
+    for episode_id in stale:
+        set_queue_status(episode_id, "failed", "Video faltante o no corresponde a la plantilla activa")
+    approved = set(pending).intersection(videos)
     candidates = (videos - published) - approved
     by_format = {}
     for format_id in {format_id_for(episode) for episode in current}:
@@ -153,13 +223,18 @@ def inventory() -> dict[str, list[str]]:
             "label": format_label(format_id),
             "pending": sorted(format_approved),
             "candidates": sorted(format_candidates),
-            "missing": [episode["id"] for episode in format_episodes if episode["id"] not in format_videos],
+            "missing": [
+                episode["id"]
+                for episode in format_episodes
+                if episode["id"] not in format_videos and episode["id"] not in legacy
+            ],
         }
     return {
         "pending": sorted(approved),
         "candidates": sorted(candidates),
         "stock": sorted(approved | candidates),
-        "missing": [episode["id"] for episode in current if episode["id"] not in videos],
+        "missing": [episode["id"] for episode in current if episode["id"] not in videos and episode["id"] not in legacy],
+        "legacy": sorted(legacy),
         "formats": by_format,
     }
 
@@ -311,6 +386,7 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
                 LOG_DIR / "generator.log",
                 f"select episode={episode_id} format={format_id} label={format_label(format_id)}",
             )
+            discard_invalid_audio_manifest(episode_id)
             result = run_logged(
                 [
                     sys.executable,
@@ -326,9 +402,9 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
                 "generation",
             )
             if result.returncode == 0:
-                if len(inventory()["stock"]) < generation["targetStock"]:
-                    retry_minutes = 0
+                retry_minutes = 0 if len(inventory()["stock"]) < generation["targetStock"] else generation["intervalMinutes"]
                 break
+            retry_minutes = min(5, generation["intervalMinutes"])
             log(LOG_DIR / "generator.log", f"skip: {episode_id} falló; se prueba el siguiente")
     else:
         log(
@@ -340,6 +416,7 @@ def maybe_generate(config: dict, stock: dict[str, list[str]]) -> None:
 
 def main() -> None:
     interval = int(os.getenv("PUBLISH_QUEUE_INTERVAL", "30"))
+    startup = True
     while True:
         try:
             HEARTBEAT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -347,6 +424,9 @@ def main() -> None:
             config = load_config()
             apply_runtime(config)
             stock = inventory()
+            if startup and config["generation"]["enabled"] and not stock["stock"]:
+                save_generation_schedule(next_run_iso(0))
+            startup = False
             alert_low_stock(len(stock["pending"]), config["generation"]["lowStockThreshold"])
             if is_due(config, load_schedule()):
                 published_ok = publish_or_repost(config, stock)

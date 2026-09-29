@@ -15,7 +15,7 @@ from publishing.settings import apply_runtime, load_generation_schedule, load_sc
 from review.storage import clear_hints, pend_hints, pending_hints_items, publishing_state
 from review.storage import queue_episode, queue_items, reject_episode, remove_queue_item
 from review.telegram import answer_callback, get_updates, send_for_review, send_message
-from video_formats import all_episodes, video_path
+from video_formats import all_episodes, current_template_video_names, video_path
 
 ROOT = Path(__file__).resolve().parents[2]
 OFFSET_PATH = ROOT / "out/telegram-offset.txt"
@@ -35,6 +35,9 @@ MONITORED_LOGS = (
 )
 HEARTBEAT_PATH = ROOT / "out/health/bot"
 MONITOR_STARTED = time.time()
+TELEGRAM_RETRY_INITIAL_SECONDS = 5
+TELEGRAM_RETRY_MAX_SECONDS = 60
+TELEGRAM_RECOVERY_CONFIRMATIONS = 2
 
 
 def log(text: str) -> None:
@@ -134,11 +137,13 @@ def approval_items() -> list[dict]:
     queue = {item["episodeId"]: item for item in queue_items()}
     published = publishing_state().get("videos", {})
     sent = read_alert_state().get("sentForReview", {})
+    current_videos = current_template_video_names(ROOT)
     items = []
     for episode_id, episode in episodes.items():
         video = video_path(episode, ROOT)
         if (
             not video.is_file()
+            or video.name not in current_videos
             or queue.get(episode_id, {}).get("status") == "pending"
             or is_currently_published(published, episode_id, video)
         ):
@@ -169,16 +174,17 @@ def approvals_text() -> tuple[str, list]:
     return "\n".join(lines), keyboard
 
 
-def send_review_video(episode_id: str) -> bool:
+def send_review_video(episode_id: str, alert_state: dict | None = None) -> bool:
     item = next((item for item in approval_items() if item["id"] == episode_id), None)
     if not item:
         raise RuntimeError(f"{episode_id} no está disponible para aprobación")
     if item["sent"]:
         return False
     send_for_review(episode_id, item["target"], item["video"])
-    state = read_alert_state()
+    state = alert_state if alert_state is not None else read_alert_state()
     state.setdefault("sentForReview", {})[episode_id] = sha256(item["video"])
-    write_alert_state(state)
+    if alert_state is None:
+        write_alert_state(state)
     return True
 
 
@@ -447,7 +453,7 @@ def notify_generation_done(job: dict, state: dict) -> None:
     sent_ids = []
     for episode_id in target_ids:
         try:
-            if send_review_video(episode_id):
+            if send_review_video(episode_id, state):
                 sent_ids.append(episode_id)
         except Exception as error:
             log(f"error enviando {episode_id} a aprobación: {error}")
@@ -477,6 +483,13 @@ def monitor_errors() -> None:
         state["initialized"] = True
         write_alert_state(state)
         return
+    for item in approval_items():
+        if item["sent"]:
+            continue
+        try:
+            send_review_video(item["id"], state)
+        except Exception as error:
+            log(f"error recuperando {item['id']} para aprobación: {error}")
     for path in paths:
         key = str(path)
         size = path.stat().st_size
@@ -519,15 +532,60 @@ def monitor_errors() -> None:
     write_alert_state(state)
 
 
+def next_retry_delay(delay: float) -> float:
+    return min(delay * 2, TELEGRAM_RETRY_MAX_SECONDS)
+
+
+def notify_telegram_failure(error: Exception, state: dict[str, bool | int]) -> None:
+    log(f"Bot: {error}")
+    state["recovery_successes"] = 0
+    if state.get("outage"):
+        return
+    state["outage"] = True
+    try:
+        if os.getenv("TELEGRAM_REVIEW_CHAT_ID"):
+            tell(os.environ["TELEGRAM_REVIEW_CHAT_ID"], f"⚠️ Error del bot:\n{error}")
+    except Exception:
+        pass
+
+
+def notify_telegram_recovery(state: dict[str, bool | int]) -> None:
+    if not state.get("outage"):
+        return
+    successes = int(state.get("recovery_successes", 0)) + 1
+    state["recovery_successes"] = successes
+    if successes < TELEGRAM_RECOVERY_CONFIRMATIONS:
+        return
+    state["outage"] = False
+    state["recovery_successes"] = 0
+    try:
+        if os.getenv("TELEGRAM_REVIEW_CHAT_ID"):
+            tell(os.environ["TELEGRAM_REVIEW_CHAT_ID"], "✅ Conexión con Telegram restaurada.")
+    except Exception as error:
+        log(f"Bot: no se pudo notificar la recuperación: {error}")
+
+
 def main() -> None:
     apply_runtime()
     offset = int(OFFSET_PATH.read_text().strip()) if OFFSET_PATH.exists() else 0
     log("Bot de control iniciado")
+    retry_delay = float(TELEGRAM_RETRY_INITIAL_SECONDS)
+    telegram_state = {"outage": False}
     while True:
+        HEARTBEAT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        HEARTBEAT_PATH.touch()
         try:
-            HEARTBEAT_PATH.parent.mkdir(parents=True, exist_ok=True)
-            HEARTBEAT_PATH.touch()
-            for update in get_updates(offset):
+            updates = get_updates(offset)
+        except Exception as error:
+            notify_telegram_failure(error, telegram_state)
+            time.sleep(retry_delay)
+            retry_delay = next_retry_delay(retry_delay)
+            continue
+
+        notify_telegram_recovery(telegram_state)
+        retry_delay = float(TELEGRAM_RETRY_INITIAL_SECONDS)
+        try:
+            for update in updates:
                 offset = update["update_id"] + 1
                 OFFSET_PATH.parent.mkdir(parents=True, exist_ok=True)
                 OFFSET_PATH.write_text(str(offset), encoding="utf-8")

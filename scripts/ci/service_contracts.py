@@ -177,7 +177,7 @@ def publisher_contract() -> None:
 
             publisher.PUBLISHERS = {"fake": broken_provider}
             assert publisher.run(args) == 1
-            assert queue["status"] == "failed"
+            assert queue["status"] == "pending"
             assert "provider unavailable" in queue["error"]
             assert state["videos"]["mc-01"]["platforms"] == {}
 
@@ -187,6 +187,7 @@ def publisher_contract() -> None:
                 "names": worker.current_template_video_names,
                 "state": worker.publishing_state,
                 "queue_ids": worker.pending_queue_ids,
+                "queue_items": worker.queue_items,
                 "run_logged": worker.run_logged,
                 "notify": worker.notify,
             }
@@ -196,6 +197,7 @@ def publisher_contract() -> None:
                 worker.current_template_video_names = lambda: {video.name}
                 worker.publishing_state = lambda: {"videos": {}}
                 worker.pending_queue_ids = lambda: []
+                worker.queue_items = lambda: []
                 inventory = worker.inventory()
                 assert inventory["candidates"] == ["mc-01"]
                 commands = []

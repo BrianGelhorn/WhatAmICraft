@@ -434,7 +434,7 @@ def analytics_snapshot() -> dict:
 def dashboard_state() -> dict:
     queue = {"items": queue_items()}
     queue_by_id = {item["episodeId"]: item for item in queue["items"]}
-    failed = [item for item in queue["items"] if item.get("status") == "failed" and item.get("error")]
+    failed = [item for item in queue["items"] if item.get("error")]
     pending = {"items": pending_hints_items()}
     pending_ids = {item["episodeId"] for item in pending["items"]}
     publishing = publishing_state()["videos"]
@@ -454,21 +454,27 @@ def dashboard_state() -> dict:
         }
         queue_item = queue_by_id.get(episode["id"])
         has_new_video = video.exists() and video.name in new_video_names
+        has_legacy_video = video.exists() and not has_new_video
         record = publishing.get(episode["id"], {})
-        current_publication = has_new_video and record.get("sha256") == sha256(video)
-        platforms = list(record.get("platforms", {})) if current_publication else []
-        if queue_item and not current_publication and queue_item["status"] != "pending":
+        publication_matches_video = has_new_video and record.get("sha256") == sha256(video)
+        current_publication = publication_matches_video
+        published_platforms = list(record.get("platforms", {}))
+        platforms = published_platforms if current_publication else []
+        historical_platforms = published_platforms if not current_publication else []
+        if queue_item and not has_new_video:
             queue_item = None
         if episode["id"] in pending_ids or episode.get("needs_review"):
             status = "Pistas pendientes"
-        elif platforms:
+        elif platforms or historical_platforms:
             status = "Publicado"
         elif queue_item:
-            status = {"pending": "En cola", "failed": "Error al publicar", "completed": "Publicado"}.get(
-                queue_item["status"], queue_item["status"]
-            )
+            status = "En cola con error" if queue_item["status"] == "pending" and queue_item.get("error") else {
+                "pending": "En cola", "failed": "Error al publicar", "completed": "Publicado"
+            }.get(queue_item["status"], queue_item["status"])
         elif has_new_video:
             status = "Esperando aprobación"
+        elif has_legacy_video:
+            status = "Histórico"
         else:
             status = "Sin generar"
 
@@ -495,7 +501,7 @@ def dashboard_state() -> dict:
                 "clues": len(episode.get("clues", [])),
                 "needsReview": episode.get("needs_review", False),
                 "hasVideo": has_new_video,
-                "hasLegacyVideo": False,
+                "hasLegacyVideo": has_legacy_video,
                 "hasThumbnail": thumbnail.exists(),
                 "hasThumbnails": len(thumbnail_urls) == len(thumbnails),
                 "videoUrl": f"/videos/{video.name}" if has_new_video else None,
@@ -504,6 +510,7 @@ def dashboard_state() -> dict:
                 "status": status,
                 "queueStatus": queue_item["status"] if queue_item else None,
                 "platforms": platforms,
+                "historicalPlatforms": historical_platforms,
                 "answer": episode["answer"].get("displayName", episode["answer"].get("id", "")),
                 "clueDetails": clue_details,
                 "revealText": episode.get("reveal", {}).get("voice", {}).get("text", ""),
@@ -555,7 +562,7 @@ def dashboard_state() -> dict:
     return {
         "episodes": items,
         "legacyVideos": legacy_videos,
-        "toGenerate": [item for item in items if not item["hasVideo"]],
+        "toGenerate": [item for item in items if not item["hasVideo"] and not item["hasLegacyVideo"]],
         "formats": format_stats,
         "music": {
             "originals": [
@@ -725,9 +732,14 @@ def start_job(
     force_render: bool = False,
 ) -> None:
     config = load_config()
-    if episode_id and not format_id:
+    if episode_id:
         episode = next((item for item in all_episodes() if item["id"] == episode_id), None)
-        format_id = format_id_for(episode) if episode else None
+        if episode:
+            video = episode_video(episode)
+            if video.exists() and video.name not in current_template_video_names():
+                raise RuntimeError(f"{episode_id} ya tiene un video histórico y no se regenera")
+        if not format_id:
+            format_id = format_id_for(episode) if episode else None
     if not format_id or format_id == "all":
         format_id = choose_weighted_format(config["generation"].get("formats", {}))
     command = [
@@ -911,7 +923,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"ok": True, "service": "dashboard"})
         elif path == "/api/state":
             self.send_json(dashboard_state())
-        elif path in {"/api/clues", "/api/clue-prefabs"}:
+        elif path == "/api/clues":
             if not os.getenv("CLUES_API_URL"):
                 self.send_json({"ok": False, "error": "La API de pistas no está configurada"}, HTTPStatus.SERVICE_UNAVAILABLE)
             else:

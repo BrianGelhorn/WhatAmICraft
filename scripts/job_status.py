@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,6 +11,7 @@ JOB_PATHS = {
     "publishing": ROOT / "out/current-publishing-job.json",
 }
 LEGACY_OWNERS = {"automatic": "publisher-worker", "manual": "dashboard"}
+STALE_PIDLESS_JOB = timedelta(minutes=15)
 
 
 def _now() -> str:
@@ -28,11 +29,24 @@ def _default() -> dict:
         "updatedAt": None,
         "log": None,
         "pid": None,
+        "processStart": None,
         "owner": "",
     }
 
 
-def _read_job(lane: str) -> dict:
+def _pidless_job_is_stale(job: dict) -> bool:
+    if job.get("pid") or not job.get("updatedAt"):
+        return False
+    try:
+        updated = datetime.fromisoformat(str(job["updatedAt"]).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return False
+    if updated.tzinfo is None:
+        updated = updated.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) - updated > STALE_PIDLESS_JOB
+
+
+def _read_job(lane: str, recover: bool = True) -> dict:
     path = JOB_PATHS[lane]
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -42,7 +56,9 @@ def _read_job(lane: str) -> dict:
             job.get("owner") == current_owner
             or (not job.get("owner") and LEGACY_OWNERS.get(job.get("source")) == current_owner)
         )
-        if job["status"] == "running" and job["pid"] and owned and not _process_alive(job["pid"]):
+        if recover and job["status"] == "running" and owned and (
+            (job["pid"] and not _same_process(job)) or _pidless_job_is_stale(job)
+        ):
             job.update({
                 "status": "failed",
                 "returnCode": -1,
@@ -85,6 +101,21 @@ def _process_alive(pid: int) -> bool:
         return False
 
 
+def _process_start(pid: int) -> str | None:
+    try:
+        return Path(f"/proc/{pid}/stat").read_text(encoding="utf-8").split()[21]
+    except (FileNotFoundError, IndexError, OSError):
+        return None
+
+
+def _same_process(job: dict) -> bool:
+    pid = job["pid"]
+    if not _process_alive(pid):
+        return False
+    expected = job.get("processStart")
+    return expected is None or _process_start(pid) == str(expected)
+
+
 def _write(job: dict, lane: str = "main") -> None:
     path = JOB_PATHS[lane]
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -116,6 +147,7 @@ def set_job_pid(pid: int, lane: str = "main") -> None:
     if job["status"] != "running":
         return
     job["pid"] = pid
+    job["processStart"] = _process_start(pid)
     job["updatedAt"] = _now()
     _write(job, lane)
 
@@ -130,7 +162,7 @@ def append_job_line(line: str, lane: str = "main") -> None:
 
 
 def finish_job(status: str, return_code: int, error: str | None = None, lane: str = "main") -> None:
-    job = _read_job(lane)
+    job = _read_job(lane, recover=False)
     job["status"] = status
     job["returnCode"] = return_code
     job["updatedAt"] = _now()

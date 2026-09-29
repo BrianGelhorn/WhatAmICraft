@@ -21,9 +21,8 @@ while ! tailscale_ready; do
 done
 
 configure() {
-  tailscale serve reset
-  tailscale serve --bg --https=8443 "$DASHBOARD_TARGET"
-  tailscale funnel --bg --https=443 "$MEDIA_TARGET"
+  tailscale serve --bg --https=8443 "$DASHBOARD_TARGET" || return
+  tailscale funnel --bg --https=443 "$MEDIA_TARGET" || return
   tailscale serve status
 }
 

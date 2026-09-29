@@ -4,4 +4,4 @@ ConditionPathExists=/var/run/docker.sock
 
 [Service]
 Type=oneshot
-ExecStart=/home/brian/MinecraftQuizGuesser/scripts/linux/docker-disk-cleanup.sh
+ExecStart=/usr/bin/bash /home/brian/MinecraftQuizGuesser/scripts/linux/docker-disk-cleanup.sh

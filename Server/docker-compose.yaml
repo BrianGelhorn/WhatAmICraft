@@ -1,0 +1,28 @@
+services:
+  studio-builder:
+    build: .
+    profiles: ["tools"]
+    volumes:
+      - ./:/studio
+
+  mc:
+    # Java 21 runtime; the server version and Fabric loader are pinned below.
+    image: itzg/minecraft-server:java21
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:25565:25565"
+    environment:
+      EULA: "TRUE"
+      TYPE: "FABRIC"
+      VERSION: "1.21.11"
+      FABRIC_LOADER_VERSION: "0.19.5"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      MEMORY: "2G"
+    volumes:
+      # Stateful, local filming world. Never use `down -v` here.
+      - ./data:/data
+      # Read-only generated pack; it is installed only into this world's datapacks.
+      - ./generated/studio:/data/world/datapacks/studio:ro
