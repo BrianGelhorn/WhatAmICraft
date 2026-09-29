@@ -13,6 +13,7 @@ services:
       CLUES_API_URL: http://clues-api:8790
       ANALYTICS_API_URL: http://analytics-api:8791
       MONITOR_API_URL: http://monitor:8792
+      MONITOR_HEARTBEAT_SERVICES: ""
       PUBLIC_VIDEO_BASE_URL: http://127.0.0.1:8088
       YOUTUBE_PRIVACY_STATUS: private
       YOUTUBE_CATEGORY_ID: 20
@@ -98,6 +99,7 @@ services:
       MONITOR_BACKUP_URL: http://backup-rollback:8793
       MONITOR_MEDIA_URL: http://media
       MONITOR_EVENTS_PATH: /app/out/monitor/events.jsonl
+      MONITOR_HEARTBEAT_SERVICES: ""
       MONITOR_INTERVAL_SECONDS: 60
     volumes:
       - ./staging/runtime/pre-main/out:/app/out

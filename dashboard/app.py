@@ -96,6 +96,15 @@ JOB_LOCK = threading.Lock()
 ANALYTICS_LOCK = threading.Lock()
 ANALYTICS_API_URL = os.getenv("ANALYTICS_API_URL", "").rstrip("/")
 MONITOR_API_URL = os.getenv("MONITOR_API_URL", "").rstrip("/")
+BASE_MONITORED_SERVICES = ("dashboard", "clues-api", "analytics-api", "backup-rollback", "media")
+MONITORED_SERVICES = (
+    *BASE_MONITORED_SERVICES,
+    *(
+        name.strip()
+        for name in os.getenv("MONITOR_HEARTBEAT_SERVICES", "bot,publisher-worker").split(",")
+        if name.strip() in {"bot", "publisher-worker"}
+    ),
+)
 JOB = {"status": "idle", "label": "", "lines": [], "returnCode": None}
 ACTIVE_PROCESSES = {}
 CANCEL_REQUESTED = {}
@@ -281,6 +290,49 @@ def append_log(path: Path, line: str) -> None:
         file.write(line.rstrip() + "\n")
 
 
+def service_statuses() -> list[dict]:
+    """Return observable service health with an explicit severity."""
+    state_map = {"up": "running", "degraded": "degraded", "down": "stopped"}
+    severity_map = {"running": "ok", "degraded": "warning", "stopped": "fatal", "unknown": "warning"}
+
+    def fallback() -> list[dict]:
+        return [
+            {"name": "dashboard", "state": "running", "severity": "ok", "status": "Responde"},
+            *(
+                {"name": name, "state": "unknown", "severity": "warning", "status": "Sin datos"}
+                for name in MONITORED_SERVICES
+                if name != "dashboard"
+            ),
+            {"name": "monitor", "state": "unknown", "severity": "warning", "status": "Sin datos"},
+        ]
+
+    if not MONITOR_API_URL:
+        return fallback()
+
+    try:
+        response_status, result = monitor_request("/api/monitor/check", method="POST")
+        if response_status != HTTPStatus.OK or not isinstance(result, dict):
+            raise MonitorApiError("El monitor devolvió una respuesta inválida")
+        services = []
+        for item in result.get("services", []):
+            if not isinstance(item, dict) or not item.get("service"):
+                continue
+            state = state_map.get(item.get("status"), "unknown")
+            services.append({
+                "name": item["service"],
+                "state": state,
+                "severity": item.get("severity") or severity_map[state],
+                "status": item.get("detail") or "Sin detalle",
+                "latencyMs": item.get("latencyMs"),
+                "checkedAt": item.get("checkedAt"),
+            })
+        services.append({"name": "monitor", "state": "running", "severity": "ok", "status": "Responde"})
+        return services
+    except (MonitorApiError, ValueError, TypeError):
+        services = fallback()
+        services[-1] = {"name": "monitor", "state": "stopped", "severity": "fatal", "status": "No responde"}
+        return services
+
 def diagnostics_state() -> dict:
     config = load_config()
     episodes = all_episodes()
@@ -337,14 +389,7 @@ def diagnostics_state() -> dict:
             if CONTEXT_SNAPSHOT_PATH.exists()
             else None,
         },
-        "services": [
-            {"name": "dashboard", "state": "running", "status": "responding"},
-            {"name": "analytics-api", "state": "external" if ANALYTICS_API_URL else "embedded", "status": "configured" if ANALYTICS_API_URL else "local fallback"},
-            {"name": "monitor", "state": "external" if MONITOR_API_URL else "disabled", "status": "configured" if MONITOR_API_URL else "not configured"},
-            {"name": "bot", "state": "external", "status": "check via SSH"},
-            {"name": "publisher-worker", "state": "external", "status": "check via SSH"},
-            {"name": "media", "state": "external", "status": "check via SSH"},
-        ],
+        "services": service_statuses(),
         "errors": failed[-5:],
         "logs": logs,
     }

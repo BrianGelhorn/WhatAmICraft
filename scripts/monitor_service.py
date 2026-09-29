@@ -46,13 +46,27 @@ class MonitorService:
 
     @staticmethod
     def _configured_targets() -> list[dict]:
-        return [
+        targets = [
             {"service": "dashboard", "url": f"{os.getenv('MONITOR_DASHBOARD_URL', 'http://dashboard:8787').rstrip('/')}/health", "expected": {200}},
             {"service": "clues-api", "url": f"{os.getenv('MONITOR_CLUES_URL', 'http://clues-api:8790').rstrip('/')}/health", "expected": {200}},
             {"service": "analytics-api", "url": f"{os.getenv('MONITOR_ANALYTICS_URL', 'http://analytics-api:8791').rstrip('/')}/health", "expected": {200}},
             {"service": "backup-rollback", "url": f"{os.getenv('MONITOR_BACKUP_URL', 'http://backup-rollback:8793').rstrip('/')}/health", "expected": {200}},
             {"service": "media", "url": os.getenv("MONITOR_MEDIA_URL", "http://media"), "expected": set(range(200, 500))},
         ]
+        heartbeat_services = {
+            name.strip()
+            for name in os.getenv("MONITOR_HEARTBEAT_SERVICES", "bot,publisher-worker").split(",")
+            if name.strip()
+        }
+        if "bot" in heartbeat_services:
+            targets.append({"service": "bot", "heartbeat": os.getenv("MONITOR_BOT_HEARTBEAT", str(ROOT / "out/health/bot")), "maxAge": 120})
+        if "publisher-worker" in heartbeat_services:
+            targets.append({"service": "publisher-worker", "heartbeat": os.getenv("MONITOR_PUBLISHER_HEARTBEAT", str(ROOT / "out/health/publisher-worker")), "maxAge": 120})
+        return targets
+
+    @staticmethod
+    def severity_for(status: str) -> str:
+        return {"up": "ok", "degraded": "warning", "down": "fatal"}.get(status, "fatal")
 
     def _record(self, service: str, level: str, message: str, context: dict | None = None) -> dict:
         event = {
@@ -86,22 +100,33 @@ class MonitorService:
         current = {}
         for target in self.targets:
             started = time.monotonic()
-            try:
-                with urlopen(Request(target["url"], headers={"User-Agent": "whatamicraft-monitor"}), timeout=3) as response:
-                    code = response.status
-                status = "up" if code in target["expected"] else "degraded"
-                detail = f"HTTP {code}"
-            except HTTPError as error:
-                code = error.code
-                status = "up" if code in target["expected"] else "degraded"
-                detail = f"HTTP {code}"
-            except (URLError, TimeoutError, OSError) as error:
-                code = None
-                status = "down"
-                detail = redact(str(error))
+            if target.get("heartbeat"):
+                heartbeat = Path(target["heartbeat"])
+                age = time.time() - heartbeat.stat().st_mtime if heartbeat.exists() else None
+                if age is None:
+                    status, detail, code = "down", "heartbeat missing", None
+                elif age > target["maxAge"]:
+                    status, detail, code = "down", f"heartbeat stale ({age:.0f}s)", None
+                else:
+                    status, detail, code = "up", f"heartbeat {age:.0f}s", None
+            else:
+                try:
+                    with urlopen(Request(target["url"], headers={"User-Agent": "whatamicraft-monitor"}), timeout=3) as response:
+                        code = response.status
+                    status = "up" if code in target["expected"] else "degraded"
+                    detail = f"HTTP {code}"
+                except HTTPError as error:
+                    code = error.code
+                    status = "up" if code in target["expected"] else "degraded"
+                    detail = f"HTTP {code}"
+                except (URLError, TimeoutError, OSError) as error:
+                    code = None
+                    status = "down"
+                    detail = redact(str(error))
             result = {
                 "service": target["service"],
                 "status": status,
+                "severity": self.severity_for(status),
                 "detail": detail,
                 "httpStatus": code,
                 "latencyMs": round((time.monotonic() - started) * 1000, 1),
